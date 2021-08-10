@@ -1,4 +1,4 @@
-namespace Solnet.Template.Examples
+namespace Solnet.Mango.Examples
 {
     /// <summary>
     /// Defines functionality for an example.

@@ -1,38 +1,36 @@
-# Solnet.Template
+<p align="center">
+    <img src="assets/icon.png" margin="auto" height="175"/>
+</p>
+<!--p align="center">
+    <a href="https://github.com/bmresearch/Solnet.Mango/actions/workflows/dotnet.yml">
+        <img src="https://github.com/bmresearch/Solnet.Mango/actions/workflows/dotnet.yml/badge.svg"
+            alt="Build Status (master)" ></a>
+    <a href="https://coveralls.io/github/bmresearch/Solnet.Mango?branch=master">
+        <img src="https://coveralls.io/repos/github/bmresearch/Solnet.Mango/badge.svg?branch=master" 
+            alt="Coverage Status" ></a>
+</p-->
 
-Template repository to easily bootstrap new program implementations using Solnet.
+# What is Solnet.Mango?
 
-## Instructions
+[Solnet](https://github.com/bmresearch/Solnet) is Solana's .NET integration library, a number of packages that implement features to interact with
+Solana from .Net applications.
 
-To quickly bootstrap a new project using the current "standard" project structure for program implementations using Solnet do the following:
+Solnet.Mango is a package within the same `Solnet.` namespace that implements a Client for [Mango Markets](https://mango.markets/), this project is in a
+separate repository so it is contained, as the goal for [Solnet](https://github.com/bmresearch/Solnet) was to be a core SDK.
 
-- Click the `Use this template` button in the repository page.
+## Features
 
-- Choose the desired name for the project (i.e. `Solnet.Serum`, `Solnet.Mango`, `Solnet.Pyth`).
+- TO DO
 
-- Clone the newly created repository.
+## Requirements
+- net 5.0
 
-- Change every `Solnet.Template` occurrence in the repository to the desired project name:
+## Dependencies
+- Solnet.Serum 0.1.0
+- Solnet.Wallet 0.4.0
+- Solnet.Rpc 0.4.0
 
-    - Namespaces 
-      - `Solnet.Template.Examples` already features the `IRunnableExample` and the code to get the classes which implement the interface in the assembly
-    - Directories
-    - SharedBuildProperties
-    - `build.cake`
-  
-- Add a "logo" to the `assets` directory.
+## Examples
 
-- Remove the `README.md` file and rename `PLACEHOLDER.md` to `README.md`.
-
-- As you bootstrap the project, pipelines etc, change the badges accordingly.
-
-- For generic guidelines on how you should bootstrap the project itself, in order to easily maintain the codebase of a program client implementation, see:
-  - [Solnet.Programs](https://github.com/bmresearch/Solnet/tree/master/src/Solnet.Programs)
-  - [Solnet.Serum](https://github.com/bmresearch/Solnet.Serum)
-
-- ??????
-
-- Profit.
-
-
+- TO DO
 
