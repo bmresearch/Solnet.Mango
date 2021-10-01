@@ -1,3 +1,4 @@
+using Solnet.Programs;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,23 +12,24 @@ namespace Solnet.Mango.Examples
     {
         public static void Main(string[] args)
         {
-            var examples = Assembly.GetEntryAssembly().GetExportedTypes().Where(t => t.IsAssignableTo(typeof(IRunnableExample))).ToList();
+            InstructionDecoder.Register(MangoProgram.ProgramIdKeyV3, MangoProgram.Decode);
+            List<Type> examples = Assembly.GetEntryAssembly().GetExportedTypes().Where(t => t.IsAssignableTo(typeof(IRunnableExample))).ToList();
 
             while(true)
             {
                 Console.WriteLine("Choose an example to run: ");
                 int i = 0;
-                foreach(var ex in examples)
+                foreach(Type ex in examples)
                 {
                     Console.WriteLine($"{i++}){ex.Name}");
                 }
 
-                var option = Console.ReadLine();
+                string? option = Console.ReadLine();
 
                 if(int.TryParse(option, out int res) && res <= examples.Count && res >= 0)
                 {
-                    var t = examples[res];
-                    var example = (IRunnableExample)t.GetConstructor(Type.EmptyTypes).Invoke(null);
+                    Type t = examples[res];
+                    IRunnableExample example = (IRunnableExample)t.GetConstructor(Type.EmptyTypes).Invoke(null);
 
                     example.Run();
                 }
