@@ -178,6 +178,141 @@ namespace Solnet.Mango.Models
         public PublicKey FeesVault;
 
         /// <summary>
+        /// Gets the index for the given oracle <see cref="PublicKey"/>.
+        /// </summary>
+        /// <param name="oracle"></param>
+        /// <returns></returns>
+        public int GetOracleIndex(PublicKey oracle)
+        {
+            for(int i = 0; i < (int) NumOracles; i++)
+            {
+                if (Oracles[i] == oracle) return i;
+            }
+
+            throw new Exception("This Oracle does not belong to this MangoGroup");
+        }
+
+        /// <summary>
+        /// Gets the index for the given spot market <see cref="PublicKey"/>.
+        /// </summary>
+        /// <param name="spotMarket"></param>
+        /// <returns></returns>
+        public int GetSpotMarketIndex(PublicKey spotMarket)
+        {
+            for (int i = 0; i < (int)NumOracles; i++)
+            {
+                if (SpotMarkets[i].Market == spotMarket) return i;
+            }
+
+            throw new Exception("This Market does not belong to this MangoGroup");
+        }
+
+        /// <summary>
+        /// Gets the index for the given perp market <see cref="PublicKey"/>.
+        /// </summary>
+        /// <param name="perpMarket"></param>
+        /// <returns></returns>
+        public int GetPerpMarketIndex(PublicKey perpMarket)
+        {
+            for (int i = 0; i < (int)NumOracles; i++)
+            {
+                if (PerpetualMarkets[i].Market == perpMarket) return i;
+            }
+
+            throw new Exception("This PerpMarket does not belong to this MangoGroup");
+        }
+
+        /// <summary>
+        /// Gets the index for the given token mint <see cref="PublicKey"/>.
+        /// </summary>
+        /// <param name="tokenMint"></param>
+        /// <returns></returns>
+        public int GetTokenIndex(PublicKey tokenMint)
+        {
+            for (int i = 0; i < Tokens.Count; i++)
+            {
+                if (Tokens[i].Mint == tokenMint) return i;
+            }
+
+            throw new Exception("This Token Mint does not belong to this MangoGroup");
+        }
+
+        /// <summary>
+        /// Gets the index for the given root bank <see cref="PublicKey"/>.
+        /// </summary>
+        /// <param name="rootBank"></param>
+        /// <returns></returns>
+        public int GetRootBankIndex(PublicKey rootBank)
+        {
+            for (int i = 0; i < Tokens.Count; i++)
+            {
+                if (Tokens[i].RootBank == rootBank) return i;
+            }
+
+            throw new Exception("This Root Bank does not belong to this MangoGroup");
+        }
+
+        /// <summary>
+        /// Gets the borrow rate for the given token index.
+        /// </summary>
+        /// <param name="tokenIndex"></param>
+        /// <returns></returns>
+        public int GetBorrowRate(int tokenIndex)
+        {
+            // TODO: load rootbanks
+
+            throw new Exception("This Root Bank does not belong to this MangoGroup");
+        }
+
+        /// <summary>
+        /// Gets the borrow rate for the given token index.
+        /// </summary>
+        /// <param name="tokenIndex"></param>
+        /// <returns></returns>
+        public int GetDepositRate(int tokenIndex)
+        {
+            // TODO: load rootbanks
+
+            throw new Exception("This Root Bank does not belong to this MangoGroup");
+        }
+
+        /// <summary>
+        /// Gets the price for the given token index.
+        /// </summary>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="tokenIndex">The token index.</param>
+        /// <returns>The price.</returns>
+        public double GetPrice(MangoCache mangoCache, int tokenIndex)
+        {
+            if (tokenIndex == Constants.QuoteIndex) return 1;
+
+            var decimalAdj = Math.Pow(10, Tokens[tokenIndex].Decimals - Tokens[Constants.QuoteIndex].Decimals);
+
+            return mangoCache.PriceCaches[tokenIndex].Price.Value * decimalAdj;
+        }
+
+        /// <summary>
+        /// Gets the native price for the given token index.
+        /// </summary>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="tokenIndex">The token index.</param>
+        /// <returns>The price.</returns>
+        public double GetPriceNative(MangoCache mangoCache, int tokenIndex)
+        {
+            if (tokenIndex == Constants.QuoteIndex) return 1;
+            return mangoCache.PriceCaches[tokenIndex].Price.Value;
+        }
+
+        /// <summary>
+        /// Gets the <see cref="TokenInfo"/> of the quote token.
+        /// </summary>
+        /// <returns>The token info.</returns>
+        public TokenInfo GetQuoteTokenInfo()
+        {
+            return Tokens[Constants.MaxTokens - 1];
+        }
+
+        /// <summary>
         /// Deserialize a span of bytes into a <see cref="MangoGroup"/> instance.
         /// </summary>
         /// <param name="data">The data to deserialize into the structure.</param>
@@ -189,7 +324,7 @@ namespace Solnet.Mango.Models
             ReadOnlySpan<byte> tokensBytes =
                 span.Slice(Layout.TokensOffset, TokenInfo.Layout.Length * Constants.MaxTokens);
 
-            for (int i = 0; i < Constants.MaxTokens - 1; i++)
+            for (int i = 0; i < Constants.MaxTokens; i++)
             {
                 TokenInfo tokenInfo = TokenInfo.Deserialize(tokensBytes.GetSpan(i * TokenInfo.Layout.Length,
                     TokenInfo.Layout.Length));
@@ -200,7 +335,7 @@ namespace Solnet.Mango.Models
             ReadOnlySpan<byte> spotMarketsBytes =
                 span.Slice(Layout.SpotMarketsOffset, SpotMarketInfo.Layout.Length * Constants.MaxPairs);
 
-            for (int i = 0; i < Constants.MaxPairs - 1; i++)
+            for (int i = 0; i < Constants.MaxPairs; i++)
             {
                 SpotMarketInfo spotMarketInfo = SpotMarketInfo.Deserialize(spotMarketsBytes.GetSpan(
                     i * SpotMarketInfo.Layout.Length,
@@ -212,7 +347,7 @@ namespace Solnet.Mango.Models
             ReadOnlySpan<byte> perpMarketsBytes = span.Slice(Layout.PerpMarketsOffset,
                 PerpMarketInfo.ExtraLayout.Length * Constants.MaxPairs);
 
-            for (int i = 0; i < Constants.MaxPairs - 1; i++)
+            for (int i = 0; i < Constants.MaxPairs; i++)
             {
                 PerpMarketInfo perpMarketInfo =
                     PerpMarketInfo.Deserialize(perpMarketsBytes.GetSpan(i * PerpMarketInfo.ExtraLayout.Length,
@@ -224,7 +359,7 @@ namespace Solnet.Mango.Models
             ReadOnlySpan<byte> oraclesBytes =
                 span.Slice(Layout.OraclesOffset, PublicKey.PublicKeyLength * Constants.MaxPairs);
 
-            for (int i = 0; i < Constants.MaxPairs - 1; i++)
+            for (int i = 0; i < Constants.MaxPairs; i++)
             {
                 PublicKey oracle = oraclesBytes.GetPubKey(i * PublicKey.PublicKeyLength);
                 oracles.Add(oracle);

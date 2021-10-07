@@ -58,7 +58,7 @@ namespace Solnet.Mango
             /// <summary>
             /// The offset at which to write the side value.
             /// </summary>
-            internal const int OrderTypeOffset = 32;
+            internal const int OrderTypeOffset = 29;
         }
 
         /// <summary>
@@ -117,42 +117,42 @@ namespace Solnet.Mango
             /// <summary>
             /// The offset at which to write the order side value.
             /// </summary>
-            internal const int SideOffset = 5;
+            internal const int SideOffset = 4;
 
             /// <summary>
             /// The offset at which to write the limit price value.
             /// </summary>
-            internal const int PriceOffset = 9;
+            internal const int PriceOffset = 8;
 
             /// <summary>
             /// The offset at which to write the max base quantity value.
             /// </summary>
-            internal const int MaxBaseQuantityOffset = 17;
+            internal const int MaxBaseQuantityOffset = 16;
 
             /// <summary>
             /// The offset at which to write the max quote quantity value.
             /// </summary>
-            internal const int MaxQuoteQuantity = 25;
+            internal const int MaxQuoteQuantity = 24;
 
             /// <summary>
             /// The offset at which to write the self trade behavior value.
             /// </summary>
-            internal const int SelfTradeBehaviorOffset = 33;
+            internal const int SelfTradeBehaviorOffset = 32;
 
             /// <summary>
             /// The offset at which to write the order type value.
             /// </summary>
-            internal const int OrderTypeOffset = 37;
+            internal const int OrderTypeOffset = 36;
 
             /// <summary>
             /// The offset at which to write the client id value.
             /// </summary>
-            internal const int ClientIdOffset = 41;
+            internal const int ClientIdOffset = 40;
 
             /// <summary>
             /// The offset at which to write the limit value.
             /// </summary>
-            internal const int LimitOffset = 49;
+            internal const int LimitOffset = 48;
         }
         
         /// <summary>

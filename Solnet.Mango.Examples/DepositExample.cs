@@ -8,6 +8,7 @@ using Solnet.Rpc.Messages;
 using Solnet.Rpc.Models;
 using Solnet.Serum;
 using Solnet.Wallet;
+using Solnet.Wallet.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,10 +22,10 @@ namespace Solnet.Mango.Examples
         private static readonly PublicKey MangoGroup = new PublicKey("98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue");
         private static readonly PublicKey MangoCache = new("EBDRoayCDDUvDgCimta45ajQeXbexv7aKqJubruqpyvu");
 
-        private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient(Cluster.MainNet);
+        private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient("https://solana-api.projectserum.com");
 
         private static readonly IStreamingRpcClient StreamingRpcClient =
-            Solnet.Rpc.ClientFactory.GetStreamingClient(Cluster.MainNet);
+            Solnet.Rpc.ClientFactory.GetStreamingClient("wss://solana-api.projectserum.com");
 
         private readonly Wallet.Wallet _wallet;
 
@@ -35,9 +36,9 @@ namespace Solnet.Mango.Examples
             Console.WriteLine($"Initializing {ToString()}");
             // init stuff
             SolanaKeyStoreService keyStore = new();
-
             // get the wallet
-            _wallet = keyStore.RestoreKeystoreFromFile("/home/murlux/hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh.json");
+            _wallet = keyStore.RestoreKeystoreFromFile("/path/to/keystore.json");
+
             _mangoClient = ClientFactory.GetClient(RpcClient, StreamingRpcClient);
         }
 
@@ -100,23 +101,7 @@ namespace Solnet.Mango.Examples
 
             byte[] msg = txBuilder.CompileMessage();
 
-            Console.WriteLine("Message Data: " + Convert.ToBase64String(msg));
-
-            List<DecodedInstruction> ix =
-                InstructionDecoder.DecodeInstructions(Message.Deserialize(msg));
-
-            string aggregate = ix.Aggregate(
-                "Decoded Instructions:",
-                (s, instruction) =>
-                {
-                    s += $"\n\tProgram: {instruction.ProgramName}\n\t\t\t Instruction: {instruction.InstructionName}\n";
-                    return instruction.Values.Aggregate(
-                        s,
-                        (current, entry) =>
-                            current +
-                            $"\t\t\t\t{entry.Key} - {Convert.ChangeType(entry.Value, entry.Value.GetType())}\n");
-                });
-            Console.WriteLine(aggregate);
+            ExampleHelpers.DecodeAndLogMessage(msg);
 
             byte[] txBytes = txBuilder.Build(new List<Account> { _wallet.Account, acc });
 

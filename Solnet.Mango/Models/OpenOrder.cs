@@ -4,24 +4,14 @@ using System.Numerics;
 namespace Solnet.Mango.Models
 {
     /// <summary>
-    /// 
+    /// Represents an open order in the Mango order book.
     /// </summary>
-    public class OpenOrder
+    public class OpenOrder : OrderBase
     {
         /// <summary>
-        /// The index of the order within the <see cref="OpenOrdersAccount"/> data.
+        /// The index of the order within the lists of order data in the <see cref="MangoAccount"/>.
         /// </summary>
         public int OrderIndex;
-        
-        /// <summary>
-        /// The order id.
-        /// </summary>
-        public BigInteger OrderId;
-
-        /// <summary>
-        /// The client's order id.
-        /// </summary>
-        public ulong ClientOrderId;
 
         /// <summary>
         /// The raw value for the price of the order.

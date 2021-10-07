@@ -1,11 +1,20 @@
-namespace Solnet.Mango.Models
+﻿using System.Numerics;
+
+namespace Solnet.Mango
 {
     /// <summary>
-    /// Represents a base order with shared properties between an order in the books
-    /// and an order in a user's perp account.
+    /// A base order.
     /// </summary>
-    public class OrderBase
+    public abstract class OrderBase
     {
-        
+        /// <summary>
+        /// The order id.
+        /// </summary>
+        public BigInteger OrderId;
+
+        /// <summary>
+        /// The client's order id.
+        /// </summary>
+        public ulong ClientOrderId;
     }
 }

@@ -188,7 +188,8 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(signer, false),
                 AccountMeta.ReadOnly(TokenProgram.ProgramIdKey, false)
             };
-            keys.AddRange(openOrdersAccounts.Select(key => AccountMeta.ReadOnly(key, false)));
+            if(openOrdersAccounts != null )
+                keys.AddRange(openOrdersAccounts.Select(key => AccountMeta.ReadOnly(key, false)));
 
             return new TransactionInstruction
             {
@@ -910,31 +911,25 @@ namespace Solnet.Mango
                     MangoProgramData.DecodeWithdrawData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.PlaceSpotOrder:
-                    MangoProgramData.DecodePlaceSpotOrderData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodePlaceSpotOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.PlacePerpOrder:
-                    MangoProgramData.DecodePlacePerpOrderData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodePlacePerpOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CancelPerpOrderByClientId:
-                    MangoProgramData.DecodeCancelPerpOrderByClientIdData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeCancelPerpOrderByClientIdData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CancelPerpOrder:
-                    MangoProgramData.DecodeCancelPerpOrderData(decodedInstruction, keys, keyIndices);
-                    break;
-                case MangoProgramInstructions.Values.ConsumeEvents:
-                    MangoProgramData.DecodeConsumeEventsData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeCancelPerpOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.SettleFunds:
                     MangoProgramData.DecodeSettleFundsData(decodedInstruction, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CancelSpotOrder:
-                    MangoProgramData.DecodeCancelSpotOrderData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeCancelSpotOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.SettleProfitAndLoss:
-                    MangoProgramData.DecodeSettleProfitAndLossData(decodedInstruction, keys, keyIndices);
-                    break;
-                case MangoProgramInstructions.Values.SettleFees:
-                    MangoProgramData.DecodeSettleFeesData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeSettleProfitAndLossData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.InitSpotOpenOrders:
                     MangoProgramData.DecodeInitSpotOpenOrdersData(decodedInstruction, keys, keyIndices);
@@ -945,14 +940,8 @@ namespace Solnet.Mango
                 case MangoProgramInstructions.Values.AddMangoAccountInfo:
                     MangoProgramData.DecodeAddMangoAccountInfoData(decodedInstruction, data, keys, keyIndices);
                     break;
-                case MangoProgramInstructions.Values.DepositMegaSerum:
-                    MangoProgramData.DecodeDepositMegaSerumData(decodedInstruction, keys, keyIndices);
-                    break;
-                case MangoProgramInstructions.Values.WithdrawMegaSerum:
-                    MangoProgramData.DecodeWithdrawMegaSerumData(decodedInstruction, keys, keyIndices);
-                    break;
                 case MangoProgramInstructions.Values.CancelAllPerpOrders:
-                    MangoProgramData.DecodeCancelAllPerpOrdersData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeCancelAllPerpOrdersData(decodedInstruction, data, keys, keyIndices);
                     break;
             }
 

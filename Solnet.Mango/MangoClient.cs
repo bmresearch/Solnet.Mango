@@ -165,7 +165,7 @@ namespace Solnet.Mango
                 new MemCmp { Offset = PerpMarket.Layout.MangoGroupOffset, Bytes = mangoGroup }
             };
 
-            return await GetProgramAccounts<PerpMarket>(MangoProgram.ProgramIdKeyV3, filters, MangoAccount.Layout.Length,
+            return await GetProgramAccounts<PerpMarket>(MangoProgram.ProgramIdKeyV3, filters, PerpMarket.Layout.Length,
                 commitment);
         }
 
