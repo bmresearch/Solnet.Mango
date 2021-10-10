@@ -12,7 +12,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
         <PackageDescription>Solnet.Mango is a .Net integration library for Mango Markets.</PackageDescription>
-        <PackageTags>solana;solnet;sol;net5</PackageTags>
+        <PackageTags>solana;solnet;sol;srm;mango;net5</PackageTags>
         <PackageReleaseNotes>https://github.com/bmresearch/Solnet.Mango/releases</PackageReleaseNotes>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>

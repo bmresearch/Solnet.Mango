@@ -23,12 +23,12 @@ namespace Solnet.Mango
         /// <summary>
         /// The RPC client.
         /// </summary>
-        protected IRpcClient RpcClient { get; init; }
+        public IRpcClient RpcClient { get; init; }
 
         /// <summary>
         /// The streaming RPC client.
         /// </summary>
-        protected IStreamingRpcClient StreamingRpcClient { get; init; }
+        public IStreamingRpcClient StreamingRpcClient { get; init; }
 
         /// <summary>
         /// Initialize the base client with the given RPC clients.
@@ -82,7 +82,7 @@ namespace Solnet.Mango
 
             return new ProgramAccountsResultWrapper<List<T>>(res, resultingAccounts);
         }
-        
+
         /// <summary>
         /// Gets the account info for the given account address and attempts to deserialize the account data into the specified type.
         /// </summary>
@@ -95,14 +95,14 @@ namespace Solnet.Mango
         {
             RequestResult<ResponseValue<List<AccountInfo>>> res =
                 await RpcClient.GetMultipleAccountsAsync(accountAddresses, commitment);
-            
+
             if (!res.WasSuccessful || !(res.Result?.Value?.Count > 0))
                 return new MultipleAccountsResultWrapper<List<T>>(res);
 
             List<T> resultingAccounts = new(res.Result.Value.Count);
             resultingAccounts.AddRange(res.Result.Value.Select(result =>
                 DeserializeAccount<T>(Convert.FromBase64String(result.Data[0]))));
-            
+
             return new MultipleAccountsResultWrapper<List<T>>(res, resultingAccounts);
         }
 

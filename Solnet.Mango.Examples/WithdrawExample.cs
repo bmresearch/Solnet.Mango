@@ -18,9 +18,7 @@ namespace Solnet.Mango.Examples
 {
     public class WithdrawExample : IRunnableExample
     {
-        private static readonly PublicKey Owner = new PublicKey("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
-        private static readonly PublicKey MangoGroup = new PublicKey("98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue");
-        private static readonly PublicKey MangoCache = new("EBDRoayCDDUvDgCimta45ajQeXbexv7aKqJubruqpyvu");
+        private static readonly PublicKey Owner = new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
 
         private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient("https://solana-api.projectserum.com");
 
@@ -50,7 +48,7 @@ namespace Solnet.Mango.Examples
 
             await Task.Delay(200);
 
-            AccountResultWrapper<MangoGroup> mangoGroup = await _mangoClient.GetMangoGroupAsync(MangoGroup);
+            AccountResultWrapper<MangoGroup> mangoGroup = await _mangoClient.GetMangoGroupAsync(Constants.MangoGroup);
             Console.WriteLine($"Type: {mangoGroup.ParsedResult.Metadata.DataType}");
 
             await Task.Delay(200);
@@ -88,10 +86,10 @@ namespace Solnet.Mango.Examples
                     TokenProgram.ProgramIdKey))
                 .AddInstruction(TokenProgram.InitializeAccount(acc, MarketUtils.WrappedSolMint, Owner))
                 .AddInstruction(MangoProgram.Withdraw(
-                    MangoGroup,
+                    Constants.MangoGroup,
                     new PublicKey(mangoAccounts.OriginalRequest.Result[1].PublicKey),
                     Owner,
-                    MangoCache,
+                    Constants.MangoCache,
                     wrappedSolTokenInfo.RootBank,
                     nodeBankKey,
                     nodeBank.ParsedResult.Vault,

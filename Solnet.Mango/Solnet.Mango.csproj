@@ -5,9 +5,7 @@
             Solnet.Mango implements functionality to integrate Mango Markets into .Net applications.
         </Description>
         <TargetFramework>net5.0</TargetFramework>
-
-        <IsPackable>false</IsPackable>
-
+        <IsPackable>true</IsPackable>
         <RootNamespace>Solnet.Mango</RootNamespace>
     </PropertyGroup>
 
@@ -24,7 +22,7 @@
         <PackageReference Include="Solnet.Programs" Version="0.4.11" />
         <PackageReference Include="Solnet.Rpc" Version="0.4.11" />
         <PackageReference Include="Solnet.Wallet" Version="0.4.11" />
-        <PackageReference Include="Solnet.Serum" Version="1.0.4" />
+        <PackageReference Include="Solnet.Serum" Version="1.0.5" />
     </ItemGroup>
 
     <Import Project="..\SharedBuildProperties.props" />

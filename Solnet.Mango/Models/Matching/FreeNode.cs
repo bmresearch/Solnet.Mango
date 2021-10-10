@@ -2,7 +2,7 @@ using Solnet.Programs.Utilities;
 using Solnet.Serum.Models;
 using System;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Matching
 {
     /// <summary>
     /// Represents a free node in the Mango Perpetual Market order book side.
@@ -30,7 +30,7 @@ namespace Solnet.Mango.Models
         /// The next node.
         /// </summary>
         public uint Next;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="FreeNode"/> instance.
         /// </summary>

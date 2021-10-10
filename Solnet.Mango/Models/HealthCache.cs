@@ -20,18 +20,18 @@ namespace Solnet.Mango.Models
             /// The length of the <see cref="UserActiveAssets"/> structure.
             /// </summary>
             internal const int Length = 30;
-            
+
             /// <summary>
             /// 
             /// </summary>
             internal const int SpotOffset = 0;
-            
+
             /// <summary>
             /// 
             /// </summary>
             internal const int PerpetualsOffset = 15;
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -58,15 +58,15 @@ namespace Solnet.Mango.Models
             {
                 spot.Add(spotBytes.GetU8(i) == 1);
             }
-            
+
             List<bool> perpetuals = new(Constants.MaxPairs);
             ReadOnlySpan<byte> perpetualsBytes = data.Slice(Layout.PerpetualsOffset, Constants.MaxPairs);
-            
+
             for (int i = 0; i < Constants.MaxPairs - 1; i++)
             {
                 perpetuals.Add(perpetualsBytes.GetU8(i) == 1);
             }
-            
+
             return new UserActiveAssets
             {
                 Spot = spot,
@@ -74,7 +74,7 @@ namespace Solnet.Mango.Models
             };
         }
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -110,7 +110,7 @@ namespace Solnet.Mango.Models
         /// 
         /// </summary>
         public List<Tuple<I80F48, I80F48>> Spot;
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -120,12 +120,12 @@ namespace Solnet.Mango.Models
         /// 
         /// </summary>
         public I80F48 Quote;
-        
+
         /// <summary>
         /// 
         /// </summary>
         public List<I80F48> Health;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="HealthCache"/> instance.
         /// </summary>
@@ -133,7 +133,7 @@ namespace Solnet.Mango.Models
         /// <returns>The <see cref="HealthCache"/> structure.</returns>
         public static HealthCache Deserialize(ReadOnlySpan<byte> data)
         {
-            List<Tuple<I80F48, I80F48>> spot = new ();
+            List<Tuple<I80F48, I80F48>> spot = new();
             uint spotSize = data.GetU32(Layout.SpotOffset);
             data = data[..sizeof(uint)];
             ReadOnlySpan<byte> spotBytes = data[..(I80F48.Length * 2 * (int)spotSize)];
@@ -146,11 +146,11 @@ namespace Solnet.Mango.Models
             }
 
             data = data[spotBytes.Length..];
-            List<Tuple<I80F48, I80F48>> perp = new ();
+            List<Tuple<I80F48, I80F48>> perp = new();
             uint perpSize = data.GetU32(0);
             data = data[..sizeof(uint)];
             ReadOnlySpan<byte> perpBytes = data[(I80F48.Length * 2 * (int)perpSize)..];
-            
+
             for (int i = 0; i < perpSize; i++)
             {
                 ReadOnlySpan<byte> bytes = perpBytes.Slice(i * I80F48.Length * 2, I80F48.Length * 2);
@@ -166,7 +166,7 @@ namespace Solnet.Mango.Models
             {
                 health.Add(I80F48.Deserialize(data.Slice(i * I80F48.Length, I80F48.Length)));
             }
-            
+
             return new HealthCache
             {
                 ActiveAssets = UserActiveAssets.Deserialize(data.Slice(Layout.UserActiveAssetsOffset, UserActiveAssets.Layout.Length)),

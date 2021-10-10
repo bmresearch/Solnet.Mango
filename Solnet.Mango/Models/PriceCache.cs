@@ -18,7 +18,7 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int Length = 24;
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -39,7 +39,7 @@ namespace Solnet.Mango.Models
         /// 
         /// </summary>
         public ulong LastUpdated;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="PriceCache"/> instance.
         /// </summary>
@@ -48,7 +48,7 @@ namespace Solnet.Mango.Models
         public static PriceCache Deserialize(ReadOnlySpan<byte> data)
         {
             if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
-            
+
             return new PriceCache
             {
                 Price = I80F48.Deserialize(data.GetSpan(Layout.PriceOffset, I80F48.Length)),

@@ -6,14 +6,11 @@ using System.Linq;
 
 namespace Solnet.Mango.Examples
 {
-
     public class TransactionAnalysis : IRunnableExample
     {
-
         private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient(Cluster.MainNet);
-        private static readonly IStreamingRpcClient StreamingRpcClient = Solnet.Rpc.ClientFactory.GetStreamingClient(Cluster.MainNet);
 
-        public TransactionAnalysis(){}
+        public TransactionAnalysis() { }
 
         public void Run()
         {
@@ -34,7 +31,7 @@ namespace Solnet.Mango.Examples
                 }
 
                 List<DecodedInstruction> ix =
-                InstructionDecoder.DecodeInstructions(tx.Result);
+                    InstructionDecoder.DecodeInstructions(tx.Result);
 
                 string aggregate = ix.Aggregate(
                     "Decoded Instructions:",

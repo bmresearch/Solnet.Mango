@@ -9,7 +9,7 @@ namespace Solnet.Mango.Models
         /// A collateralized token.
         /// </summary>
         Token = 0,
-        
+
         /// <summary>
         /// A perpetual position.
         /// </summary>

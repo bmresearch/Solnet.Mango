@@ -24,7 +24,7 @@ namespace Solnet.Mango.Models
         /// <remarks>This value needs to be converted according to decimals and lot sizes.</remarks>
         /// </summary>
         public long RawQuantity;
-        
+
         /// <summary>
         /// The owner of this order.
         /// </summary>

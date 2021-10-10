@@ -2,7 +2,7 @@ using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using System;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Perpetuals
 {
     /// <summary>
     /// Represents a perp account for a <see cref="MangoAccount"/>,
@@ -120,7 +120,6 @@ namespace Solnet.Mango.Models
         public double GetProfitAndLoss(PerpMarketInfo perpMarketInfo, PerpMarketCache perpMarketCache, double price)
         {
             return BasePosition * perpMarketInfo.BaseLotSize * price + GetQuotePosition(perpMarketCache);
-
         }
 
         /// <summary>
@@ -192,11 +191,11 @@ namespace Solnet.Mango.Models
 
             double x = 0;
 
-            if(BasePosition > 0)
+            if (BasePosition > 0)
             {
                 x = health - ((longFunding - LongSettledFunding.Value) * BasePosition);
             }
-            else if(BasePosition < 0)
+            else if (BasePosition < 0)
             {
                 x = health + ((shortFunding - ShortSettledFunding.Value) * BasePosition);
             }

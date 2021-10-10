@@ -1,3 +1,4 @@
+using Solnet.Mango.Models.Matching;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -13,12 +14,12 @@ namespace Solnet.Mango.Models
         /// 
         /// </summary>
         public OrderBookSide Bids;
-        
+
         /// <summary>
         /// 
         /// </summary>
         public OrderBookSide Asks;
-        
+
         /// <summary>
         /// Gets the orders in the bid side of the order book.
         /// </summary>
@@ -27,18 +28,18 @@ namespace Solnet.Mango.Models
         {
             if (Bids == null) return new List<OpenOrder>();
             return (from node in Bids.Nodes
-                where node is LeafNode
-                select (LeafNode)node
+                    where node is LeafNode
+                    select (LeafNode)node
                 into leafNode
-                select new OpenOrder
-                {
-                    RawPrice = leafNode.Price, 
-                    RawQuantity = leafNode.Quantity, 
-                    ClientOrderId = leafNode.ClientOrderId, 
-                    Owner = leafNode.Owner,
-                    OrderIndex = leafNode.OwnerSlot,
-                    OrderId = new BigInteger(leafNode.Key)
-                }).ToList();
+                    select new OpenOrder
+                    {
+                        RawPrice = leafNode.Price,
+                        RawQuantity = leafNode.Quantity,
+                        ClientOrderId = leafNode.ClientOrderId,
+                        Owner = leafNode.Owner,
+                        OrderIndex = leafNode.OwnerSlot,
+                        OrderId = new BigInteger(leafNode.Key)
+                    }).ToList();
         }
 
         /// <summary>
@@ -49,18 +50,18 @@ namespace Solnet.Mango.Models
         {
             if (Asks == null) return new List<OpenOrder>();
             return (from node in Asks.Nodes
-                where node is LeafNode
-                select (LeafNode)node
+                    where node is LeafNode
+                    select (LeafNode)node
                 into leafNode
-                select new OpenOrder
-                {
-                    RawPrice = leafNode.Price, 
-                    RawQuantity = leafNode.Quantity, 
-                    ClientOrderId = leafNode.ClientOrderId, 
-                    Owner = leafNode.Owner,
-                    OrderIndex = leafNode.OwnerSlot,
-                    OrderId = new BigInteger(leafNode.Key)
-                }).ToList();
+                    select new OpenOrder
+                    {
+                        RawPrice = leafNode.Price,
+                        RawQuantity = leafNode.Quantity,
+                        ClientOrderId = leafNode.ClientOrderId,
+                        Owner = leafNode.Owner,
+                        OrderIndex = leafNode.OwnerSlot,
+                        OrderId = new BigInteger(leafNode.Key)
+                    }).ToList();
         }
     }
 }

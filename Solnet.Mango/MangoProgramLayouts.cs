@@ -54,7 +54,7 @@ namespace Solnet.Mango
             /// The offset at which to write the side value.
             /// </summary>
             internal const int SideOffset = 28;
-            
+
             /// <summary>
             /// The offset at which to write the side value.
             /// </summary>
@@ -70,13 +70,13 @@ namespace Solnet.Mango
             /// The offset at which to write the client order id value.
             /// </summary>
             internal const int ClientOrderIdOffset = 4;
-            
+
             /// <summary>
             /// The offset at which to write the invalid id ok? value.
             /// </summary>
             internal const int InvalidIdOkOffset = 12;
         }
-        
+
         /// <summary>
         /// Represents the layout of the <see cref="MangoProgramInstructions.Values.CancelPerpOrder"/> method encoded data structure.
         /// </summary>
@@ -86,7 +86,7 @@ namespace Solnet.Mango
             /// The offset at which to write the client order id value.
             /// </summary>
             internal const int OrderIdOffset = 4;
-            
+
             /// <summary>
             /// The offset at which to write the invalid id ok? value.
             /// </summary>
@@ -108,7 +108,7 @@ namespace Solnet.Mango
             /// </summary>
             internal const int QuantityOffset = 12;
         }
-        
+
         /// <summary>
         /// Represents the layout of the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method encoded data structure.
         /// </summary>
@@ -154,7 +154,7 @@ namespace Solnet.Mango
             /// </summary>
             internal const int LimitOffset = 48;
         }
-        
+
         /// <summary>
         /// Represents the layout of the <see cref="MangoProgramInstructions.Values.CancelSpotOrder"/> method encoded data structure.
         /// </summary>

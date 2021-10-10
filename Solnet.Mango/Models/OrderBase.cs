@@ -1,6 +1,6 @@
 ﻿using System.Numerics;
 
-namespace Solnet.Mango
+namespace Solnet.Mango.Models
 {
     /// <summary>
     /// A base order.

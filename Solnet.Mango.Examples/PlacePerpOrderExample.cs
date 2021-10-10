@@ -15,16 +15,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Constants = Solnet.Mango.Models.Constants;
 
 namespace Solnet.Mango.Examples
 {
     public class PlacePerpOrderExample : IRunnableExample
     {
-        private static readonly PublicKey Owner = new PublicKey("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
-        private static readonly PublicKey MangoGroup = new PublicKey("98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue");
-        private static readonly PublicKey MangoCache = new("EBDRoayCDDUvDgCimta45ajQeXbexv7aKqJubruqpyvu");
+        private static readonly PublicKey Owner = new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
 
-        private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient("https://solana-api.projectserum.com");
+        private static readonly IRpcClient RpcClient =
+            Solnet.Rpc.ClientFactory.GetClient("https://solana-api.projectserum.com");
 
         private static readonly IStreamingRpcClient StreamingRpcClient =
             Solnet.Rpc.ClientFactory.GetStreamingClient("wss://solana-api.projectserum.com");
@@ -67,13 +67,15 @@ namespace Solnet.Mango.Examples
 
             var _priceAccount = await _pythClient.GetPriceDataAccountsAsync(productAccounts.ParsedResult);
 
-            Models.ProgramAccountsResultWrapper<List<MangoAccount>> mangoAccounts = await _mangoClient.GetMangoAccountsAsync(Owner);
+            Models.ProgramAccountsResultWrapper<List<MangoAccount>> mangoAccounts =
+                await _mangoClient.GetMangoAccountsAsync(Owner);
             Console.WriteLine($"Type: {mangoAccounts.ParsedResult[0].Metadata.DataType}");
             Console.WriteLine($"PublicKey: {mangoAccounts.OriginalRequest.Result[0].PublicKey}");
 
             await Task.Delay(200);
 
-            Models.AccountResultWrapper<MangoGroup> mangoGroup = await _mangoClient.GetMangoGroupAsync(MangoGroup);
+            Models.AccountResultWrapper<MangoGroup> mangoGroup =
+                await _mangoClient.GetMangoGroupAsync(Constants.MangoGroup);
             Console.WriteLine($"Type: {mangoGroup.ParsedResult.Metadata.DataType}");
 
             var _oracle = mangoGroup.ParsedResult.Oracles.First(x => x.Key == _productAccount.PriceAccount.Key);
@@ -81,31 +83,32 @@ namespace Solnet.Mango.Examples
 
             await Task.Delay(200);
 
-            var perpMarket = _mangoClient.GetPerpMarket(mangoGroup.ParsedResult.PerpetualMarkets[_perpetualMarketIndex].Market);
+            var perpMarket =
+                _mangoClient.GetPerpMarket(mangoGroup.ParsedResult.PerpetualMarkets[_perpetualMarketIndex].Market);
 
             await Task.Delay(200);
 
             RequestResult<ResponseValue<BlockHash>> blockhash = await RpcClient.GetRecentBlockHashAsync();
 
             var baseTokenInfo = mangoGroup.ParsedResult.Tokens[_perpetualMarketIndex];
-            var qTokenInfo = mangoGroup.ParsedResult.Tokens[Models.Constants.MaxTokens -1];
+            var qTokenInfo = mangoGroup.ParsedResult.Tokens[Models.Constants.MaxTokens - 1];
             var baseUnit = Math.Pow(10, baseTokenInfo.Decimals);
             var quoteUnit = Math.Pow(10, qTokenInfo.Decimals);
 
-            var nativePrice = (long) ((171f * quoteUnit) * perpMarket.ParsedResult.BaseLotSize) / (long)
+            var nativePrice = (long)((171f * quoteUnit) * perpMarket.ParsedResult.BaseLotSize) / (long)
                 (perpMarket.ParsedResult.QuoteLotSize * baseUnit);
 
-            var nativeQuantity = (long) ( 0.1f * baseUnit / perpMarket.ParsedResult.BaseLotSize);
+            var nativeQuantity = (long)(0.1f * baseUnit / perpMarket.ParsedResult.BaseLotSize);
 
 
             TransactionBuilder txBuilder = new TransactionBuilder()
                 .SetFeePayer(Owner)
                 .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
                 .AddInstruction(MangoProgram.PlacePerpOrder(
-                    MangoGroup,
+                    Constants.MangoGroup,
                     new(mangoAccounts.OriginalRequest.Result[1].PublicKey),
                     Owner,
-                    MangoCache,
+                    Constants.MangoCache,
                     mangoGroup.ParsedResult.PerpetualMarkets[_perpetualMarketIndex].Market,
                     perpMarket.ParsedResult.Bids,
                     perpMarket.ParsedResult.Asks,
@@ -116,7 +119,7 @@ namespace Solnet.Mango.Examples
                     nativePrice,
                     nativeQuantity,
                     1_000_002ul
-                    ));
+                ));
 
             byte[] msg = txBuilder.CompileMessage();
 
@@ -124,7 +127,8 @@ namespace Solnet.Mango.Examples
 
             byte[] txBytes = txBuilder.Build(new List<Wallet.Account>() { _wallet.Account });
 
-            RequestResult<string> res = await RpcClient.SendTransactionAsync(txBytes, commitment: Rpc.Types.Commitment.Confirmed);
+            RequestResult<string> res =
+                await RpcClient.SendTransactionAsync(txBytes, commitment: Rpc.Types.Commitment.Confirmed);
 
             Console.WriteLine(res.Result);
 
@@ -136,15 +140,15 @@ namespace Solnet.Mango.Examples
                 .SetFeePayer(Owner)
                 .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
                 .AddInstruction(MangoProgram.CancelPerpOrderByClientId(
-                        MangoGroup,
-                        new(mangoAccounts.OriginalRequest.Result[1].PublicKey),
-                        Owner,
-                        mangoGroup.ParsedResult.PerpetualMarkets[_perpetualMarketIndex].Market,
-                        perpMarket.ParsedResult.Bids,
-                        perpMarket.ParsedResult.Asks,
-                        1_000_002ul,
-                        false
-                        ));
+                    Constants.MangoGroup,
+                    new(mangoAccounts.OriginalRequest.Result[1].PublicKey),
+                    Owner,
+                    mangoGroup.ParsedResult.PerpetualMarkets[_perpetualMarketIndex].Market,
+                    perpMarket.ParsedResult.Bids,
+                    perpMarket.ParsedResult.Asks,
+                    1_000_002ul,
+                    false
+                ));
 
             msg = txBuilder.CompileMessage();
 
@@ -152,7 +156,8 @@ namespace Solnet.Mango.Examples
 
             txBytes = txBuilder.Build(new List<Wallet.Account>() { _wallet.Account });
 
-            res = await RpcClient.SendTransactionAsync(txBytes, skipPreflight: true, commitment: Rpc.Types.Commitment.Confirmed);
+            res = await RpcClient.SendTransactionAsync(txBytes, skipPreflight: true,
+                commitment: Rpc.Types.Commitment.Confirmed);
 
             Console.WriteLine(res.Result);
 

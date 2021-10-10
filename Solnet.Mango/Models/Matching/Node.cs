@@ -2,7 +2,7 @@ using Solnet.Programs.Utilities;
 using Solnet.Serum.Models;
 using System;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Matching
 {
     /// <summary>
     /// Represents a node in the Mango Perpetual Market order book side.
@@ -21,7 +21,7 @@ namespace Solnet.Mango.Models
             /// The length of a node.
             /// </summary>
             internal const int Length = 88;
-            
+
             /// <summary>
             /// The offset at which the tag value begins.
             /// </summary>
@@ -34,7 +34,7 @@ namespace Solnet.Mango.Models
             /// </remarks>
             /// </summary>
             internal const int BlobOffset = 4;
-            
+
             /// <summary>
             /// The size of the data for the slab node's blob.
             /// </summary>
@@ -45,17 +45,17 @@ namespace Solnet.Mango.Models
             /// </summary>
             internal const int KeyLength = 16;
         }
-        
+
         /// <summary>
         /// The node type.
         /// </summary>
         public NodeType Tag;
-        
+
         /// <summary>
         /// The key of the node.
         /// </summary>
         public byte[] Key;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="Node"/> instance.
         /// </summary>
@@ -64,7 +64,7 @@ namespace Solnet.Mango.Models
         public static Node Deserialize(ReadOnlySpan<byte> data)
         {
             if (data.Length != Layout.Length) throw new Exception("data length is invalid");
-            
+
             uint tag = data.GetU32(Layout.TagOffset);
             if (tag is (byte)NodeType.Uninitialized or (byte)NodeType.LastFreeNode or (byte)NodeType.FreeNode)
                 return null;

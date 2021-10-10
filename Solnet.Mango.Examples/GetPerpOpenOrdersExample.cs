@@ -1,4 +1,5 @@
 ﻿using Solnet.Mango.Models;
+using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs;
 using Solnet.Rpc;
 using Solnet.Wallet;
@@ -13,8 +14,6 @@ namespace Solnet.Mango.Examples
     public class GetPerpOpenOrdersExample : IRunnableExample
     {
         private static readonly PublicKey Owner = new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
-        private static readonly PublicKey MangoGroup = new("98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue");
-        private static readonly PublicKey MangoCache = new("EBDRoayCDDUvDgCimta45ajQeXbexv7aKqJubruqpyvu");
         private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient("https://solana-api.projectserum.com");
 
         private static readonly IStreamingRpcClient StreamingRpcClient =
@@ -29,7 +28,7 @@ namespace Solnet.Mango.Examples
 
         public void Run()
         {
-            AccountResultWrapper<MangoGroup> mangoGroup = _mangoClient.GetMangoGroup(MangoGroup);
+            AccountResultWrapper<MangoGroup> mangoGroup = _mangoClient.GetMangoGroup(Constants.MangoGroup);
             List<OrderBook> orderBooks = new();
             foreach (PerpMarketInfo t in mangoGroup.ParsedResult.PerpetualMarkets)
             {
@@ -51,7 +50,7 @@ namespace Solnet.Mango.Examples
                 var orders = mangoAccounts.ParsedResult[i].GetOrders();
                 Console.WriteLine($"Open Orders: {orders.Count}");
 
-                foreach(var order in orders)
+                foreach (var order in orders)
                 {
                     var orderBook = orderBooks[order.MarketIndex];
                     var bids = orderBook.Bids.GetOrders();

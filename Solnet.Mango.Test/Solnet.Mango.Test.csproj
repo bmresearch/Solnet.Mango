@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-
         <IsPackable>false</IsPackable>
     </PropertyGroup>
 
@@ -18,7 +17,7 @@
         </PackageReference>
         <PackageReference Include="Solnet.Rpc" Version="0.4.11" />
         <PackageReference Include="Solnet.Wallet" Version="0.4.11" />
-        <PackageReference Include="Solnet.Serum" Version="1.0.4" />
+        <PackageReference Include="Solnet.Serum" Version="1.0.5" />
     </ItemGroup>
 
     <ItemGroup>

@@ -5,7 +5,7 @@ using Solnet.Wallet;
 using System;
 using System.Numerics;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Events
 {
     /// <summary>
     /// Represents a <see cref="EventType.Fill"/> in the Mango <see cref="EventQueue"/>.
@@ -46,7 +46,7 @@ namespace Solnet.Mango.Models
             /// The offset at which the maker client order id value begins.
             /// </summary>
             internal const int MakerClientOrderIdOffset = 72;
-            
+
             /// <summary>
             /// The offset at which the maker fee value begins.
             /// </summary>
@@ -61,7 +61,7 @@ namespace Solnet.Mango.Models
             /// The offset at which the maker timestamp value begins.
             /// </summary>
             internal const int MakerTimestampOffset = 104;
-            
+
             /// <summary>
             /// The offset at which the taker public key value begins.
             /// </summary>
@@ -137,7 +137,7 @@ namespace Solnet.Mango.Models
         /// Timestamp of when the maker order was placed.
         /// </summary>
         public ulong MakerTimestamp;
-        
+
         /// <summary>
         /// The taker's public key.
         /// </summary>
@@ -167,7 +167,7 @@ namespace Solnet.Mango.Models
         /// The quantity that was filled.
         /// </summary>
         public long Quantity;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="FillEvent"/> instance.
         /// </summary>
@@ -177,8 +177,8 @@ namespace Solnet.Mango.Models
         {
             return new FillEvent
             {
-                EventType = (EventType) Enum.Parse(typeof(EventType), data.GetU8(Layout.EventTypeOffset).ToString()),
-                TakerSide = (Side) Enum.Parse(typeof(Side), data.GetU8(ExtraLayout.TakerSideOffset).ToString()),
+                EventType = (EventType)Enum.Parse(typeof(EventType), data.GetU8(Layout.EventTypeOffset).ToString()),
+                TakerSide = (Side)Enum.Parse(typeof(Side), data.GetU8(ExtraLayout.TakerSideOffset).ToString()),
                 MakerSlot = data.GetU8(ExtraLayout.MakerSlotOffset),
                 MakerOut = data.GetU8(ExtraLayout.MakerOutOffset) == 1,
                 Timestamp = data.GetU64(Layout.TimestampOffset),

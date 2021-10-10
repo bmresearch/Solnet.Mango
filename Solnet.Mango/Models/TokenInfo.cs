@@ -18,7 +18,7 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int Length = 72;
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -34,7 +34,7 @@ namespace Solnet.Mango.Models
             /// </summary>
             internal const int DecimalsOffset = 64;
         }
-        
+
         /// <summary>
         /// The token's mint.
         /// </summary>
@@ -56,9 +56,9 @@ namespace Solnet.Mango.Models
         /// <param name="data"></param>
         /// <returns></returns>
         public static TokenInfo Deserialize(ReadOnlySpan<byte> data)
-        { 
-            if(data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
-            
+        {
+            if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
+
             return new TokenInfo
             {
                 Mint = data.GetPubKey(Layout.MintOffset),

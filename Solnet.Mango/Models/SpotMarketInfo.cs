@@ -19,12 +19,12 @@ namespace Solnet.Mango.Models
             /// The length of the <see cref="SpotMarketInfo"/> structure.
             /// </summary>
             internal const int Length = 112;
-            
+
             /// <summary>
             /// The offset at which the market public key starts.
             /// </summary>
             internal const int MarketOffset = 0;
-            
+
             /// <summary>
             /// The offset at which the asset's maintenance weight starts.
             /// </summary>
@@ -44,13 +44,13 @@ namespace Solnet.Mango.Models
             /// The offset at which the initialization liability weight value starts.
             /// </summary>
             internal const int InitializationLiabilityWeightOffset = 80;
-    
+
             /// <summary>
             /// The offset at which the liquidation fee value starts.
             /// </summary>
             internal const int LiquidationFeeOffset = 96;
         }
-        
+
         /// <summary>
         /// The public key of the market.
         /// </summary>
@@ -60,22 +60,22 @@ namespace Solnet.Mango.Models
         /// The asset maintenance weight.
         /// </summary>
         public I80F48 MaintenanceAssetWeight;
-        
+
         /// <summary>
         /// The asset initialization weight.
         /// </summary>
         public I80F48 InitializationAssetWeight;
-        
+
         /// <summary>
         /// The maintenance liability weight.
         /// </summary>
         public I80F48 MaintenanceLiabilityWeight;
-        
+
         /// <summary>
         /// The initialization liability weight.
         /// </summary>
         public I80F48 InitializationLiabilityWeight;
-        
+
         /// <summary>
         /// The liquidation fee.
         /// </summary>
@@ -89,7 +89,7 @@ namespace Solnet.Mango.Models
         public static SpotMarketInfo Deserialize(ReadOnlySpan<byte> data)
         {
             if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
-            
+
             return new SpotMarketInfo
             {
                 Market = data.GetPubKey(Layout.MarketOffset),

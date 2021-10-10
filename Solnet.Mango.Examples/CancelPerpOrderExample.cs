@@ -1,4 +1,6 @@
-﻿using Solnet.Mango.Models;
+﻿using Solnet.KeyStore;
+using Solnet.Mango.Models;
+using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs;
 using Solnet.Rpc;
 using Solnet.Rpc.Builders;
@@ -6,20 +8,15 @@ using Solnet.Rpc.Core.Http;
 using Solnet.Rpc.Messages;
 using Solnet.Rpc.Models;
 using Solnet.Wallet;
-using Solnet.Wallet.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Solnet.Mango.Examples
 {
     public class CancelPerpOrderExample : IRunnableExample
     {
         private static readonly PublicKey Owner = new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
-        private static readonly PublicKey MangoGroup = new("98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue");
-        private static readonly PublicKey MangoCache = new("EBDRoayCDDUvDgCimta45ajQeXbexv7aKqJubruqpyvu");
         private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient("https://solana-api.projectserum.com");
 
         private static readonly IStreamingRpcClient StreamingRpcClient =
@@ -42,7 +39,7 @@ namespace Solnet.Mango.Examples
 
         public async void Run()
         {
-            AccountResultWrapper<MangoGroup> mangoGroup = await _mangoClient.GetMangoGroupAsync(MangoGroup);
+            AccountResultWrapper<MangoGroup> mangoGroup = await _mangoClient.GetMangoGroupAsync(Constants.MangoGroup);
             List<PerpMarket> perpMarkets = new();
 
             List<OrderBook> orderBooks = new();
@@ -84,7 +81,7 @@ namespace Solnet.Mango.Examples
                     Console.WriteLine($"Order {order.OrderId} - {order.Side} - Size: {orderBookOrder.RawQuantity} - Price: {orderBookOrder.RawQuantity} - Market: {order.MarketIndex} - Client Id: {order.ClientOrderId}");
 
                     txBuilder.AddInstruction(MangoProgram.CancelPerpOrder(
-                        MangoGroup, 
+                        Constants.MangoGroup,
                         new(mangoAccounts.OriginalRequest.Result[i].PublicKey),
                         Owner,
                         mangoGroup.ParsedResult.PerpetualMarkets[order.MarketIndex].Market,

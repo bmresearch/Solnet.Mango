@@ -1,4 +1,6 @@
 using Solnet.Mango.Models;
+using Solnet.Mango.Models.Events;
+using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs;
 using Solnet.Rpc;
 using Solnet.Rpc.Types;
@@ -12,7 +14,6 @@ namespace Solnet.Mango.Examples
 {
     public class SubscribeEventQueueExample : IRunnableExample
     {
-        private static readonly PublicKey MangoGroup = new("98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue");
         private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient(Cluster.MainNet);
 
         private static readonly IStreamingRpcClient StreamingRpcClient =
@@ -28,7 +29,7 @@ namespace Solnet.Mango.Examples
 
         public void Run()
         {
-            AccountResultWrapper<MangoGroup> mangoGroup = _mangoClient.GetMangoGroup(MangoGroup);
+            AccountResultWrapper<MangoGroup> mangoGroup = _mangoClient.GetMangoGroup(Constants.MangoGroup);
 
             foreach (PerpMarketInfo t in mangoGroup.ParsedResult.PerpetualMarkets.Where(t =>
                 t.Market.Key != SystemProgram.ProgramIdKey.Key))

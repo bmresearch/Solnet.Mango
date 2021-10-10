@@ -1,5 +1,6 @@
 ﻿using Solnet.Mango.Models;
 using Solnet.Mango.Types;
+using Solnet.Serum.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +27,28 @@ namespace Solnet.Mango
         }
 
         /// <summary>
+        /// Splits the open orders funds.
+        /// </summary>
+        /// <param name="openOrdersAccount">The open orders account.</param>
+        /// <returns>The open orders stats.</returns>
+        public static OpenOrdersStats SplitOpenOrders(OpenOrdersAccount openOrdersAccount)
+        {
+            double quoteFree = openOrdersAccount.QuoteTokenFree + openOrdersAccount.ReferrerRebatesAccrued;
+            double quoteLocked = openOrdersAccount.QuoteTokenTotal - openOrdersAccount.QuoteTokenFree;
+
+            double baseFree = openOrdersAccount.BaseTokenFree;
+            double baseLocked = openOrdersAccount.BaseTokenTotal - openOrdersAccount.BaseTokenFree;
+
+            return new OpenOrdersStats
+            {
+                QuoteFree = quoteFree,
+                QuoteLocked = quoteLocked,
+                BaseLocked = baseLocked,
+                BaseFree = baseFree
+            };
+        }
+
+        /// <summary>
         /// Gets the weights to calculate account health ratios.
         /// </summary>
         /// <param name="mangoGroup">The mango group.</param>
@@ -40,7 +63,7 @@ namespace Solnet.Mango
                 {
                     SpotAssetWeight = mangoGroup.SpotMarkets[tokenIndex].MaintenanceAssetWeight.Value,
                     SpotLiabilityWeight = mangoGroup.SpotMarkets[tokenIndex].MaintenanceLiabilityWeight.Value,
-                    PerpAssetWeight = mangoGroup.PerpetualMarkets[tokenIndex].MaintenanceLiabilityWeight.Value,
+                    PerpAssetWeight = mangoGroup.PerpetualMarkets[tokenIndex].MaintenanceAssetWeight.Value,
                     PerpLiabilityWeight = mangoGroup.PerpetualMarkets[tokenIndex].MaintenanceLiabilityWeight.Value,
                 },
                 HealthType.Initialization => new Weights

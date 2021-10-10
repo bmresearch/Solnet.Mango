@@ -2,9 +2,8 @@ using Solnet.Programs.Utilities;
 using Solnet.Serum.Models;
 using System;
 using System.Collections.Generic;
-using System.Numerics;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Matching
 {
     /// <summary>
     /// Represents an inner node in the Mango Perpetual Market order book side.
@@ -34,7 +33,7 @@ namespace Solnet.Mango.Models
             /// </remarks>
             /// </summary>
             internal const int KeyOffset = 4;
-            
+
             /// <summary>
             /// The offset at which the key value begins.
             /// <remarks>
@@ -66,15 +65,15 @@ namespace Solnet.Mango.Models
         /// <returns>The <see cref="InnerNode"/> structure.</returns>
         public static new InnerNode Deserialize(ReadOnlySpan<byte> data)
         {
-            List<uint> children = new (ExtraLayout.ChildrenLength);
+            List<uint> children = new(ExtraLayout.ChildrenLength);
             ReadOnlySpan<byte> childrenBytes =
                 data.GetSpan(ExtraLayout.ChildrenOffset, sizeof(uint) * ExtraLayout.ChildrenLength);
-            
-            for (int i = 0; i < ExtraLayout.ChildrenLength - 1 ; i++)
+
+            for (int i = 0; i < ExtraLayout.ChildrenLength - 1; i++)
             {
                 children.Add(childrenBytes.GetU32(i * sizeof(uint)));
             }
-            
+
             return new InnerNode
             {
                 Tag = NodeType.InnerNode,

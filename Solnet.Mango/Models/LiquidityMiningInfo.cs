@@ -18,7 +18,7 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int Length = 64;
-            
+
             /// <summary>
             /// 
             /// </summary>

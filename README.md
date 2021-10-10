@@ -1,14 +1,14 @@
 <p align="center">
     <img src="assets/icon.png" margin="auto" height="175"/>
 </p>
-<!--p align="center">
+<p align="center">
     <a href="https://github.com/bmresearch/Solnet.Mango/actions/workflows/dotnet.yml">
         <img src="https://github.com/bmresearch/Solnet.Mango/actions/workflows/dotnet.yml/badge.svg"
             alt="Build Status (master)" ></a>
     <a href="https://coveralls.io/github/bmresearch/Solnet.Mango?branch=master">
         <img src="https://coveralls.io/repos/github/bmresearch/Solnet.Mango/badge.svg?branch=master" 
             alt="Coverage Status" ></a>
-</p-->
+</p>
 
 # What is Solnet.Mango?
 
@@ -20,17 +20,61 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
 
 ## Features
 
-- TO DO
+- Decoding of Mango data structures:
+    - `MangoGroup`
+    - `MangoCache`
+    - `MangoAccount`
+    - `PerpMarket`
+    - `RootBank`
+    - `NodeBank`
+    - `OrderBookSide` (`Node`s are decoded and processed into a friendlier structure)
+    - `EventQueue`
+- `MangoProgram` instructions implemented:
+  - InitMangoAccount
+  - Deposit
+  - Withdraw
+  - PlaceSpotOrder
+  - PlacePerpOrder
+  - CancelPerpOrderByClientId
+  - CancelPerpOrder
+  - SettleFunds
+  - CancelSpotOrder
+  - SettleProfitAndLoss
+  - InitSpotOpenOrders
+  - RedeemMango
+  - AddMangoAccountInfo
+  - CancelAllPerpOrders
+- `MangoClient` class which allows to:
+    - Get these structures and decode them only by having their address
+    - Subscribing to these accounts in real time, getting notifications with their decoded structures
 
 ## Requirements
 - net 5.0
 
 ## Dependencies
-- Solnet.Serum 0.1.0
-- Solnet.Wallet 0.4.0
-- Solnet.Rpc 0.4.0
+- Solnet.Serum v1.0.5
+- Solnet.Wallet v0.4.11
+- Solnet.Rpc v0.4.11
 
 ## Examples
 
-- TO DO
+The [Solnet.Mango.Examples](https://github.com/bmresearch/Solnet.Mango/tree/master/Solnet.Mango.Examples) project features some examples on how to use the [IMangoClient](https://github.com/bmresearch/Solnet.Mango/tree/master/Solnet.Mango/IMangoClient.cs), these examples include:
+- Getting all mango accounts owned by a specific address
+- Streaming market data and various structures
+- Submitting orders
+- Creating new mango accounts
 
+## Contribution
+
+We encourage everyone to contribute, submit issues, PRs, discuss. Every kind of help is welcome.
+
+## Contributors
+
+* **Hugo** - *Maintainer* - [murlokito](https://github.com/murlokito)
+* **Tiago** - *Maintainer* - [tiago](https://github.com/tiago18c)
+
+See also the list of [contributors](https://github.com/bmresearch/Solnet.Serum/contributors) who participated in this project.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](https://github.com/bmresearch/Solnet.Serum/blob/master/LICENSE) file for details

@@ -21,10 +21,10 @@ namespace Solnet.Mango
         internal static byte[] EncodeInitMangoAccountData()
         {
             byte[] data = new byte[4];
-            data.WriteU32((uint) MangoProgramInstructions.Values.InitMangoAccount, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.InitMangoAccount, MangoProgramLayouts.MethodOffset);
             return data;
         }
-        
+
         /// <summary>
         /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.InitMangoAccount"/> method
         /// </summary>
@@ -46,11 +46,11 @@ namespace Solnet.Mango
         internal static byte[] EncodeDepositData(ulong quantity)
         {
             byte[] data = new byte[12];
-            data.WriteU32((uint) MangoProgramInstructions.Values.Deposit, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.Deposit, MangoProgramLayouts.MethodOffset);
             data.WriteU64(quantity, MangoProgramLayouts.DepositQuantityOffset);
             return data;
         }
-        
+
         /// <summary>
         /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.Deposit"/> method
         /// </summary>
@@ -72,7 +72,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Owner Token Account", keys[keyIndices[8]]);
             decodedInstruction.Values.Add("Quantity", data.GetU64(MangoProgramLayouts.DepositQuantityOffset));
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.Withdraw"/> method.
         /// </summary>
@@ -82,12 +82,12 @@ namespace Solnet.Mango
         internal static byte[] EncodeWithdrawData(ulong quantity, bool allowBorrow)
         {
             byte[] data = new byte[13];
-            data.WriteU32((uint) MangoProgramInstructions.Values.Withdraw, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.Withdraw, MangoProgramLayouts.MethodOffset);
             data.WriteU64(quantity, MangoProgramLayouts.WithdrawQuantityOffset);
-            data.WriteU8(allowBorrow ? (byte) 1 : (byte) 0, MangoProgramLayouts.WithdrawAllowBorrowOffset);
+            data.WriteU8(allowBorrow ? (byte)1 : (byte)0, MangoProgramLayouts.WithdrawAllowBorrowOffset);
             return data;
         }
-        
+
         /// <summary>
         /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.Withdraw"/> method
         /// </summary>
@@ -110,12 +110,12 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Token Program", keys[keyIndices[9]]);
             for (int i = 10; i < keyIndices.Length; i++)
             {
-                decodedInstruction.Values.Add($"Open Orders {i-9}", keys[keyIndices[i]]);
+                decodedInstruction.Values.Add($"Open Orders {i - 9}", keys[keyIndices[i]]);
             }
             decodedInstruction.Values.Add("Quantity", data.GetU64(MangoProgramLayouts.WithdrawQuantityOffset));
             decodedInstruction.Values.Add("Allow Borrow", data.GetU8(MangoProgramLayouts.WithdrawQuantityOffset) == 1);
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method.
         /// </summary>
@@ -123,7 +123,7 @@ namespace Solnet.Mango
         internal static byte[] EncodePlaceSpotOrderData(Order order)
             => EncodePlaceSpotOrderData(order.Side, order.RawPrice, order.RawQuantity, order.Type, order.ClientOrderId,
                 order.SelfTradeBehavior, order.MaxQuoteQuantity, ushort.MaxValue);
-        
+
         /// <summary>
         /// Encode the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method.
         /// </summary>
@@ -188,7 +188,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Serum Vault", keys[keyIndices[22]]);
             for (int i = 23; i < keyIndices.Length; i++)
             {
-                decodedInstruction.Values.Add($"Open Orders {i-22}", keys[keyIndices[i]]);
+                decodedInstruction.Values.Add($"Open Orders {i - 22}", keys[keyIndices[i]]);
             }
             decodedInstruction.Values.Add("Side",
                 (Side)Enum.Parse(typeof(Side), data.GetU8(MangoProgramLayouts.PlaceSpotOrder.SideOffset).ToString()));
@@ -202,7 +202,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Client Order Id", data.GetU64(MangoProgramLayouts.PlaceSpotOrder.ClientIdOffset));
             decodedInstruction.Values.Add("Limit", data.GetU16(MangoProgramLayouts.PlaceSpotOrder.LimitOffset));
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.PlacePerpOrder"/> method.
         /// </summary>
@@ -215,12 +215,12 @@ namespace Solnet.Mango
         internal static byte[] EncodePlacePerpOrderData(Side side, OrderType orderType, long price, long quantity, ulong clientOrderId)
         {
             byte[] data = new byte[30];
-            data.WriteU32((uint) MangoProgramInstructions.Values.PlacePerpOrder, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.PlacePerpOrder, MangoProgramLayouts.MethodOffset);
             data.WriteS64(price, MangoProgramLayouts.PlacePerpOrder.PriceOffset);
             data.WriteS64(quantity, MangoProgramLayouts.PlacePerpOrder.QuantityOffset);
             data.WriteU64(clientOrderId, MangoProgramLayouts.PlacePerpOrder.ClientOrderIdOffset);
-            data.WriteU8((byte) side, MangoProgramLayouts.PlacePerpOrder.SideOffset);
-            data.WriteU8((byte) orderType, MangoProgramLayouts.PlacePerpOrder.OrderTypeOffset);
+            data.WriteU8((byte)side, MangoProgramLayouts.PlacePerpOrder.SideOffset);
+            data.WriteU8((byte)orderType, MangoProgramLayouts.PlacePerpOrder.OrderTypeOffset);
             return data;
         }
 
@@ -244,7 +244,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Event Queue", keys[keyIndices[7]]);
             for (int i = 8; i < keyIndices.Length; i++)
             {
-                decodedInstruction.Values.Add($"Open Orders {i-7}", keys[keyIndices[i]]);
+                decodedInstruction.Values.Add($"Open Orders {i - 7}", keys[keyIndices[i]]);
             }
             decodedInstruction.Values.Add("Price", data.GetS64(MangoProgramLayouts.PlacePerpOrder.PriceOffset));
             decodedInstruction.Values.Add("Quantity", data.GetS64(MangoProgramLayouts.PlacePerpOrder.QuantityOffset));
@@ -264,9 +264,9 @@ namespace Solnet.Mango
         internal static byte[] EncodeCancelPerpOrderByClientIdData(ulong clientOrderId, bool invalidIdOk)
         {
             byte[] data = new byte[13];
-            data.WriteU32((uint) MangoProgramInstructions.Values.CancelPerpOrderByClientId, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.CancelPerpOrderByClientId, MangoProgramLayouts.MethodOffset);
             data.WriteU64(clientOrderId, MangoProgramLayouts.CancelPerpOrderByClientId.ClientOrderIdOffset);
-            data.WriteU8(invalidIdOk ? (byte) 1 : (byte) 0, MangoProgramLayouts.CancelPerpOrderByClientId.InvalidIdOkOffset);
+            data.WriteU8(invalidIdOk ? (byte)1 : (byte)0, MangoProgramLayouts.CancelPerpOrderByClientId.InvalidIdOkOffset);
             return data;
         }
 
@@ -289,7 +289,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Client Order Id", data.GetU64(MangoProgramLayouts.CancelPerpOrderByClientId.ClientOrderIdOffset));
             decodedInstruction.Values.Add("Invalid Ok", data.GetU8(MangoProgramLayouts.CancelPerpOrderByClientId.InvalidIdOkOffset) == 1);
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.CancelPerpOrder"/> method.
         /// </summary>
@@ -299,9 +299,9 @@ namespace Solnet.Mango
         internal static byte[] EncodeCancelPerpOrderData(BigInteger orderId, bool invalidIdOk)
         {
             byte[] data = new byte[21];
-            data.WriteU32((uint) MangoProgramInstructions.Values.CancelPerpOrder, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.CancelPerpOrder, MangoProgramLayouts.MethodOffset);
             data.WriteBigInt(orderId, MangoProgramLayouts.CancelPerpOrder.OrderIdOffset);
-            data.WriteU8(invalidIdOk ? (byte) 1 : (byte) 0, MangoProgramLayouts.CancelPerpOrder.InvalidIdOkOffset);
+            data.WriteU8(invalidIdOk ? (byte)1 : (byte)0, MangoProgramLayouts.CancelPerpOrder.InvalidIdOkOffset);
             return data;
         }
 
@@ -324,7 +324,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Order Id", data.GetBigInt(MangoProgramLayouts.CancelPerpOrder.OrderIdOffset, 16));
             decodedInstruction.Values.Add("Invalid Ok", data.GetU8(MangoProgramLayouts.CancelPerpOrder.InvalidIdOkOffset) == 1);
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.SettleFunds"/> method.
         /// </summary>
@@ -332,10 +332,10 @@ namespace Solnet.Mango
         internal static byte[] EncodeSettleFundsData()
         {
             byte[] data = new byte[4];
-            data.WriteU32((uint) MangoProgramInstructions.Values.SettleFunds, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.SettleFunds, MangoProgramLayouts.MethodOffset);
             return data;
         }
-        
+
         /// <summary>
         /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.SettleFunds"/> method
         /// </summary>
@@ -363,7 +363,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Dex Signer", keys[keyIndices[16]]);
             decodedInstruction.Values.Add("Token Program", keys[keyIndices[17]]);
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.CancelSpotOrder"/> method.
         /// </summary>
@@ -373,7 +373,7 @@ namespace Solnet.Mango
         internal static byte[] EncodeCancelSpotOrderData(Side side, BigInteger orderId)
         {
             byte[] data = new byte[25];
-            data.WriteU32((uint) MangoProgramInstructions.Values.CancelSpotOrder, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.CancelSpotOrder, MangoProgramLayouts.MethodOffset);
             data.WriteU32((uint)side, MangoProgramLayouts.CancelSpotOrder.SideOffset);
             data.WriteBigInt(orderId, MangoProgramLayouts.CancelSpotOrder.OrderIdOffset);
             return data;
@@ -399,11 +399,11 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Open Orders", keys[keyIndices[7]]);
             decodedInstruction.Values.Add("Signer", keys[keyIndices[8]]);
             decodedInstruction.Values.Add("Event Queue", keys[keyIndices[9]]);
-            decodedInstruction.Values.Add("Side", 
-                (Side) Enum.Parse( typeof(Side), data.GetU32(MangoProgramLayouts.CancelSpotOrder.SideOffset).ToString()));
+            decodedInstruction.Values.Add("Side",
+                (Side)Enum.Parse(typeof(Side), data.GetU32(MangoProgramLayouts.CancelSpotOrder.SideOffset).ToString()));
             decodedInstruction.Values.Add("Order Id", data.GetBigInt(MangoProgramLayouts.CancelSpotOrder.OrderIdOffset, 16));
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.SettleProfitAndLoss"/> method.
         /// </summary>
@@ -411,7 +411,7 @@ namespace Solnet.Mango
         internal static byte[] EncodeSettleProfitAndLossData(ulong quantity)
         {
             byte[] data = new byte[12];
-            data.WriteU32((uint) MangoProgramInstructions.Values.SettleProfitAndLoss, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.SettleProfitAndLoss, MangoProgramLayouts.MethodOffset);
             data.WriteU64(quantity, MangoProgramLayouts.DepositQuantityOffset);
             return data;
         }
@@ -434,7 +434,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Node Bank", keys[keyIndices[5]]);
             decodedInstruction.Values.Add("Market Index", data.GetU64(MangoProgramLayouts.DepositQuantityOffset));
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.InitSpotOpenOrders"/> method.
         /// </summary>
@@ -442,7 +442,7 @@ namespace Solnet.Mango
         internal static byte[] EncodeInitSpotOpenOrdersData()
         {
             byte[] data = new byte[4];
-            data.WriteU32((uint) MangoProgramInstructions.Values.InitSpotOpenOrders, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.InitSpotOpenOrders, MangoProgramLayouts.MethodOffset);
             return data;
         }
 
@@ -463,7 +463,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Signer", keys[keyIndices[6]]);
             decodedInstruction.Values.Add("Sysvar Rent", keys[keyIndices[7]]);
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.RedeemMango"/> method.
         /// </summary>
@@ -471,10 +471,10 @@ namespace Solnet.Mango
         internal static byte[] EncodeRedeemMangoData()
         {
             byte[] data = new byte[4];
-            data.WriteU32((uint) MangoProgramInstructions.Values.RedeemMango, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.RedeemMango, MangoProgramLayouts.MethodOffset);
             return data;
         }
-        
+
         /// <summary>
         /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.RedeemMango"/> method
         /// </summary>
@@ -495,7 +495,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Signer", keys[keyIndices[9]]);
             decodedInstruction.Values.Add("Token Program", keys[keyIndices[10]]);
         }
-        
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.AddMangoAccountInfo"/> method.
         /// </summary>
@@ -503,12 +503,12 @@ namespace Solnet.Mango
         internal static byte[] EncodeAddMangoAccountInfoData(string info)
         {
             byte[] data = new byte[36];
-            data.WriteU32((uint) MangoProgramInstructions.Values.AddMangoAccountInfo, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.AddMangoAccountInfo, MangoProgramLayouts.MethodOffset);
             byte[] encodedInfo = Serialization.EncodeRustString(info);
             data.WriteSpan(encodedInfo, MangoProgramLayouts.MangoAccountInfoOffset);
             return data;
         }
-        
+
         /// <summary>
         /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.AddMangoAccountInfo"/> method
         /// </summary>
@@ -524,8 +524,8 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Owner", keys[keyIndices[2]]);
             (string accountInfo, _) = data.DecodeRustString(MangoProgramLayouts.MangoAccountInfoOffset);
             decodedInstruction.Values.Add("Account Info", accountInfo);
-        }        
-        
+        }
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.CancelAllPerpOrders"/> method.
         /// </summary>
@@ -533,18 +533,18 @@ namespace Solnet.Mango
         internal static byte[] EncodeCancelAllPerpOrdersData(byte limit)
         {
             byte[] data = new byte[5];
-            data.WriteU32((uint) MangoProgramInstructions.Values.CancelAllPerpOrders, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)MangoProgramInstructions.Values.CancelAllPerpOrders, MangoProgramLayouts.MethodOffset);
             data.WriteU8(limit, MangoProgramLayouts.DepositQuantityOffset);
             return data;
         }
-        
+
         /// <summary>
         /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.CancelAllPerpOrders"/> method
         /// </summary>
         /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
         /// <param name="keys">The account keys present in the transaction.</param>
         /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
-        internal static void DecodeCancelAllPerpOrdersData(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data, 
+        internal static void DecodeCancelAllPerpOrdersData(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data,
             IList<PublicKey> keys, byte[] keyIndices)
         {
             decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
@@ -554,6 +554,6 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Bids", keys[keyIndices[4]]);
             decodedInstruction.Values.Add("Asks", keys[keyIndices[5]]);
             decodedInstruction.Values.Add("Limit", data.GetU8(MangoProgramLayouts.DepositQuantityOffset));
-        }        
+        }
     }
 }

@@ -2,7 +2,7 @@ using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using System;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Perpetuals
 {
     /// <summary>
     /// 
@@ -18,7 +18,7 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int Length = 40;
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -28,7 +28,7 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int ShortFundingOffset = 16;
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -49,7 +49,7 @@ namespace Solnet.Mango.Models
         /// 
         /// </summary>
         public ulong LastUpdated;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="RootBankCache"/> instance.
         /// </summary>
@@ -58,7 +58,7 @@ namespace Solnet.Mango.Models
         public static PerpMarketCache Deserialize(ReadOnlySpan<byte> data)
         {
             if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
-            
+
             return new PerpMarketCache
             {
                 LongFunding = I80F48.Deserialize(data.GetSpan(Layout.LongFundingOffset, I80F48.Length)),

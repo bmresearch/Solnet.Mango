@@ -4,7 +4,7 @@ using Solnet.Wallet;
 using System;
 using System.Numerics;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Matching
 {
     /// <summary>
     /// Represents a leaf node in the Mango Perpetual Market order book side.
@@ -34,7 +34,7 @@ namespace Solnet.Mango.Models
             /// </remarks>
             /// </summary>
             internal const int OrderIdOffset = 4;
-            
+
             /// <summary>
             /// The offset at which the order id value begins.
             /// <remarks>
@@ -42,7 +42,7 @@ namespace Solnet.Mango.Models
             /// </remarks>
             /// </summary>
             internal const int PriceOffset = 8;
-            
+
             /// <summary>
             /// The offset at which the owner public key value begins.
             /// <remarks>
@@ -50,7 +50,7 @@ namespace Solnet.Mango.Models
             /// </remarks>
             /// </summary>
             internal const int OwnerOffset = 20;
-            
+
             /// <summary>
             /// The offset at which the quantity value begins.
             /// <remarks>
@@ -58,7 +58,7 @@ namespace Solnet.Mango.Models
             /// </remarks>
             /// </summary>
             internal const int QuantityOffset = 52;
-            
+
             /// <summary>
             /// The offset at which the client order id value begins.
             /// <remarks>
@@ -66,7 +66,7 @@ namespace Solnet.Mango.Models
             /// </remarks>
             /// </summary>
             internal const int ClientOrderIdOffset = 60;
-            
+
             /// <summary>
             /// The offset at which the best initial value begins.
             /// <remarks>
@@ -74,7 +74,7 @@ namespace Solnet.Mango.Models
             /// </remarks>
             /// </summary>
             internal const int BestInitialOffset = 68;
-            
+
             /// <summary>
             /// The offset at which the timestamp value begins.
             /// <remarks>
@@ -103,7 +103,7 @@ namespace Solnet.Mango.Models
         /// The quantity of the order.
         /// </summary>
         public long Quantity;
-        
+
         /// <summary>
         /// The price of the order.
         /// </summary>
@@ -124,7 +124,7 @@ namespace Solnet.Mango.Models
         /// The time the order was placed.
         /// </summary>
         public ulong Timestamp;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="LeafNode"/> instance.
         /// </summary>
@@ -136,7 +136,7 @@ namespace Solnet.Mango.Models
             long price = ((ReadOnlySpan<byte>)key).GetS64(ExtraLayout.PriceOffset);
             return new LeafNode
             {
-                Tag = NodeType.LeafNode, 
+                Tag = NodeType.LeafNode,
                 OwnerSlot = data.GetU8(ExtraLayout.OwnerSlotOffset),
                 OrderId = data.GetBigInt(ExtraLayout.OrderIdOffset, 16, true),
                 Owner = data.GetPubKey(ExtraLayout.OwnerOffset),
