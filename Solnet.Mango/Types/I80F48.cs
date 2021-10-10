@@ -14,17 +14,17 @@ namespace Solnet.Mango.Types
         /// The length of the data type in bytes.
         /// </summary>
         public const int Length = 16;
-        
+
         /// <summary>
         /// 
         /// </summary>
         public double Value;
-        
+
         /// <summary>
         /// The original raw data.
         /// </summary>
         public byte[] Data;
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -39,7 +39,7 @@ namespace Solnet.Mango.Types
         {
             return new I80F48
             {
-                Value = (double) data.GetBigInt(0, Length, true) / (double)Divisor,
+                Value = (double)data.GetBigInt(0, Length, true) / (double)Divisor,
                 Data = data.ToArray()
             };
         }

@@ -25,7 +25,7 @@ namespace Solnet.Mango
         /// 
         /// </summary>
         public static readonly PublicKey SysVarClock = new("SysvarC1ock11111111111111111111111111111111");
-        
+
         /// <summary>
         /// The public key of the MNGO token mint.
         /// </summary>
@@ -71,7 +71,9 @@ namespace Solnet.Mango
             };
             return new TransactionInstruction
             {
-                Data = MangoProgramData.EncodeInitMangoAccountData(), Keys = keys, ProgramId = programIdKey
+                Data = MangoProgramData.EncodeInitMangoAccountData(),
+                Keys = keys,
+                ProgramId = programIdKey
             };
         }
 
@@ -126,7 +128,9 @@ namespace Solnet.Mango
             };
             return new TransactionInstruction
             {
-                Data = MangoProgramData.EncodeDepositData(quantity), Keys = keys, ProgramId = programIdKey
+                Data = MangoProgramData.EncodeDepositData(quantity),
+                Keys = keys,
+                ProgramId = programIdKey
             };
         }
 
@@ -188,7 +192,8 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(signer, false),
                 AccountMeta.ReadOnly(TokenProgram.ProgramIdKey, false)
             };
-            keys.AddRange(openOrdersAccounts.Select(key => AccountMeta.ReadOnly(key, false)));
+            if (openOrdersAccounts != null)
+                keys.AddRange(openOrdersAccounts.Select(key => AccountMeta.ReadOnly(key, false)));
 
             return new TransactionInstruction
             {
@@ -298,13 +303,13 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(dexSigner, false),
                 AccountMeta.ReadOnly(serumVault, false)
             };
-            
+
             keys.AddRange(openOrdersAccounts.Select((t, i) => (ulong)i == marketIndex
                 ? AccountMeta.Writable(t, false)
                 : AccountMeta.ReadOnly(t, false)));
 
             return new TransactionInstruction
-            { 
+            {
                 Keys = keys,
                 Data = MangoProgramData.EncodePlaceSpotOrderData(order),
                 ProgramId = programIdKey,
@@ -428,7 +433,7 @@ namespace Solnet.Mango
             return new TransactionInstruction
             {
                 Keys = keys,
-                ProgramId =programIdKey,
+                ProgramId = programIdKey,
                 Data = MangoProgramData.EncodeCancelPerpOrderByClientIdData(clientOrderId, invalidIdOk)
             };
         }
@@ -480,7 +485,7 @@ namespace Solnet.Mango
             return new TransactionInstruction
             {
                 Keys = keys,
-                ProgramId =programIdKey,
+                ProgramId = programIdKey,
                 Data = MangoProgramData.EncodeCancelPerpOrderData(orderId, invalidIdOk)
             };
         }
@@ -566,7 +571,9 @@ namespace Solnet.Mango
             };
             return new TransactionInstruction
             {
-                Keys = keys, Data = MangoProgramData.EncodeSettleFundsData(), ProgramId = programIdKey
+                Keys = keys,
+                Data = MangoProgramData.EncodeSettleFundsData(),
+                ProgramId = programIdKey
             };
         }
 
@@ -588,7 +595,7 @@ namespace Solnet.Mango
         public static TransactionInstruction CancelSpotOrder(PublicKey mangoGroup,
             PublicKey owner, PublicKey mangoAccount, PublicKey spotMarket,
             PublicKey bids, PublicKey asks, PublicKey openOrders, PublicKey signer, PublicKey eventQueue,
-            BigInteger orderId, Side side) => CancelSpotOrder(ProgramIdKeyV3, mangoGroup, owner, mangoAccount, 
+            BigInteger orderId, Side side) => CancelSpotOrder(ProgramIdKeyV3, mangoGroup, owner, mangoAccount,
             SerumProgram.ProgramIdKey, spotMarket, bids, asks, openOrders, signer, eventQueue, orderId, side);
 
         /// <summary>
@@ -730,7 +737,9 @@ namespace Solnet.Mango
 
             return new TransactionInstruction
             {
-                Keys = keys, Data = MangoProgramData.EncodeInitSpotOpenOrdersData(), ProgramId = programIdKey
+                Keys = keys,
+                Data = MangoProgramData.EncodeInitSpotOpenOrdersData(),
+                ProgramId = programIdKey
             };
         }
 
@@ -753,7 +762,7 @@ namespace Solnet.Mango
             PublicKey mangoRootBank, PublicKey mangoNodeBank, PublicKey mangoBankVault, PublicKey signer)
             => RedeemMango(ProgramIdKeyV3, mangoGroup, mangoCache, mangoAccount, owner, perpetualMarket, mangoPerpetualVault,
                 mangoRootBank, mangoNodeBank, mangoBankVault, signer);
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -789,7 +798,9 @@ namespace Solnet.Mango
             };
             return new TransactionInstruction
             {
-                Keys = keys, Data = MangoProgramData.EncodeRedeemMangoData(), ProgramId = programIdKey
+                Keys = keys,
+                Data = MangoProgramData.EncodeRedeemMangoData(),
+                ProgramId = programIdKey
             };
         }
 
@@ -825,7 +836,9 @@ namespace Solnet.Mango
             };
             return new TransactionInstruction
             {
-                Keys = keys, Data = MangoProgramData.EncodeAddMangoAccountInfoData(info), ProgramId = programIdKey
+                Keys = keys,
+                Data = MangoProgramData.EncodeAddMangoAccountInfoData(info),
+                ProgramId = programIdKey
             };
         }
 
@@ -843,7 +856,7 @@ namespace Solnet.Mango
         public static TransactionInstruction CancelAllPerpOrders(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey perpetualMarket, PublicKey bids, PublicKey asks,
             byte limit) => CancelAllPerpOrders(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, perpetualMarket, bids, asks, limit);
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -871,7 +884,9 @@ namespace Solnet.Mango
             };
             return new TransactionInstruction
             {
-                Keys = keys, Data = MangoProgramData.EncodeCancelAllPerpOrdersData(limit), ProgramId = programIdKey
+                Keys = keys,
+                Data = MangoProgramData.EncodeCancelAllPerpOrdersData(limit),
+                ProgramId = programIdKey
             };
         }
 
@@ -910,31 +925,25 @@ namespace Solnet.Mango
                     MangoProgramData.DecodeWithdrawData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.PlaceSpotOrder:
-                    MangoProgramData.DecodePlaceSpotOrderData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodePlaceSpotOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.PlacePerpOrder:
-                    MangoProgramData.DecodePlacePerpOrderData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodePlacePerpOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CancelPerpOrderByClientId:
-                    MangoProgramData.DecodeCancelPerpOrderByClientIdData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeCancelPerpOrderByClientIdData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CancelPerpOrder:
-                    MangoProgramData.DecodeCancelPerpOrderData(decodedInstruction, keys, keyIndices);
-                    break;
-                case MangoProgramInstructions.Values.ConsumeEvents:
-                    MangoProgramData.DecodeConsumeEventsData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeCancelPerpOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.SettleFunds:
                     MangoProgramData.DecodeSettleFundsData(decodedInstruction, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CancelSpotOrder:
-                    MangoProgramData.DecodeCancelSpotOrderData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeCancelSpotOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.SettleProfitAndLoss:
-                    MangoProgramData.DecodeSettleProfitAndLossData(decodedInstruction, keys, keyIndices);
-                    break;
-                case MangoProgramInstructions.Values.SettleFees:
-                    MangoProgramData.DecodeSettleFeesData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeSettleProfitAndLossData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.InitSpotOpenOrders:
                     MangoProgramData.DecodeInitSpotOpenOrdersData(decodedInstruction, keys, keyIndices);
@@ -945,14 +954,8 @@ namespace Solnet.Mango
                 case MangoProgramInstructions.Values.AddMangoAccountInfo:
                     MangoProgramData.DecodeAddMangoAccountInfoData(decodedInstruction, data, keys, keyIndices);
                     break;
-                case MangoProgramInstructions.Values.DepositMegaSerum:
-                    MangoProgramData.DecodeDepositMegaSerumData(decodedInstruction, keys, keyIndices);
-                    break;
-                case MangoProgramInstructions.Values.WithdrawMegaSerum:
-                    MangoProgramData.DecodeWithdrawMegaSerumData(decodedInstruction, keys, keyIndices);
-                    break;
                 case MangoProgramInstructions.Values.CancelAllPerpOrders:
-                    MangoProgramData.DecodeCancelAllPerpOrdersData(decodedInstruction, keys, keyIndices);
+                    MangoProgramData.DecodeCancelAllPerpOrdersData(decodedInstruction, data, keys, keyIndices);
                     break;
             }
 

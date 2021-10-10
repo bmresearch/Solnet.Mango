@@ -2,9 +2,8 @@ using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using Solnet.Wallet;
 using System;
-using System.Collections.Generic;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Perpetuals
 {
     /// <summary>
     /// Represents a perpetual market in Mango.
@@ -171,6 +170,58 @@ namespace Solnet.Mango.Models
         /// 
         /// </summary>
         public PublicKey MangoVault;
+
+        /// <summary>
+        /// Converts the price lots quantity to a the native value.
+        /// </summary>
+        /// <param name="price">The price</param>
+        /// <returns>Convert price lots to the native value.</returns>
+        public long PriceLotsToNative(double price) => (long)(QuoteLotSize * price) / BaseLotSize;
+
+        /// <summary>
+        /// Converts the base lots quantity to a the native value.
+        /// </summary>
+        /// <param name="quantity">The quantity.</param>
+        /// <returns>Convert price lots to the native value.</returns>
+        public long BaseLotsToNative(double quantity) => (long)(BaseLotSize * quantity);
+
+        /// <summary>
+        /// Converts the price lots quantity to a humanized number.
+        /// </summary>
+        /// <param name="price">The price</param>
+        /// <param name="baseDecimals">The base decimals.</param>
+        /// <param name="quoteDecimals">The quote decimals.</param>
+        /// <returns>Convert price lots to humanized number.</returns>
+        public double PriceLotsToNumber(double price, byte baseDecimals, byte quoteDecimals)
+        {
+            double nativeToUi = Math.Pow(10, baseDecimals - quoteDecimals);
+            double lotsToNative = QuoteLotSize / BaseLotSize;
+            return price * lotsToNative * nativeToUi;
+        }
+
+        /// <summary>
+        /// Converts the base lots quantity to a humanized number.
+        /// </summary>
+        /// <param name="baseDecimals">The base decimals.</param>
+        /// <param name="quantity">The quantity.</param>
+        /// <returns>Converted base lots to humanized number.</returns>
+        public double BaseLotsToNumber(double quantity, byte baseDecimals)
+            => (quantity * BaseLotSize) / Math.Pow(10, baseDecimals);
+
+        /// <summary>
+        /// Get the minimum order size.
+        /// </summary>
+        /// <param name="baseDecimals">The base decimals.</param>
+        /// <returns>The minimum order size.</returns>
+        public double MinOrderSize(byte baseDecimals) => BaseLotsToNumber(1, baseDecimals);
+
+        /// <summary>
+        /// The tick size.
+        /// </summary>
+        /// <param name="baseDecimals">The base decimals.</param>
+        /// <param name="quoteDecimals">The quote decimals.</param>
+        /// <returns>The tick size.</returns>
+        public double TickSize(byte baseDecimals, byte quoteDecimals) => PriceLotsToNumber(1, baseDecimals, quoteDecimals);
 
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="PerpMarket"/> instance.

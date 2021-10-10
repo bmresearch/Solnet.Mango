@@ -58,42 +58,42 @@ namespace Solnet.Mango
             /// Withdraws funds that were deposited earlier.
             /// </summary>
             Withdraw = 3,
-            
+
             /// <summary>
             /// Places an order on the Serum DEX using Mango's margin facilities.
             /// </summary>
             PlaceSpotOrder = 9,
-            
+
             /// <summary>
             /// Places a perp order.
             /// </summary>
             PlacePerpOrder = 12,
-            
+
             /// <summary>
             /// Cancels an order using Serum <see cref="Order"/>'s clientOrderId.
             /// </summary>
             CancelPerpOrderByClientId = 13,
-            
+
             /// <summary>
             /// Cancels a perp order.
             /// </summary>
             CancelPerpOrder = 14,
-            
+
             /// <summary>
-            /// Consumes events on the Serum <see cref="EventQueue"/>.
+            /// Consumes events on the Mango Perpetual <see cref="Models.EventQueue"/>.
             /// </summary>
             ConsumeEvents = 15,
-            
+
             /// <summary>
             /// Settles all funds from Serum DEX open orders into <see cref="MangoAccount"/> positions.
             /// </summary>
             SettleFunds = 19,
-            
+
             /// <summary>
             /// Cancels an order using Serum DEX instruction.
             /// </summary>
             CancelSpotOrder = 20,
-            
+
             /// <summary>
             /// Take two MangoAccounts and settle profits and losses between them for a perp market.
             /// </summary>
@@ -108,36 +108,36 @@ namespace Solnet.Mango
             /// Take an account that has losses in the selected perp market to account for fees accrued.
             /// </summary>
             SettleFees = 29,
-            
+
             /// <summary>
             /// Initialize a spot <see cref="OpenOrdersAccount"/> on Serum.
             /// </summary>
             InitSpotOpenOrders = 32,
-            
+
             /// <summary>
             /// Redeem the MNGO accrued in a PerpAccount for MNGO in MangoAccount deposits
             /// </summary>
             RedeemMango = 33,
-            
+
             /// <summary>
             /// Adds info to a <see cref="MangoAccount"/>.
             /// </summary>
             AddMangoAccountInfo = 34,
-            
+
             /// <summary>
             /// Deposits MSRM into the MSRM vault for <see cref="MangoGroup"/>.
             /// These MSRM are not at risk and are not counted towards collateral or any margin calculations.
             /// Depositing MSRM is a strictly altruistic act with no upside and no downside.
             /// </summary>
             DepositMegaSerum = 35,
-            
+
             /// <summary>
             /// Withdraws MSRM from the MSRM vault for <see cref="MangoGroup"/>.
             /// These MSRM are not at risk and are not counted towards collateral or any margin calculations.
             /// Depositing MSRM is a strictly altruistic act with no upside and no downside.
             /// </summary>
             WithdrawMegaSerum = 36,
-            
+
             /// <summary>
             /// Cancels all open perp orders.
             /// </summary>

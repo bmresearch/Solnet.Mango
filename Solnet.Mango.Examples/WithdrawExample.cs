@@ -1,4 +1,4 @@
-using Solnet.KeyStore;
+﻿using Solnet.KeyStore;
 using Solnet.Mango.Models;
 using Solnet.Programs;
 using Solnet.Rpc;
@@ -16,9 +16,9 @@ using System.Threading.Tasks;
 
 namespace Solnet.Mango.Examples
 {
-    public class DepositExample : IRunnableExample
+    public class WithdrawExample : IRunnableExample
     {
-        private static readonly PublicKey Owner = new PublicKey("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
+        private static readonly PublicKey Owner = new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
 
         private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient("https://solana-api.projectserum.com");
 
@@ -29,14 +29,14 @@ namespace Solnet.Mango.Examples
 
         private readonly IMangoClient _mangoClient;
 
-        public DepositExample()
+        public WithdrawExample()
         {
             Console.WriteLine($"Initializing {ToString()}");
             // init stuff
             SolanaKeyStoreService keyStore = new();
+
             // get the wallet
             _wallet = keyStore.RestoreKeystoreFromFile("/path/to/keystore.json");
-
             _mangoClient = ClientFactory.GetClient(RpcClient, StreamingRpcClient);
         }
 
@@ -81,11 +81,11 @@ namespace Solnet.Mango.Examples
                 .AddInstruction(SystemProgram.CreateAccount(
                     Owner,
                     acc,
-                    minBalance.Result + 1_000_000,
+                    minBalance.Result,
                     TokenProgram.TokenAccountDataSize,
                     TokenProgram.ProgramIdKey))
                 .AddInstruction(TokenProgram.InitializeAccount(acc, MarketUtils.WrappedSolMint, Owner))
-                .AddInstruction(MangoProgram.Deposit(
+                .AddInstruction(MangoProgram.Withdraw(
                     Constants.MangoGroup,
                     new PublicKey(mangoAccounts.OriginalRequest.Result[1].PublicKey),
                     Owner,
@@ -93,7 +93,11 @@ namespace Solnet.Mango.Examples
                     wrappedSolTokenInfo.RootBank,
                     nodeBankKey,
                     nodeBank.ParsedResult.Vault,
-                    acc, 1_000_000
+                    acc,
+                    mangoGroup.ParsedResult.SignerKey,
+                    mangoAccounts.ParsedResult[1].SpotOpenOrders,
+                    1_000_000,
+                    false
                 ))
                 .AddInstruction(TokenProgram.CloseAccount(acc, Owner, Owner, TokenProgram.ProgramIdKey));
 

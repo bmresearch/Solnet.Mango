@@ -1,3 +1,4 @@
+using Solnet.Mango.Models.Matching;
 using Solnet.Programs.Utilities;
 using System;
 using System.Collections.Generic;
@@ -91,7 +92,7 @@ namespace Solnet.Mango.Models
         /// The nodes.
         /// </summary>
         public List<Node> Nodes;
-        
+
         /// <summary>
         /// Gets the list of orders in the order book.
         /// </summary>
@@ -99,20 +100,20 @@ namespace Solnet.Mango.Models
         public List<OpenOrder> GetOrders()
         {
             return (from node in Nodes
-                where node is LeafNode
-                select (LeafNode)node
+                    where node is LeafNode
+                    select (LeafNode)node
                 into leafNode
-                select new OpenOrder
-                {
-                    RawPrice = leafNode.Price, 
-                    RawQuantity = leafNode.Quantity, 
-                    ClientOrderId = leafNode.ClientOrderId, 
-                    Owner = leafNode.Owner,
-                    OrderIndex = leafNode.OwnerSlot,
-                    OrderId = new BigInteger(leafNode.Key)
-                }).ToList();
+                    select new OpenOrder
+                    {
+                        RawPrice = leafNode.Price,
+                        RawQuantity = leafNode.Quantity,
+                        ClientOrderId = leafNode.ClientOrderId,
+                        Owner = leafNode.Owner,
+                        OrderIndex = leafNode.OwnerSlot,
+                        OrderId = new BigInteger(leafNode.Key)
+                    }).ToList();
         }
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="OrderBookSide"/> instance.
         /// </summary>
@@ -127,9 +128,9 @@ namespace Solnet.Mango.Models
             ReadOnlySpan<byte> nodesBytes = span[Layout.NodesOffset..];
             for (int i = 0; i < Constants.MaxBookNodes - 1; i++)
             {
-                nodes.Add(Node.Deserialize(nodesBytes.Slice(i *  Node.Layout.Length, Node.Layout.Length)));
+                nodes.Add(Node.Deserialize(nodesBytes.Slice(i * Node.Layout.Length, Node.Layout.Length)));
             }
-            
+
             return new OrderBookSide
             {
                 Metadata = MetaData.Deserialize(span.Slice(Layout.MetadataOffset, MetaData.Layout.Length)),

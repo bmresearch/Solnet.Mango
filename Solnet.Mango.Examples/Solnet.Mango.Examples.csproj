@@ -4,6 +4,7 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>Solnet.Mango.Examples</RootNamespace>
+        <IsPackable>false</IsPackable>
     </PropertyGroup>
 
     <ItemGroup>
@@ -11,11 +12,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Solnet.Programs" Version="0.4.8" />
-        <PackageReference Include="Solnet.Rpc" Version="0.4.8" />
-        <PackageReference Include="Solnet.Wallet" Version="0.4.8" />
-        <PackageReference Include="Solnet.KeyStore" Version="0.4.8" />
-        <PackageReference Include="Solnet.Serum" Version="1.0.2" />
+        <PackageReference Include="Solnet.Programs" Version="0.4.11" />
+        <PackageReference Include="Solnet.Rpc" Version="0.4.11" />
+        <PackageReference Include="Solnet.Wallet" Version="0.4.11" />
+        <PackageReference Include="Solnet.KeyStore" Version="0.4.11" />
+		<PackageReference Include="Solnet.Pyth" Version="0.2.2" />
+        <PackageReference Include="Solnet.Serum" Version="1.0.5" />
     </ItemGroup>
 
 </Project>

@@ -1,4 +1,4 @@
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Events
 {
     /// <summary>
     /// The type of event raised by the <see cref="EventQueue"/>.
@@ -9,12 +9,12 @@ namespace Solnet.Mango.Models
         /// An event that represents an order fill.
         /// </summary>
         Fill,
-        
+
         /// <summary>
         /// An event that represents an order removal.
         /// </summary>
         Out,
-        
+
         /// <summary>
         /// An event that represents a liquidation.
         /// </summary>

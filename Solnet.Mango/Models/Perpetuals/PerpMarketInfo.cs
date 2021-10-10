@@ -2,7 +2,7 @@ using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using System;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Perpetuals
 {
     /// <summary>
     /// Represents information about a perpetual market in Mango.
@@ -44,12 +44,12 @@ namespace Solnet.Mango.Models
         /// The taker fee.
         /// </summary>
         public I80F48 TakerFee;
-        
+
         /// <summary>
         /// The maker fee.
         /// </summary>
         public I80F48 MakerFee;
-        
+
         /// <summary>
         /// The base lot size.
         /// </summary>
@@ -59,7 +59,7 @@ namespace Solnet.Mango.Models
         /// The quote lot size.
         /// </summary>
         public long QuoteLotSize;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="PerpMarketInfo"/> instance.
         /// </summary>
@@ -68,7 +68,7 @@ namespace Solnet.Mango.Models
         public static new PerpMarketInfo Deserialize(ReadOnlySpan<byte> data)
         {
             if (data.Length != ExtraLayout.Length) throw new ArgumentException("data length is invalid");
-            
+
             return new PerpMarketInfo
             {
                 Market = data.GetPubKey(Layout.MarketOffset),

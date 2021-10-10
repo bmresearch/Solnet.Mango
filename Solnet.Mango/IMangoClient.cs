@@ -1,9 +1,11 @@
-using System.Threading.Tasks;
 using Solnet.Mango.Models;
+using Solnet.Mango.Models.Perpetuals;
+using Solnet.Rpc;
 using Solnet.Rpc.Types;
 using Solnet.Serum.Models;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using EventQueue = Solnet.Mango.Models.EventQueue;
 using OrderBook = Solnet.Mango.Models.OrderBook;
 using OrderBookSide = Solnet.Mango.Models.OrderBookSide;
@@ -15,6 +17,16 @@ namespace Solnet.Mango
     /// </summary>
     public interface IMangoClient
     {
+        /// <summary>
+        /// The <see cref="IRpcClient"/> instance.
+        /// </summary>
+        IRpcClient RpcClient { get; }
+
+        /// <summary>
+        /// The <see cref="IStreamingRpcClient"/> instance.
+        /// </summary>
+        IStreamingRpcClient StreamingRpcClient { get; }
+
         /// <summary>
         /// Gets the given <see cref="MangoGroup"/>. This is an asynchronous operation.
         /// </summary>
@@ -48,13 +60,13 @@ namespace Solnet.Mango
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="MangoCache"/>s.</returns>
         AccountResultWrapper<MangoCache> GetMangoCache(string account, Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
         /// Gets the given <see cref="RootBank"/>. This is an asynchronous operation.
         /// </summary>
         /// <param name="account">The <see cref="RootBank"/> public key.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
-        /// <returns>The list of <see cref="RootBank"/>s or null in case an error occurred.</returns>
+        /// <returns>The <see cref="RootBank"/>s or null in case an error occurred.</returns>
         Task<AccountResultWrapper<RootBank>> GetRootBankAsync(string account,
             Commitment commitment = Commitment.Finalized);
 
@@ -63,9 +75,26 @@ namespace Solnet.Mango
         /// </summary>
         /// <param name="account">The <see cref="RootBank"/> public key.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
-        /// <returns>The list of <see cref="RootBank"/>s.</returns>
+        /// <returns>The <see cref="RootBank"/>.</returns>
         AccountResultWrapper<RootBank> GetRootBank(string account, Commitment commitment = Commitment.Finalized);
-        
+
+        /// <summary>
+        /// Gets the <see cref="RootBank"/>s for the given <see cref="MangoGroup"/>. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="mangoGroup">The <see cref="MangoGroup"/>.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The list of <see cref="RootBank"/>s or null in case an error occurred.</returns>
+        Task<MultipleAccountsResultWrapper<List<RootBank>>> GetRootBanksAsync(MangoGroup mangoGroup,
+            Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the <see cref="RootBank"/>s for the given <see cref="MangoGroup"/>.
+        /// </summary>
+        /// <param name="mangoGroup">The <see cref="MangoGroup"/>.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The list of <see cref="RootBank"/>s.</returns>
+        MultipleAccountsResultWrapper<List<RootBank>> GetRootBanks(MangoGroup mangoGroup, Commitment commitment = Commitment.Finalized);
+
         /// <summary>
         /// Gets the given <see cref="NodeBank"/>. This is an asynchronous operation.
         /// </summary>
@@ -74,6 +103,23 @@ namespace Solnet.Mango
         /// <returns>The list of <see cref="NodeBank"/>s or null in case an error occurred.</returns>
         Task<AccountResultWrapper<NodeBank>> GetNodeBankAsync(string account,
             Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the <see cref="NodeBank"/>s for the given <see cref="RootBank"/>. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="rootBank">The <see cref="RootBank"/>.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The list of <see cref="NodeBank"/>s or null in case an error occurred.</returns>
+        Task<MultipleAccountsResultWrapper<List<NodeBank>>> GetNodeBanksAsync(RootBank rootBank,
+            Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the <see cref="NodeBank"/>s for the given <see cref="RootBank"/>.
+        /// </summary>
+        /// <param name="rootBank">The <see cref="RootBank"/>.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The list of <see cref="NodeBank"/>s.</returns>
+        MultipleAccountsResultWrapper<List<NodeBank>> GetNodeBanks(RootBank rootBank, Commitment commitment = Commitment.Finalized);
 
         /// <summary>
         /// Gets the given <see cref="NodeBank"/>.
@@ -133,7 +179,7 @@ namespace Solnet.Mango
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="OrderBook"/>s.</returns>
         MultipleAccountsResultWrapper<OrderBook> GetOrderBook(PerpMarket perpMarket, Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
         /// Gets the given <see cref="Models.EventQueue"/>. This is an asynchronous operation.
         /// </summary>
@@ -150,7 +196,7 @@ namespace Solnet.Mango
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="EventQueue"/>s.</returns>
         AccountResultWrapper<EventQueue> GetEventQueue(string eventQueueAddress, Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
         /// Gets the Mango accounts for the given owner. This is an asynchronous operation.
         /// </summary>
@@ -168,7 +214,7 @@ namespace Solnet.Mango
         /// <returns>The list of <see cref="MangoAccount"/>s or null in case an error occurred.</returns>
         ProgramAccountsResultWrapper<List<MangoAccount>> GetMangoAccounts(string ownerAccount,
             Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
         /// Gets the perpetual markets for the given Mango group. This is an asynchronous operation.
         /// </summary>
@@ -186,7 +232,7 @@ namespace Solnet.Mango
         /// <returns>The list of <see cref="PerpMarket"/>s or null in case an error occurred.</returns>
         ProgramAccountsResultWrapper<List<PerpMarket>> GetPerpMarkets(string mangoGroup,
             Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
         /// Subscribe to a live feed of an <see cref="EventQueue"/>. This is an asynchronous operation.
         /// </summary>
@@ -194,7 +240,7 @@ namespace Solnet.Mango
         /// <param name="eventQueueAccountAddress">The public key of the <see cref="EventQueue"/> account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
         Task<Subscription> SubscribeEventQueueAsync(Action<Subscription, EventQueue, ulong> action, string eventQueueAccountAddress, Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
         /// Subscribe to a live feed of an <see cref="EventQueue"/>.
         /// </summary>
@@ -202,7 +248,7 @@ namespace Solnet.Mango
         /// <param name="eventQueueAccountAddress">The public key of the <see cref="EventQueue"/> account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
         Subscription SubscribeEventQueue(Action<Subscription, EventQueue, ulong> action, string eventQueueAccountAddress, Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
         /// Unsubscribe to a live feed of an <see cref="EventQueue"/>. This is an asynchronous operation.
         /// </summary>
@@ -214,35 +260,35 @@ namespace Solnet.Mango
         /// </summary>
         /// <param name="eventQueueAccountAddress">The public key of the <see cref="EventQueue"/> account.</param>
         void UnsubscribeEventQueue(string eventQueueAccountAddress);
-        
+
         /// <summary>
-        /// Subscribe to a live feed of a Serum Market's Order Book. This will either be a Bid or Ask account data feed. This is an asynchronous operation.
+        /// Subscribe to a live feed of a Mango Perpetual Market's Order Book. This will either be a Bid or Ask account data feed. This is an asynchronous operation.
         /// </summary>
         /// <param name="action">An action which receives the <see cref="Subscription"/>, an <see cref="OrderBookSide"/> and the corresponding slot.</param>
         /// <param name="orderBookAccountAddress">The public key of the Order Book account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
         Task<Subscription> SubscribeOrderBookSideAsync(Action<Subscription, OrderBookSide, ulong> action, string orderBookAccountAddress, Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
-        /// Subscribe to a live feed of a Serum Market's Order Book. This will either be a Bid or Ask account data feed.
+        /// Subscribe to a live feed of a Mango Perpetual Market's Order Book. This will either be a Bid or Ask account data feed.
         /// </summary>
         /// <param name="action">An action which receives the <see cref="Subscription"/>, an <see cref="OrderBookSide"/> and the corresponding slot.</param>
         /// <param name="orderBookAccountAddress">The public key of the Order Book account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
         Subscription SubscribeOrderBookSide(Action<Subscription, OrderBookSide, ulong> action, string orderBookAccountAddress, Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
-        /// Unsubscribe to a live feed of a Serum Market's Order Book Side. This will either be a Bid or Ask account data feed. This is an asynchronous operation.
+        /// Unsubscribe to a live feed of a Mango Perpetual Market's Order Book Side. This will either be a Bid or Ask account data feed. This is an asynchronous operation.
         /// </summary>
         /// <param name="orderBookAccountAddress">The public key of the Order Book account.</param>
         Task UnsubscribeOrderBookSideAsync(string orderBookAccountAddress);
 
         /// <summary>
-        /// Unsubscribe to a live feed of a Serum Market's Order Book Side. This will either be a Bid or Ask account data feed.
+        /// Unsubscribe to a live feed of a Mango Perpetual Market's Order Book Side. This will either be a Bid or Ask account data feed.
         /// </summary>
         /// <param name="orderBookAccountAddress">The public key of the Order Book account.</param>
         void UnsubscribeOrderBookSide(string orderBookAccountAddress);
-        
+
         /// <summary>
         /// Subscribe to a live feed of a <see cref="MangoAccount"/>. This is an asynchronous operation.
         /// </summary>
@@ -250,7 +296,7 @@ namespace Solnet.Mango
         /// <param name="mangoAccountAddress">The public key of the <see cref="MangoAccount"/> account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
         Task<Subscription> SubscribeMangoAccountAsync(Action<Subscription, MangoAccount, ulong> action, string mangoAccountAddress, Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
         /// Subscribe to a live feed of a <see cref="MangoAccount"/>.
         /// </summary>
@@ -258,7 +304,7 @@ namespace Solnet.Mango
         /// <param name="mangoAccountAddress">The public key of the <see cref="MangoAccount"/> account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
         Subscription SubscribeMangoAccount(Action<Subscription, MangoAccount, ulong> action, string mangoAccountAddress, Commitment commitment = Commitment.Finalized);
-        
+
         /// <summary>
         /// Unsubscribe to a live feed of a <see cref="MangoAccount"/>. This is an asynchronous operation.
         /// </summary>
@@ -270,5 +316,33 @@ namespace Solnet.Mango
         /// </summary>
         /// <param name="mangoAccountAddress">The public key of the <see cref="MangoAccount"/> account.</param>
         void UnsubscribeMangoAccount(string mangoAccountAddress);
+
+        /// <summary>
+        /// Subscribe to a live feed of a <see cref="MangoCache"/>. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="action">An action which receives the <see cref="Serum.Models.Subscription"/>, an <see cref="MangoCache"/> and the corresponding slot.</param>
+        /// <param name="mangoAccountAddress">The public key of the <see cref="MangoCache"/> account.</param>
+        /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
+        Task<Subscription> SubscribeMangoCacheAsync(Action<Subscription, MangoCache, ulong> action, string mangoAccountAddress, Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Subscribe to a live feed of a <see cref="MangoCache"/>.
+        /// </summary>
+        /// <param name="action">An action which receives the <see cref="Subscription"/>, an <see cref="MangoCache"/> and the corresponding slot.</param>
+        /// <param name="mangoCacheAddress">The public key of the <see cref="MangoCache"/> account.</param>
+        /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
+        Subscription SubscribeMangoCache(Action<Subscription, MangoCache, ulong> action, string mangoCacheAddress, Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Unsubscribe to a live feed of a <see cref="MangoCache"/>. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="mangoCacheAddress">The public key of the <see cref="MangoCache"/> account.</param>
+        Task UnsubscribeMangoCacheAsync(string mangoCacheAddress);
+
+        /// <summary>
+        /// Unsubscribe to a live feed of a <see cref="MangoCache"/>.
+        /// </summary>
+        /// <param name="mangoCacheAddress">The public key of the <see cref="MangoCache"/> account.</param>
+        void UnsubscribeMangoCache(string mangoCacheAddress);
     }
 }

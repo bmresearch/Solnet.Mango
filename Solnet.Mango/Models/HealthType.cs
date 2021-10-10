@@ -9,7 +9,7 @@ namespace Solnet.Mango.Models
         /// The maintenance health.
         /// </summary>
         Maintenance,
-        
+
         /// <summary>
         /// The initialization health.
         /// </summary>

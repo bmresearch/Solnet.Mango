@@ -24,7 +24,7 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int MetadataOffset = 0;
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -40,7 +40,7 @@ namespace Solnet.Mango.Models
             /// </summary>
             internal const int VaultOffset = 40;
         }
-        
+
         /// <summary>
         /// The account metadata.
         /// </summary>
@@ -50,12 +50,12 @@ namespace Solnet.Mango.Models
         /// 
         /// </summary>
         public I80F48 Deposits;
-        
+
         /// <summary>
         /// 
         /// </summary>
         public I80F48 Borrows;
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -70,7 +70,7 @@ namespace Solnet.Mango.Models
         {
             if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
             ReadOnlySpan<byte> span = data.AsSpan();
-            
+
             return new NodeBank
             {
                 Metadata = MetaData.Deserialize(span.GetSpan(Layout.MetadataOffset, MetaData.Layout.Length)),

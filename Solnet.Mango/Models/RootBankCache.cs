@@ -18,7 +18,7 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int Length = 40;
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -28,7 +28,7 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int BorrowIndexOffset = 16;
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -49,7 +49,7 @@ namespace Solnet.Mango.Models
         /// 
         /// </summary>
         public ulong LastUpdated;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="RootBankCache"/> instance.
         /// </summary>
@@ -58,7 +58,7 @@ namespace Solnet.Mango.Models
         public static RootBankCache Deserialize(ReadOnlySpan<byte> data)
         {
             if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
-            
+
             return new RootBankCache
             {
                 DepositIndex = I80F48.Deserialize(data.GetSpan(Layout.DepositIndexOffset, I80F48.Length)),

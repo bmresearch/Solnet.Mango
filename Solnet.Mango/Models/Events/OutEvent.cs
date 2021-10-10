@@ -3,7 +3,7 @@ using Solnet.Serum.Models;
 using Solnet.Wallet;
 using System;
 
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Events
 {
     /// <summary>
     /// Represents a <see cref="EventType.Out"/> in the Mango <see cref="EventQueue"/>.
@@ -35,7 +35,7 @@ namespace Solnet.Mango.Models
             /// </summary>
             internal const int QuantityOffset = 56;
         }
-        
+
         /// <summary>
         /// The side from the taker's point of view.
         /// </summary>
@@ -55,7 +55,7 @@ namespace Solnet.Mango.Models
         /// The quantity that was filled.
         /// </summary>
         public long Quantity;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="OutEvent"/> instance.
         /// </summary>
@@ -65,8 +65,8 @@ namespace Solnet.Mango.Models
         {
             return new OutEvent
             {
-                EventType = (EventType) Enum.Parse(typeof(EventType), data.GetU8(Layout.EventTypeOffset).ToString()),
-                Side = (Side) Enum.Parse(typeof(Side), data.GetU8(ExtraLayout.SideOffset).ToString()),
+                EventType = (EventType)Enum.Parse(typeof(EventType), data.GetU8(Layout.EventTypeOffset).ToString()),
+                Side = (Side)Enum.Parse(typeof(Side), data.GetU8(ExtraLayout.SideOffset).ToString()),
                 Slot = data.GetU8(ExtraLayout.SlotOffset),
                 Owner = data.GetPubKey(ExtraLayout.OwnerOffset),
                 Quantity = data.GetS64(ExtraLayout.QuantityOffset)

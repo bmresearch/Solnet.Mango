@@ -15,7 +15,7 @@ namespace Solnet.Mango.Models
     /// <typeparam name="T2">The underlying type of the request.</typeparam>
     public class ResultWrapper<T, T2>
     {
-        
+
         /// <summary>
         /// Initialize the result wrapper with the given result.
         /// </summary>
@@ -56,7 +56,7 @@ namespace Solnet.Mango.Models
         /// </summary>
         public bool WasSuccessful => OriginalRequest.WasSuccessful && WasDeserializationSuccessful;
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -68,7 +68,7 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="result">The result of the request.</param>
         public MultipleAccountsResultWrapper(RequestResult<ResponseValue<List<AccountInfo>>> result) : base(result) { }
-        
+
         /// <summary>
         /// Initialize the result wrapper with the given result.
         /// </summary>
@@ -88,7 +88,7 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="result">The result of the request.</param>
         public AccountResultWrapper(RequestResult<ResponseValue<AccountInfo>> result) : base(result) { }
-        
+
         /// <summary>
         /// Initialize the result wrapper with the given result.
         /// </summary>
@@ -96,7 +96,7 @@ namespace Solnet.Mango.Models
         /// <param name="parsedResult">The parsed result type.</param>
         public AccountResultWrapper(RequestResult<ResponseValue<AccountInfo>> result, T parsedResult) : base(result, parsedResult) { }
     }
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -108,7 +108,7 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="result">The result of the request.</param>
         public ProgramAccountsResultWrapper(RequestResult<List<AccountKeyPair>> result) : base(result) { }
-        
+
         /// <summary>
         /// Initialize the result wrapper with the given result.
         /// </summary>

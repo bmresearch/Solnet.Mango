@@ -9,7 +9,7 @@ namespace Solnet.Mango.Models
     public class QueueHeader
     {
         #region Layout
-        
+
         /// <summary>
         /// Represents the layout of the <see cref="QueueHeader"/> data structure.
         /// </summary>
@@ -19,7 +19,7 @@ namespace Solnet.Mango.Models
             /// The size of the data for a queue header structure.
             /// </summary>
             internal const int Length = 32;
-            
+
             /// <summary>
             /// The offset at which the value of the queue's metadata begins.
             /// </summary>
@@ -42,7 +42,7 @@ namespace Solnet.Mango.Models
         }
 
         #endregion
-        
+
         /// <summary>
         /// The metadata of the account.
         /// </summary>
@@ -80,6 +80,6 @@ namespace Solnet.Mango.Models
                 NextSequenceNumber = data.GetU64(Layout.NextSequenceNumberOffset)
             };
         }
-        
+
     }
 }

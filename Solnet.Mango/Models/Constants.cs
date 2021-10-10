@@ -1,3 +1,6 @@
+using Solnet.Mango.Models.Matching;
+using Solnet.Wallet;
+
 namespace Solnet.Mango.Models
 {
     /// <summary>
@@ -9,7 +12,7 @@ namespace Solnet.Mango.Models
         /// The maximum number of tokens.
         /// </summary>
         public const int MaxTokens = 16;
-        
+
         /// <summary>
         /// The maximum number of pairs.
         /// </summary>
@@ -44,5 +47,15 @@ namespace Solnet.Mango.Models
         /// Maximum amount of numbers in the margin basket.
         /// </summary>
         public const int MaxNumInMarginBasket = 10;
+
+        /// <summary>
+        /// The mango group.
+        /// </summary>
+        public static readonly PublicKey MangoGroup = new("98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue");
+
+        /// <summary>
+        /// The mango cache.
+        /// </summary>
+        public static readonly PublicKey MangoCache = new("EBDRoayCDDUvDgCimta45ajQeXbexv7aKqJubruqpyvu");
     }
 }

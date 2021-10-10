@@ -1,4 +1,4 @@
-namespace Solnet.Mango.Models
+namespace Solnet.Mango.Models.Events
 {
     /// <summary>
     /// Represents a <see cref="EventType"/> in the Mango <see cref="EventQueue"/>.
@@ -19,12 +19,12 @@ namespace Solnet.Mango.Models
             /// The offset at which the event type begins.
             /// </summary>
             internal const int EventTypeOffset = 0;
-            
+
             /// <summary>
             /// The offset at which the timestamp value begins.
             /// </summary>
             internal const int TimestampOffset = 8;
-            
+
             /// <summary>
             /// The offset at which the sequence number value begins.
             /// </summary>
@@ -35,12 +35,12 @@ namespace Solnet.Mango.Models
         /// The event type.
         /// </summary>
         public EventType EventType;
-        
+
         /// <summary>
         /// The timestamp of the fill event.
         /// </summary>
-        public ulong Timestamp; 
-       
+        public ulong Timestamp;
+
         /// <summary>
         /// The sequence number.
         /// </summary>

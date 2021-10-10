@@ -1,3 +1,4 @@
+using Solnet.Mango.Models.Perpetuals;
 using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using System;
@@ -19,12 +20,12 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int Length = 1608;
-            
+
             /// <summary>
             /// 
             /// </summary>
             internal const int MetadataOffset = 0;
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -34,7 +35,7 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int RootBankCachesOffset = 368;
-            
+
             /// <summary>
             /// 
             /// </summary>
@@ -60,7 +61,7 @@ namespace Solnet.Mango.Models
         /// 
         /// </summary>
         public List<PerpMarketCache> PerpetualMarketCaches;
-        
+
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="RootBankCache"/> instance.
         /// </summary>
@@ -70,34 +71,34 @@ namespace Solnet.Mango.Models
         {
             if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
             ReadOnlySpan<byte> span = data.AsSpan();
-            
+
             List<PriceCache> priceCaches = new(Constants.MaxPairs);
             ReadOnlySpan<byte> priceCachesBytes = span.Slice(Layout.PriceCachesOffset, PriceCache.Layout.Length * Constants.MaxPairs);
 
-            for (int i = 0; i < Constants.MaxPairs - 1; i++)
+            for (int i = 0; i < Constants.MaxPairs; i++)
             {
                 PriceCache priceCache = PriceCache.Deserialize(priceCachesBytes.Slice(i * PriceCache.Layout.Length, PriceCache.Layout.Length));
                 priceCaches.Add(priceCache);
             }
-            
+
             List<RootBankCache> rootBankCaches = new(Constants.MaxTokens);
-            ReadOnlySpan<byte> rootBankCachesBytes = span.Slice(Layout.RootBankCachesOffset, RootBankCache.Layout.Length * Constants.MaxPairs);
-            
-            for (int i = 0; i < Constants.MaxPairs - 1; i++)
+            ReadOnlySpan<byte> rootBankCachesBytes = span.Slice(Layout.RootBankCachesOffset, RootBankCache.Layout.Length * Constants.MaxTokens);
+
+            for (int i = 0; i < Constants.MaxTokens; i++)
             {
                 RootBankCache rootBankCache = RootBankCache.Deserialize(rootBankCachesBytes.Slice(i * RootBankCache.Layout.Length, RootBankCache.Layout.Length));
                 rootBankCaches.Add(rootBankCache);
             }
-            
+
             List<PerpMarketCache> perpMarketCaches = new(Constants.MaxPairs);
             ReadOnlySpan<byte> perpMarketCachesBytes = span.Slice(Layout.RootBankCachesOffset, PerpMarketCache.Layout.Length * Constants.MaxPairs);
-            
-            for (int i = 0; i < Constants.MaxPairs - 1; i++)
+
+            for (int i = 0; i < Constants.MaxPairs; i++)
             {
                 PerpMarketCache perpMarketCache = PerpMarketCache.Deserialize(perpMarketCachesBytes.Slice(i * PerpMarketCache.Layout.Length, PerpMarketCache.Layout.Length));
                 perpMarketCaches.Add(perpMarketCache);
             }
-            
+
             return new MangoCache
             {
                 Metadata = MetaData.Deserialize(span.GetSpan(Layout.MetadataOffset, MetaData.Layout.Length)),
