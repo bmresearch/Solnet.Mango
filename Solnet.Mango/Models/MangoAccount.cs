@@ -203,7 +203,7 @@ namespace Solnet.Mango.Models
         /// <summary>
         /// Account info.
         /// </summary>
-        public string AccountInfo;
+        public string AccountInfo { get; set; }
 
         /// <summary>
         /// The loaded open orders accounts.
@@ -617,13 +617,24 @@ namespace Solnet.Mango.Models
 
             return 100;
         }
+        
+        /// <summary>
+        /// Gets the account's available balance.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="tokenIndex">The token index.</param>
+        /// <returns>The available balance.</returns>
+        public double GetUiAvailableBalance(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex) =>
+            MangoUtils.HumanizeNative(GetAvailableBalance(mangoGroup, mangoCache, tokenIndex),
+                mangoGroup.GetQuoteTokenInfo().Decimals);
 
         /// <summary>
         /// Gets the account's available balance.
         /// </summary>
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="mangoCache">The mango cache.</param>
-        /// <param name="tokenIndex"></param>
+        /// <param name="tokenIndex">The token index.</param>
         /// <returns>The available balance.</returns>
         public double GetAvailableBalance(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex)
         {
@@ -789,6 +800,19 @@ namespace Solnet.Mango.Models
 
             return (spot.ToList(), perps.ToList(), quote);
         }
+
+        /// <summary>
+        /// Gets the margin available to expand a position in this market.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="marketIndex">The market index.</param>
+        /// <param name="marketType">The market type.</param>
+        /// <returns>The margin available.</returns>
+        public double GetUiMarketMarginAvailable(MangoGroup mangoGroup, MangoCache mangoCache, int marketIndex,
+            MarketType marketType) =>
+            MangoUtils.HumanizeNative(GetMarketMarginAvailable(mangoGroup, mangoCache, marketIndex, marketType),
+                mangoGroup.GetQuoteTokenInfo().Decimals);
 
         /// <summary>
         /// Gets the margin available to expand a position in this market.
