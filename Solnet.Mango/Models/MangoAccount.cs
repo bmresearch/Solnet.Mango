@@ -1062,28 +1062,28 @@ namespace Solnet.Mango.Models
 
             List<PerpAccount> perpAccounts = new(Constants.MaxPairs);
             ReadOnlySpan<byte> perpAccountsBytes = span.Slice(Layout.PerpetualAccountsOffset,
-                PerpAccount.Layout.Length * Constants.MaxTokens);
-            for (int i = 0; i < Constants.MaxTokens; i++)
+                PerpAccount.Layout.Length * Constants.MaxPairs);
+            for (int i = 0; i < Constants.MaxPairs; i++)
             {
                 perpAccounts.Add(PerpAccount.Deserialize(perpAccountsBytes.Slice(i * PerpAccount.Layout.Length,
                     PerpAccount.Layout.Length)));
             }
 
-            List<byte> orderMarkets = new(Constants.MaxPairs);
+            List<byte> orderMarkets = new(Constants.MaxPerpOpenOrders);
             ReadOnlySpan<byte> orderMarketsBytes = span.Slice(Layout.OrderMarketOffset, Constants.MaxPerpOpenOrders);
             for (int i = 0; i < Constants.MaxPerpOpenOrders; i++)
             {
                 orderMarkets.Add(orderMarketsBytes.GetU8(i));
             }
 
-            List<Side> orderSides = new(Constants.MaxPairs);
+            List<Side> orderSides = new(Constants.MaxPerpOpenOrders);
             ReadOnlySpan<byte> orderSidesBytes = span.Slice(Layout.OrderSideOffset, Constants.MaxPerpOpenOrders);
             for (int i = 0; i < Constants.MaxPerpOpenOrders; i++)
             {
                 orderSides.Add(orderSidesBytes.GetU8(i) == 0 ? Side.Buy : Side.Sell);
             }
 
-            List<BigInteger> orderIds = new(Constants.MaxPairs);
+            List<BigInteger> orderIds = new(Constants.MaxPerpOpenOrders);
             ReadOnlySpan<byte> orderIdsBytes =
                 span.Slice(Layout.OrderIdsOffset, I80F48.Length * Constants.MaxPerpOpenOrders);
             for (int i = 0; i < Constants.MaxPerpOpenOrders; i++)
@@ -1091,7 +1091,7 @@ namespace Solnet.Mango.Models
                 orderIds.Add(orderIdsBytes.GetBigInt(i * I80F48.Length, I80F48.Length, true));
             }
 
-            List<ulong> clientOrderIds = new(Constants.MaxPairs);
+            List<ulong> clientOrderIds = new(Constants.MaxPerpOpenOrders);
             ReadOnlySpan<byte> clientOrderIdsBytes =
                 span.Slice(Layout.ClientOrderIdsOffset, sizeof(ulong) * Constants.MaxPerpOpenOrders);
             for (int i = 0; i < Constants.MaxPerpOpenOrders; i++)
