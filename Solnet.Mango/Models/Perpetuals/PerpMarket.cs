@@ -224,6 +224,25 @@ namespace Solnet.Mango.Models.Perpetuals
         public double TickSize(byte baseDecimals, byte quoteDecimals) => PriceLotsToNumber(1, baseDecimals, quoteDecimals);
 
         /// <summary>
+        /// Conversion for order values.
+        /// </summary>
+        /// <param name="price"></param>
+        /// <param name="quantity"></param>
+        /// <param name="baseDecimals"></param>
+        /// <param name="quoteDecimals"></param>
+        /// <returns></returns>
+        public (long Price, long Quantity) UiToNativePriceQuantity(double price, double quantity, byte baseDecimals, byte quoteDecimals)
+        {
+            var baseUnit = Math.Pow(10, baseDecimals);
+            var quoteUnit = Math.Pow(10, quoteDecimals);
+
+            var nativePrice = (long)((price * quoteUnit * BaseLotSize) / (QuoteLotSize / baseUnit));
+            var nativeQuantity = (long)((quantity * baseUnit) / BaseLotSize);
+
+            return (nativePrice, nativeQuantity);
+        }
+
+        /// <summary>
         /// Deserialize a span of bytes into a <see cref="PerpMarket"/> instance.
         /// </summary>
         /// <param name="data">The data to deserialize into the structure.</param>

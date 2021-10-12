@@ -147,6 +147,13 @@ namespace Solnet.Mango.Models.Perpetuals
         }
 
         /// <summary>
+        /// Gets the base position value converted for ui display.
+        /// </summary>
+        /// <returns></returns>
+        public double GetUiBasePosition(PerpMarket market, byte decimals) =>
+            market.BaseLotsToNumber(BasePosition, decimals);
+
+        /// <summary>
         /// Simulates the position health against the given base position change.
         /// </summary>
         /// <param name="perpMarketInfo">The perpetual market's info.</param>
