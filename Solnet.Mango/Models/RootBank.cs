@@ -154,6 +154,21 @@ namespace Solnet.Mango.Models
             ILogger logger = null) => LoadNodeBanksAsync(rpcClient, logger).Result;
 
         /// <summary>
+        /// Gets the index of the given node bank key.
+        /// </summary>
+        /// <param name="nodeBankKey">The node bank key.</param>
+        /// <returns>The index.</returns>
+        public int GetNodeBankIndex(PublicKey nodeBankKey)
+        {
+            for (int i = 0; i < NodeBanks.Count; i++)
+            {
+                if (NodeBanks[i].Equals(nodeBankKey)) return i;
+            }
+
+            throw new Exception("This Node Bank does not belong to this RootBank");
+        }
+        
+        /// <summary>
         /// Gets the total amount of deposits.
         /// </summary>
         /// <returns>The total amount of deposits.</returns>
