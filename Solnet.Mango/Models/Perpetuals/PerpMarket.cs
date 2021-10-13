@@ -195,7 +195,7 @@ namespace Solnet.Mango.Models.Perpetuals
         public double PriceLotsToNumber(double price, byte baseDecimals, byte quoteDecimals)
         {
             double nativeToUi = Math.Pow(10, baseDecimals - quoteDecimals);
-            double lotsToNative = QuoteLotSize / BaseLotSize;
+            double lotsToNative = (double) QuoteLotSize / BaseLotSize;
             return price * lotsToNative * nativeToUi;
         }
 
