@@ -196,7 +196,7 @@ namespace Solnet.Mango.Models
         public List<PerpMarket> PerpMarketAccounts;
 
         /// <summary>
-        /// Loads the node banks for this root bank. This is an asynchronous operation.
+        /// Loads the root banks for this root bank. This is an asynchronous operation.
         /// </summary>
         /// <param name="rpcClient">A rpc client instance.</param>
         /// <param name="logger">A logger instance.</param>
@@ -230,7 +230,7 @@ namespace Solnet.Mango.Models
         }
 
         /// <summary>
-        /// Loads the node banks for this root bank.
+        /// Loads the root banks for this root bank.
         /// </summary>
         /// <param name="rpcClient">A rpc client instance.</param>
         /// <param name="logger">A logger instance.</param>
