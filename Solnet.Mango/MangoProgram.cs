@@ -315,6 +315,128 @@ namespace Solnet.Mango
                 ProgramId = programIdKey,
             };
         }
+        
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="mangoGroup"></param>
+        /// <param name="mangoAccount"></param>
+        /// <param name="owner"></param>
+        /// <param name="mangoCache"></param>
+        /// <param name="spotMarket"></param>
+        /// <param name="bids"></param>
+        /// <param name="asks"></param>
+        /// <param name="dexRequestQueue"></param>
+        /// <param name="dexEventQueue"></param>
+        /// <param name="dexBase"></param>
+        /// <param name="dexQuote"></param>
+        /// <param name="baseRootBank"></param>
+        /// <param name="baseNodeBank"></param>
+        /// <param name="baseVault"></param>
+        /// <param name="quoteRootBank"></param>
+        /// <param name="quoteNodeBank"></param>
+        /// <param name="quoteVault"></param>
+        /// <param name="signer"></param>
+        /// <param name="dexSigner"></param>
+        /// <param name="serumVault"></param>
+        /// <param name="openOrdersAccounts"></param>
+        /// <param name="marketIndex"></param>
+        /// <param name="order"></param>
+        /// <returns></returns>
+        public static TransactionInstruction PlaceSpotOrder2(PublicKey mangoGroup, PublicKey mangoAccount,
+            PublicKey owner, PublicKey mangoCache, PublicKey spotMarket, PublicKey bids, PublicKey asks,
+            PublicKey dexRequestQueue, PublicKey dexEventQueue, PublicKey dexBase, PublicKey dexQuote,
+            PublicKey baseRootBank, PublicKey baseNodeBank, PublicKey baseVault, PublicKey quoteRootBank,
+            PublicKey quoteNodeBank, PublicKey quoteVault, PublicKey signer, PublicKey dexSigner, PublicKey serumVault,
+            IList<PublicKey> openOrdersAccounts, int marketIndex, Order order)
+            => PlaceSpotOrder2(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, mangoCache,
+                SerumProgram.ProgramIdKey,
+                spotMarket, bids, asks, dexRequestQueue, dexEventQueue, dexBase, dexQuote, baseRootBank, baseNodeBank,
+                baseVault, quoteRootBank, quoteNodeBank, quoteVault, signer, dexSigner, serumVault, openOrdersAccounts,
+                marketIndex, order);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="programIdKey"></param>
+        /// <param name="mangoGroup"></param>
+        /// <param name="mangoAccount"></param>
+        /// <param name="owner"></param>
+        /// <param name="mangoCache"></param>
+        /// <param name="dexProgramIdKey"></param>
+        /// <param name="spotMarket"></param>
+        /// <param name="bids"></param>
+        /// <param name="asks"></param>
+        /// <param name="dexRequestQueue"></param>
+        /// <param name="dexEventQueue"></param>
+        /// <param name="dexBase"></param>
+        /// <param name="dexQuote"></param>
+        /// <param name="baseRootBank"></param>
+        /// <param name="baseNodeBank"></param>
+        /// <param name="baseVault"></param>
+        /// <param name="quoteRootBank"></param>
+        /// <param name="quoteNodeBank"></param>
+        /// <param name="quoteVault"></param>
+        /// <param name="signer"></param>
+        /// <param name="dexSigner"></param>
+        /// <param name="serumVault"></param>
+        /// <param name="openOrdersAccounts"></param>
+        /// <param name="marketIndex"></param>
+        /// <param name="order"></param>
+        /// <returns></returns>
+        public static TransactionInstruction PlaceSpotOrder2(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey dexProgramIdKey,
+            PublicKey spotMarket,
+            PublicKey bids, PublicKey asks, PublicKey dexRequestQueue, PublicKey dexEventQueue, PublicKey dexBase,
+            PublicKey dexQuote, PublicKey baseRootBank, PublicKey baseNodeBank, PublicKey baseVault,
+            PublicKey quoteRootBank,
+            PublicKey quoteNodeBank, PublicKey quoteVault, PublicKey signer, PublicKey dexSigner, PublicKey serumVault,
+            IList<PublicKey> openOrdersAccounts, int marketIndex, Order order)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+                AccountMeta.ReadOnly(mangoCache, false),
+                AccountMeta.ReadOnly(dexProgramIdKey, false),
+                AccountMeta.Writable(spotMarket, false),
+                AccountMeta.Writable(bids, false),
+                AccountMeta.Writable(asks, false),
+                AccountMeta.Writable(dexRequestQueue, false),
+                AccountMeta.Writable(dexEventQueue, false),
+                AccountMeta.Writable(dexBase, false),
+                AccountMeta.Writable(dexQuote, false),
+                AccountMeta.ReadOnly(baseRootBank, false),
+                AccountMeta.Writable(baseNodeBank, false),
+                AccountMeta.Writable(baseVault, false),
+                AccountMeta.ReadOnly(quoteRootBank, false),
+                AccountMeta.Writable(quoteNodeBank, false),
+                AccountMeta.Writable(quoteVault, false),
+                AccountMeta.ReadOnly(TokenProgram.ProgramIdKey, false),
+                AccountMeta.ReadOnly(signer, false),
+                AccountMeta.ReadOnly(dexSigner, false),
+                AccountMeta.ReadOnly(serumVault, false)
+            };
+
+            if (openOrdersAccounts.Count == 1)
+            {
+                keys.Add(AccountMeta.Writable(openOrdersAccounts[0], false));
+            }
+            else
+            {
+                keys.AddRange(openOrdersAccounts.Select((t, i) => i == marketIndex
+                    ? AccountMeta.Writable(t, false)
+                    : AccountMeta.ReadOnly(t, false)));
+            }
+
+            return new TransactionInstruction
+            {
+                Keys = keys,
+                Data = MangoProgramData.EncodePlaceSpotOrderData(order),
+                ProgramId = programIdKey,
+            };
+        }
 
         /// <summary>
         /// 
@@ -631,7 +753,7 @@ namespace Solnet.Mango
                 AccountMeta.Writable(asks, false),
                 AccountMeta.Writable(openOrders, false),
                 AccountMeta.ReadOnly(signer, false),
-                AccountMeta.ReadOnly(eventQueue, false)
+                AccountMeta.Writable(eventQueue, false)
             };
             return new TransactionInstruction
             {

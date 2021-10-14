@@ -120,7 +120,7 @@ namespace Solnet.Mango
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method.
         /// </summary>
         /// <returns>The encoded data.</returns>
-        internal static byte[] EncodePlaceSpotOrderData(Order order)
+        public static byte[] EncodePlaceSpotOrderData(Order order)
             => EncodePlaceSpotOrderData(order.Side, order.RawPrice, order.RawQuantity, order.Type, order.ClientOrderId,
                 order.SelfTradeBehavior, order.MaxQuoteQuantity, ushort.MaxValue);
 
@@ -152,7 +152,44 @@ namespace Solnet.Mango
             data.WriteU16(limit, MangoProgramLayouts.PlaceSpotOrder.LimitOffset);
             return data;
         }
+        
+        /// <summary>
+        /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method.
+        /// </summary>
+        /// <returns>The encoded data.</returns>
+        public static byte[] EncodePlaceSpotOrder2Data(Order order)
+            => EncodePlaceSpotOrderData(order.Side, order.RawPrice, order.RawQuantity, order.Type, order.ClientOrderId,
+                order.SelfTradeBehavior, order.MaxQuoteQuantity, ushort.MaxValue);
 
+        /// <summary>
+        /// Encode the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method.
+        /// </summary>
+        /// <param name="side">The side of the order.</param>
+        /// <param name="limitPrice">The price at which the order is to be placed.</param>
+        /// <param name="maxCoinQty">The maximum amount of coins to receive.</param>
+        /// <param name="orderType">The type of the order.</param>
+        /// <param name="clientOrderId">The client's order id.</param>
+        /// <param name="selfTradeBehaviorType">The behavior when trading against oneself.</param>
+        /// <param name="maxNativePcQtyIncludingFees">The maximum amount of price coins to pay.</param>
+        /// <param name="limit">The maximum number of iterations of the Serum order matching loop.</param>
+        /// <returns>The encoded data.</returns>
+        public static byte[] EncodePlaceSpotOrder2Data(Side side, ulong limitPrice, ulong maxCoinQty,
+            OrderType orderType, ulong clientOrderId, SelfTradeBehavior selfTradeBehaviorType,
+            ulong maxNativePcQtyIncludingFees, ushort limit)
+        {
+            byte[] data = new byte[50];
+            data.WriteU32((uint)MangoProgramInstructions.Values.PlaceSpotOrder2, MangoProgramLayouts.MethodOffset);
+            data.WriteU32((uint)side, MangoProgramLayouts.PlaceSpotOrder.SideOffset);
+            data.WriteU64(limitPrice, MangoProgramLayouts.PlaceSpotOrder.PriceOffset);
+            data.WriteU64(maxCoinQty, MangoProgramLayouts.PlaceSpotOrder.MaxBaseQuantityOffset);
+            data.WriteU64(maxNativePcQtyIncludingFees, MangoProgramLayouts.PlaceSpotOrder.MaxQuoteQuantity);
+            data.WriteU32((uint)selfTradeBehaviorType, MangoProgramLayouts.PlaceSpotOrder.SelfTradeBehaviorOffset);
+            data.WriteU32((uint)orderType, MangoProgramLayouts.PlaceSpotOrder.OrderTypeOffset);
+            data.WriteU64(clientOrderId, MangoProgramLayouts.PlaceSpotOrder.ClientIdOffset);
+            data.WriteU16(limit, MangoProgramLayouts.PlaceSpotOrder.LimitOffset);
+            return data;
+        }
+        
         /// <summary>
         /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method
         /// </summary>
