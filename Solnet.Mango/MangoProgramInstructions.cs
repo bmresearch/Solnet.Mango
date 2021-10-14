@@ -142,6 +142,11 @@ namespace Solnet.Mango
             /// Cancels all open perp orders.
             /// </summary>
             CancelAllPerpOrders = 39,
+            
+            /// <summary>
+            /// Cancel spot order v2
+            /// </summary>
+            PlaceSpotOrder2 = 41,
         };
     }
 }
