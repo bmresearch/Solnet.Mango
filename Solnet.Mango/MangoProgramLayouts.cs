@@ -163,12 +163,12 @@ namespace Solnet.Mango
             /// <summary>
             /// The offset at which to write the order side value.
             /// </summary>
-            internal const int SideOffset = 5;
+            internal const int SideOffset = 4;
 
             /// <summary>
             /// The offset at which to write the order id value.
             /// </summary>
-            internal const int OrderIdOffset = 9;
+            internal const int OrderIdOffset = 8;
         }
 
     }
