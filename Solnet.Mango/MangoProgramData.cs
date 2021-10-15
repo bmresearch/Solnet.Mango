@@ -158,7 +158,7 @@ namespace Solnet.Mango
         /// </summary>
         /// <returns>The encoded data.</returns>
         public static byte[] EncodePlaceSpotOrder2Data(Order order)
-            => EncodePlaceSpotOrderData(order.Side, order.RawPrice, order.RawQuantity, order.Type, order.ClientOrderId,
+            => EncodePlaceSpotOrder2Data(order.Side, order.RawPrice, order.RawQuantity, order.Type, order.ClientOrderId,
                 order.SelfTradeBehavior, order.MaxQuoteQuantity, ushort.MaxValue);
 
         /// <summary>
