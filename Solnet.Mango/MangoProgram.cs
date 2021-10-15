@@ -433,7 +433,7 @@ namespace Solnet.Mango
             return new TransactionInstruction
             {
                 Keys = keys,
-                Data = MangoProgramData.EncodePlaceSpotOrderData(order),
+                Data = MangoProgramData.EncodePlaceSpotOrder2Data(order),
                 ProgramId = programIdKey,
             };
         }
