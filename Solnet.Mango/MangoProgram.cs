@@ -688,8 +688,8 @@ namespace Solnet.Mango
                 AccountMeta.Writable(quoteNodeBank, false),
                 AccountMeta.Writable(baseVault, false),
                 AccountMeta.Writable(quoteVault, false),
-                AccountMeta.Writable(dexSigner, false),
-                AccountMeta.Writable(TokenProgram.ProgramIdKey, false),
+                AccountMeta.ReadOnly(dexSigner, false),
+                AccountMeta.ReadOnly(TokenProgram.ProgramIdKey, false),
             };
             return new TransactionInstruction
             {
