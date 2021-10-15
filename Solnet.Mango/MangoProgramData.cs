@@ -409,7 +409,7 @@ namespace Solnet.Mango
         /// <returns>The encoded data.</returns>
         internal static byte[] EncodeCancelSpotOrderData(Side side, BigInteger orderId)
         {
-            byte[] data = new byte[25];
+            byte[] data = new byte[24];
             data.WriteU32((uint)MangoProgramInstructions.Values.CancelSpotOrder, MangoProgramLayouts.MethodOffset);
             data.WriteU32((uint)side, MangoProgramLayouts.CancelSpotOrder.SideOffset);
             data.WriteBigInt(orderId, MangoProgramLayouts.CancelSpotOrder.OrderIdOffset);
