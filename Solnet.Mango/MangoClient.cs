@@ -1,12 +1,12 @@
 using Microsoft.Extensions.Logging;
 using Solnet.Mango.Models;
 using Solnet.Mango.Models.Perpetuals;
+using Solnet.Programs.Abstract;
+using Solnet.Programs.Models;
 using Solnet.Rpc;
 using Solnet.Rpc.Core.Sockets;
 using Solnet.Rpc.Models;
 using Solnet.Rpc.Types;
-using Solnet.Serum;
-using Solnet.Serum.Models;
 using Solnet.Wallet;
 using System;
 using System.Collections.Generic;
