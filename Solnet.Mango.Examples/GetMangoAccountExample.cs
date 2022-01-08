@@ -1,5 +1,6 @@
 using Solnet.Mango.Models;
 using Solnet.Programs;
+using Solnet.Programs.Models;
 using Solnet.Rpc;
 using Solnet.Wallet;
 using System;

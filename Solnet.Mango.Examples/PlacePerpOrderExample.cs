@@ -1,6 +1,6 @@
 ﻿using Solnet.KeyStore;
 using Solnet.Mango.Models;
-using Solnet.Programs;
+using Solnet.Programs.Models;
 using Solnet.Pyth;
 using Solnet.Pyth.Models;
 using Solnet.Rpc;
@@ -8,9 +8,7 @@ using Solnet.Rpc.Builders;
 using Solnet.Rpc.Core.Http;
 using Solnet.Rpc.Messages;
 using Solnet.Rpc.Models;
-using Solnet.Serum;
 using Solnet.Wallet;
-using Solnet.Wallet.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,7 +47,7 @@ namespace Solnet.Mango.Examples
 
         public async void Run()
         {
-            Pyth.Models.AccountResultWrapper<MappingAccount> mappingAccount = await
+            AccountResultWrapper<MappingAccount> mappingAccount = await
                 _pythClient.GetMappingAccountAsync(Pyth.Constants.MappingAccount);
 
             /*  Optionally perform a single request to get the product account
@@ -59,7 +57,7 @@ namespace Solnet.Mango.Examples
             }
             */
 
-            Pyth.Models.MultipleAccountsResultWrapper<List<ProductAccount>> productAccounts = await
+            MultipleAccountsResultWrapper<List<ProductAccount>> productAccounts = await
                 _pythClient.GetProductAccountsAsync(mappingAccount.ParsedResult);
 
             var _productAccount = productAccounts.ParsedResult.First(x => x.Product.Symbol.Contains("SOL"));
@@ -67,14 +65,14 @@ namespace Solnet.Mango.Examples
 
             var _priceAccount = await _pythClient.GetPriceDataAccountsAsync(productAccounts.ParsedResult);
 
-            Models.ProgramAccountsResultWrapper<List<MangoAccount>> mangoAccounts =
+            ProgramAccountsResultWrapper<List<MangoAccount>> mangoAccounts =
                 await _mangoClient.GetMangoAccountsAsync(Owner);
             Console.WriteLine($"Type: {mangoAccounts.ParsedResult[0].Metadata.DataType}");
             Console.WriteLine($"PublicKey: {mangoAccounts.OriginalRequest.Result[0].PublicKey}");
 
             await Task.Delay(200);
 
-            Models.AccountResultWrapper<MangoGroup> mangoGroup =
+            AccountResultWrapper<MangoGroup> mangoGroup =
                 await _mangoClient.GetMangoGroupAsync(Constants.MangoGroup);
             Console.WriteLine($"Type: {mangoGroup.ParsedResult.Metadata.DataType}");
 

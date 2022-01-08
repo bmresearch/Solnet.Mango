@@ -69,7 +69,7 @@ namespace Solnet.Mango.Models.Matching
             if (tag is (byte)NodeType.Uninitialized or (byte)NodeType.LastFreeNode or (byte)NodeType.FreeNode)
                 return null;
 
-            Span<byte> blob = data.GetSpan(Layout.BlobOffset, Layout.BlobSpanLength);
+            ReadOnlySpan<byte> blob = data.GetSpan(Layout.BlobOffset, Layout.BlobSpanLength);
 
             return tag switch
             {

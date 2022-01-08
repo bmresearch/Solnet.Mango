@@ -1,8 +1,8 @@
 using Solnet.Mango.Models;
 using Solnet.Mango.Models.Perpetuals;
+using Solnet.Programs.Models;
 using Solnet.Rpc;
 using Solnet.Rpc.Types;
-using Solnet.Serum.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -236,7 +236,7 @@ namespace Solnet.Mango
         /// <summary>
         /// Subscribe to a live feed of an <see cref="EventQueue"/>. This is an asynchronous operation.
         /// </summary>
-        /// <param name="action">An action which receives the <see cref="Serum.Models.Subscription"/>, an <see cref="EventQueue"/> and the corresponding slot.</param>
+        /// <param name="action">An action which receives the <see cref="Subscription"/>, an <see cref="EventQueue"/> and the corresponding slot.</param>
         /// <param name="eventQueueAccountAddress">The public key of the <see cref="EventQueue"/> account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
         Task<Subscription> SubscribeEventQueueAsync(Action<Subscription, EventQueue, ulong> action, string eventQueueAccountAddress, Commitment commitment = Commitment.Finalized);
@@ -292,7 +292,7 @@ namespace Solnet.Mango
         /// <summary>
         /// Subscribe to a live feed of a <see cref="MangoAccount"/>. This is an asynchronous operation.
         /// </summary>
-        /// <param name="action">An action which receives the <see cref="Serum.Models.Subscription"/>, an <see cref="MangoAccount"/> and the corresponding slot.</param>
+        /// <param name="action">An action which receives the <see cref="Subscription"/>, an <see cref="MangoAccount"/> and the corresponding slot.</param>
         /// <param name="mangoAccountAddress">The public key of the <see cref="MangoAccount"/> account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
         Task<Subscription> SubscribeMangoAccountAsync(Action<Subscription, MangoAccount, ulong> action, string mangoAccountAddress, Commitment commitment = Commitment.Finalized);
@@ -320,7 +320,7 @@ namespace Solnet.Mango
         /// <summary>
         /// Subscribe to a live feed of a <see cref="MangoCache"/>. This is an asynchronous operation.
         /// </summary>
-        /// <param name="action">An action which receives the <see cref="Serum.Models.Subscription"/>, an <see cref="MangoCache"/> and the corresponding slot.</param>
+        /// <param name="action">An action which receives the <see cref="Subscription"/>, an <see cref="MangoCache"/> and the corresponding slot.</param>
         /// <param name="mangoAccountAddress">The public key of the <see cref="MangoCache"/> account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
         Task<Subscription> SubscribeMangoCacheAsync(Action<Subscription, MangoCache, ulong> action, string mangoAccountAddress, Commitment commitment = Commitment.Finalized);

@@ -132,8 +132,8 @@ namespace Solnet.Mango.Models.Matching
         /// <returns>The <see cref="LeafNode"/> structure.</returns>
         public static new LeafNode Deserialize(ReadOnlySpan<byte> data)
         {
-            Span<byte> key = data.GetSpan(ExtraLayout.OrderIdOffset, Layout.KeyLength);
-            long price = ((ReadOnlySpan<byte>)key).GetS64(ExtraLayout.PriceOffset);
+            ReadOnlySpan<byte> key = data.GetSpan(ExtraLayout.OrderIdOffset, Layout.KeyLength);
+            long price = key.GetS64(ExtraLayout.PriceOffset);
             return new LeafNode
             {
                 Tag = NodeType.LeafNode,

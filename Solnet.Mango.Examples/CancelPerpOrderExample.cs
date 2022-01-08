@@ -2,6 +2,7 @@
 using Solnet.Mango.Models;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs;
+using Solnet.Programs.Models;
 using Solnet.Rpc;
 using Solnet.Rpc.Builders;
 using Solnet.Rpc.Core.Http;
