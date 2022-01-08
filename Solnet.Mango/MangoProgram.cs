@@ -67,7 +67,7 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(mangoGroup, false),
                 AccountMeta.Writable(mangoAccount, false),
                 AccountMeta.ReadOnly(owner, true),
-                AccountMeta.ReadOnly(SystemProgram.SysVarRentKey, false)
+                AccountMeta.ReadOnly(SysVars.RentKey, false)
             };
             return new TransactionInstruction
             {
@@ -299,7 +299,7 @@ namespace Solnet.Mango
                 AccountMeta.Writable(quoteVault, false),
                 AccountMeta.ReadOnly(TokenProgram.ProgramIdKey, false),
                 AccountMeta.ReadOnly(signer, false),
-                AccountMeta.ReadOnly(SystemProgram.SysVarRentKey, false),
+                AccountMeta.ReadOnly(SysVars.RentKey, false),
                 AccountMeta.ReadOnly(dexSigner, false),
                 AccountMeta.ReadOnly(serumVault, false)
             };
@@ -854,7 +854,7 @@ namespace Solnet.Mango
                 AccountMeta.Writable(openOrders, false),
                 AccountMeta.ReadOnly(spotMarket, false),
                 AccountMeta.ReadOnly(signer, false),
-                AccountMeta.ReadOnly(SystemProgram.SysVarRentKey, false)
+                AccountMeta.ReadOnly(SysVars.RentKey, false)
             };
 
             return new TransactionInstruction
