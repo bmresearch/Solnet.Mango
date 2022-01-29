@@ -462,6 +462,9 @@ namespace Solnet.Mango.Models
                 assetWeight;
             assetsValue += deposits;
 
+            if (OpenOrdersAccounts.Count == 0)
+                return assetsValue;
+
             OpenOrdersAccount openOrdersAccount = OpenOrdersAccounts[tokenIndex];
             if (openOrdersAccount == null)
                 return assetsValue;
@@ -764,11 +767,12 @@ namespace Solnet.Mango.Models
 
             for (int i = 0; i < (int)mangoGroup.NumOracles; i++)
             {
+                if (OpenOrdersAccounts.Count == 0) continue;
+                OpenOrdersAccount ooa = OpenOrdersAccounts[i];
                 RootBankCache bankCache = mangoCache.RootBankCaches[i];
                 double price = mangoCache.PriceCaches[i].Price.Value;
                 double baseNet = GetNet(bankCache, i);
 
-                OpenOrdersAccount ooa = OpenOrdersAccounts[i];
 
                 if (InMarginBasket[i] && ooa != null)
                 {

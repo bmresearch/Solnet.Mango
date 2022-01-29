@@ -227,7 +227,7 @@ namespace Solnet.Mango.Models
             if (utilization > OptimalUtilization.Value)
             {
                 double extraUtil = utilization - OptimalUtilization.Value;
-                double slope = ((MaxRate.Value - OptimalRate.Value) / 1) - OptimalUtilization.Value;
+                double slope = (MaxRate.Value - OptimalRate.Value) / ( 1 - OptimalUtilization.Value);
                 return OptimalRate.Value + (slope * extraUtil);
             }
             else
