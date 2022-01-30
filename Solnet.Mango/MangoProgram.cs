@@ -460,7 +460,7 @@ namespace Solnet.Mango
         public static TransactionInstruction PlacePerpOrder(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
             PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
-            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly)
+            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false)
             => PlacePerpOrder(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, mangoCache, perpetualMarket,
                 bids, asks, eventQueue, openOrdersAccounts, side, orderType, price, quantity, clientOrderId, reduceOnly);
 
@@ -487,7 +487,7 @@ namespace Solnet.Mango
         public static TransactionInstruction PlacePerpOrder(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
             PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
-            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly)
+            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false)
         {
             List<AccountMeta> keys = new()
             {

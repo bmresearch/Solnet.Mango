@@ -56,9 +56,14 @@ namespace Solnet.Mango
             internal const int SideOffset = 28;
 
             /// <summary>
-            /// The offset at which to write the side value.
+            /// The offset at which to write the order type value.
             /// </summary>
             internal const int OrderTypeOffset = 29;
+
+            /// <summary>
+            /// The offset at which to write the reduce only flag value.
+            /// </summary>
+            internal const int ReduceOnlyOffset = 30;
         }
 
         /// <summary>
