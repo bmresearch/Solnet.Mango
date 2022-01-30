@@ -455,13 +455,14 @@ namespace Solnet.Mango
         /// <param name="price"></param>
         /// <param name="quantity"></param>
         /// <param name="clientOrderId"></param>
+        /// <param name="reduceOnly"></param>
         /// <returns></returns>
         public static TransactionInstruction PlacePerpOrder(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
             PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
-            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId)
+            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly)
             => PlacePerpOrder(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, mangoCache, perpetualMarket,
-                bids, asks, eventQueue, openOrdersAccounts, side, orderType, price, quantity, clientOrderId);
+                bids, asks, eventQueue, openOrdersAccounts, side, orderType, price, quantity, clientOrderId, reduceOnly);
 
         /// <summary>
         /// 
@@ -481,11 +482,12 @@ namespace Solnet.Mango
         /// <param name="price"></param>
         /// <param name="quantity"></param>
         /// <param name="clientOrderId"></param>
+        /// <param name="reduceOnly"></param>
         /// <returns></returns>
         public static TransactionInstruction PlacePerpOrder(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
             PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
-            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId)
+            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly)
         {
             List<AccountMeta> keys = new()
             {
@@ -504,7 +506,7 @@ namespace Solnet.Mango
             {
                 Keys = keys,
                 ProgramId = programIdKey,
-                Data = MangoProgramData.EncodePlacePerpOrderData(side, orderType, price, quantity, clientOrderId)
+                Data = MangoProgramData.EncodePlacePerpOrderData(side, orderType, price, quantity, clientOrderId, reduceOnly)
             };
         }
 
