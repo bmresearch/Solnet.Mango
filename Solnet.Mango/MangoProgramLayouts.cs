@@ -26,9 +26,14 @@ namespace Solnet.Mango
         internal const int WithdrawAllowBorrowOffset = 12;
 
         /// <summary>
-        /// The offset at which to write the allow borrow flag for the <see cref="MangoProgramInstructions.Values.AddMangoAccountInfo"/> instruction.
+        /// The offset at which to write the mango account info for the <see cref="MangoProgramInstructions.Values.AddMangoAccountInfo"/> instruction.
         /// </summary>
         internal const int MangoAccountInfoOffset = 4;
+
+        /// <summary>
+        /// The offset at which to write the order index value for the <see cref="MangoProgramInstructions.Values.RemoveAdvancedOrder"/> and <see cref="MangoProgramInstructions.Values.ExecutePerpTriggerOrder"/> instructions.
+        /// </summary>
+        internal const int OrderIndexOffset = 4;
 
         /// <summary>
         /// Represents the layout of the <see cref="MangoProgramInstructions.Values.PlacePerpOrder"/> method encoded data structure.
@@ -175,6 +180,21 @@ namespace Solnet.Mango
             /// </summary>
             internal const int OrderIdOffset = 8;
         }
+        
+        /// <summary>
+        /// Represents the layout of the <see cref="MangoProgramInstructions.Values.CancelPerpOrdersSide"/> method encoded data structure.
+        /// </summary>
+        internal static class CancelPerpOrdersSide
+        {
+            /// <summary>
+            /// The offset at which to write the order side value.
+            /// </summary>
+            internal const int SideOffset = 4;
 
+            /// <summary>
+            /// The offset at which to write the limit value. 
+            /// </summary>
+            internal const int LimitOffset = 5;
+        }
     }
 }

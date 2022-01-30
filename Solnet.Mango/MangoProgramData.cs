@@ -595,5 +595,154 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Asks", keys[keyIndices[5]]);
             decodedInstruction.Values.Add("Limit", data.GetU8(MangoProgramLayouts.DepositQuantityOffset));
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal static byte[] EncodeInitAdvancedOrdersData()
+        {
+            byte[] data = new byte[4];
+            data.WriteU32((uint)MangoProgramInstructions.Values.InitAdvancedOrders, MangoProgramLayouts.MethodOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal static void DecodeInitAdvancedOrdersData(DecodedInstruction decodedInstruction, IList<PublicKey> keys,
+            byte[] keyIndices)
+        {
+        }
+
+        internal static byte[] EncodeAddPerpTriggerOrderData()
+        {
+            byte[] data = new byte[4];
+            data.WriteU32((uint)MangoProgramInstructions.Values.AddPerpTriggerOrder, MangoProgramLayouts.MethodOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal static void DecodeAddPerpTriggerOrderData(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data,
+            IList<PublicKey> keys, byte[] keyIndices)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderIndex"></param>
+        /// <returns></returns>
+        internal static byte[] EncodeRemoveAdvancedOrderData(byte orderIndex)
+        {
+            byte[] data = new byte[5];
+            data.WriteU32((uint)MangoProgramInstructions.Values.RemoveAdvancedOrder, MangoProgramLayouts.MethodOffset);
+            data.WriteU8(orderIndex, MangoProgramLayouts.OrderIndexOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="decodedInstruction"></param>
+        /// <param name="data"></param>
+        /// <param name="keys"></param>
+        /// <param name="keyIndices"></param>
+        internal static void DecodeRemoveAdvancedOrderData(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data,
+            IList<PublicKey> keys, byte[] keyIndices)
+        {
+        }
+
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="orderIndex"></param>
+        /// <returns></returns>
+        internal static byte[] EncodeExecutePerpTriggerOrderData(byte orderIndex)
+        {
+            byte[] data = new byte[5];
+            data.WriteU32((uint)MangoProgramInstructions.Values.ExecutePerpTriggerOrder, MangoProgramLayouts.MethodOffset);
+            data.WriteU8(orderIndex, MangoProgramLayouts.OrderIndexOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="decodedInstruction"></param>
+        /// <param name="data"></param>
+        /// <param name="keys"></param>
+        /// <param name="keyIndices"></param>
+        internal static void DecodeExecutePerpTriggerOrderData(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data,
+            IList<PublicKey> keys, byte[] keyIndices)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal static byte[] EncodeCloseAdvancedOrdersData()
+        {
+            byte[] data = new byte[4];
+            data.WriteU32((uint)MangoProgramInstructions.Values.CloseAdvancedOrders, MangoProgramLayouts.MethodOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal static void DecodeCloseAdvancedOrdersData(DecodedInstruction decodedInstruction, IList<PublicKey> keys,
+            byte[] keyIndices)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal static byte[] EncodeCloseMangoAccountData()
+        {
+            byte[] data = new byte[4];
+            data.WriteU32((uint)MangoProgramInstructions.Values.CloseMangoAccount, MangoProgramLayouts.MethodOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal static void DecodeCloseMangoAccountData(DecodedInstruction decodedInstruction, IList<PublicKey> keys,
+            byte[] keyIndices)
+        {
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal static byte[] EncodeCancelPerpOrdersSideData(Side side, byte limit)
+        {
+            byte[] data = new byte[6];
+            data.WriteU32((uint)MangoProgramInstructions.Values.CancelPerpOrdersSide, MangoProgramLayouts.MethodOffset);
+            data.WriteU8((byte)side, MangoProgramLayouts.CancelPerpOrdersSide.SideOffset);
+            data.WriteU8((byte)limit, MangoProgramLayouts.CancelPerpOrdersSide.LimitOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        internal static void DecodeCancelPerpOrdersSideData(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data,
+            IList<PublicKey> keys, byte[] keyIndices)
+        {
+        }
     }
 }

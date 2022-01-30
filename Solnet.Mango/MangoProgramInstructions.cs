@@ -144,9 +144,44 @@ namespace Solnet.Mango
             CancelAllPerpOrders = 39,
             
             /// <summary>
-            /// Cancel spot order v2
+            /// Place spot order v2
             /// </summary>
             PlaceSpotOrder2 = 41,
+
+            /// <summary>
+            /// Initialize the advanced orders account.
+            /// </summary>
+            InitAdvancedOrders = 42,
+
+            /// <summary>
+            /// Add a perp trigger order.
+            /// </summary>
+            AddPerpTriggerOrder = 43,
+
+            /// <summary>
+            /// Remove an advanced order.
+            /// </summary>
+            RemoveAdvancedOrder = 44,
+
+            /// <summary>
+            /// Execute the perp trigger order.
+            /// </summary>
+            ExecutePerpTriggerOrder = 45,
+
+            /// <summary>
+            /// Closes the mango account.
+            /// </summary>
+            CloseMangoAccount = 50,
+            
+            /// <summary>
+            /// Closes the advanced orders account.
+            /// </summary>
+            CloseAdvancedOrders = 52,
+            
+            /// <summary>
+            /// Cancels all perp orders on the specified side.
+            /// </summary>
+            CancelPerpOrdersSide = 57,
         };
     }
 }

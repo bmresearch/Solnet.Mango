@@ -315,7 +315,7 @@ namespace Solnet.Mango
                 ProgramId = programIdKey,
             };
         }
-        
+
         /// <summary>
         /// 
         /// </summary>
@@ -1014,6 +1014,98 @@ namespace Solnet.Mango
             };
         }
 
+        public static TransactionInstruction InitAdvancedOrders(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders)
+            => InitAdvancedOrders(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, advancedOrders);
+
+        public static TransactionInstruction InitAdvancedOrders(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+                AccountMeta.Writable(advancedOrders, false),
+                AccountMeta.ReadOnly(SystemProgram.ProgramIdKey, false),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeInitAdvancedOrdersData()
+            };
+        }
+
+        public static TransactionInstruction CloseMangoAccount(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner)
+            => CloseMangoAccount(ProgramIdKeyV3, mangoGroup, mangoAccount, owner);
+
+        public static TransactionInstruction CloseMangoAccount(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.Writable(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.Writable(owner, true),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCloseMangoAccountData()
+            };
+        }
+
+        public static TransactionInstruction CloseAdvancedOrders(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders)
+            => CloseAdvancedOrders(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, advancedOrders);
+
+        public static TransactionInstruction CloseAdvancedOrders(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.Writable(owner, true),
+                AccountMeta.Writable(advancedOrders, false),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCloseAdvancedOrdersData()
+            };
+        }
+
+        public static TransactionInstruction CancelPerpOrdersSide(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey perpMarket, PublicKey bids,
+            PublicKey asks, Side side, byte limit)
+            => CancelPerpOrdersSide(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, perpMarket, bids, asks, side, limit);
+
+        public static TransactionInstruction CancelPerpOrdersSide(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey perpMarket, PublicKey bids,
+            PublicKey asks, Side side, byte limit)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+                AccountMeta.Writable(perpMarket, false),
+                AccountMeta.Writable(bids, false),
+                AccountMeta.Writable(asks, false),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCancelPerpOrdersSideData(side, limit)
+            };
+        }
+
         /// <summary>
         /// Decodes an instruction created by the System Program.
         /// </summary>
@@ -1080,6 +1172,27 @@ namespace Solnet.Mango
                     break;
                 case MangoProgramInstructions.Values.CancelAllPerpOrders:
                     MangoProgramData.DecodeCancelAllPerpOrdersData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.InitAdvancedOrders:
+                    MangoProgramData.DecodeInitAdvancedOrdersData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.AddPerpTriggerOrder:
+                    MangoProgramData.DecodeAddPerpTriggerOrderData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.RemoveAdvancedOrder:
+                    MangoProgramData.DecodeRemoveAdvancedOrderData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.ExecutePerpTriggerOrder:
+                    MangoProgramData.DecodeExecutePerpTriggerOrderData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CloseAdvancedOrders:
+                    MangoProgramData.DecodeCloseAdvancedOrdersData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CloseMangoAccount:
+                    MangoProgramData.DecodeCloseMangoAccountData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CancelPerpOrdersSide:
+                    MangoProgramData.DecodeCancelPerpOrdersSideData(decodedInstruction, data, keys, keyIndices);
                     break;
             }
 
