@@ -248,16 +248,18 @@ namespace Solnet.Mango
         /// <param name="price"></param>
         /// <param name="quantity"></param>
         /// <param name="clientOrderId"></param>
+        /// <param name="reduceOnly"></param>
         /// <returns>The encoded data.</returns>
-        internal static byte[] EncodePlacePerpOrderData(Side side, OrderType orderType, long price, long quantity, ulong clientOrderId)
+        internal static byte[] EncodePlacePerpOrderData(Side side, OrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false)
         {
-            byte[] data = new byte[30];
+            byte[] data = new byte[31];
             data.WriteU32((uint)MangoProgramInstructions.Values.PlacePerpOrder, MangoProgramLayouts.MethodOffset);
             data.WriteS64(price, MangoProgramLayouts.PlacePerpOrder.PriceOffset);
             data.WriteS64(quantity, MangoProgramLayouts.PlacePerpOrder.QuantityOffset);
             data.WriteU64(clientOrderId, MangoProgramLayouts.PlacePerpOrder.ClientOrderIdOffset);
             data.WriteU8((byte)side, MangoProgramLayouts.PlacePerpOrder.SideOffset);
             data.WriteU8((byte)orderType, MangoProgramLayouts.PlacePerpOrder.OrderTypeOffset);
+            data.WriteU8(reduceOnly ? (byte)1 : (byte)0, MangoProgramLayouts.PlacePerpOrder.ReduceOnlyOffset);
             return data;
         }
 
