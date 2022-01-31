@@ -36,6 +36,11 @@ namespace Solnet.Mango
         internal const int OrderIndexOffset = 4;
 
         /// <summary>
+        /// The offset at which to write the account number value for the <see cref="MangoProgramInstructions.Values.CreateMangoAccount"/> instruction.
+        /// </summary>
+        internal const int AccountNumOffset = 4;
+
+        /// <summary>
         /// Represents the layout of the <see cref="MangoProgramInstructions.Values.PlacePerpOrder"/> method encoded data structure.
         /// </summary>
         internal static class PlacePerpOrder
@@ -179,6 +184,52 @@ namespace Solnet.Mango
             /// The offset at which to write the order id value.
             /// </summary>
             internal const int OrderIdOffset = 8;
+        }
+
+        /// <summary>
+        /// Represents the layout of the <see cref="MangoProgramInstructions.Values.AddPerpTriggerOrder"/> method encoded data structure.
+        /// </summary>
+        internal static class AddPerpTriggerOrder
+        {
+            /// <summary>
+            /// The offset at which to write the order type value.
+            /// </summary>
+            internal const int OrderTypeOffset = 4;
+
+            /// <summary>
+            /// The offset at which to write the order side value.
+            /// </summary>
+            internal const int SideOffset = 5;
+
+            /// <summary>
+            /// The offset at which to write the trigger condition value.
+            /// </summary>
+            internal const int TriggerConditionOffset = 6;
+
+            /// <summary>
+            /// The offset at which to write the reduce only flag value.
+            /// </summary>
+            internal const int ReduceOnlyOffset = 7;
+
+            /// <summary>
+            /// The offset at which to write the client order id value.
+            /// </summary>
+            internal const int ClientOrderIdOffset = 8;
+
+            /// <summary>
+            /// The offset at which to write the limit price value.
+            /// </summary>
+            internal const int PriceOffset = 16;
+
+            /// <summary>
+            /// The offset at which to write the quantity value.
+            /// </summary>
+            internal const int QuantityOffset = 24;
+
+            /// <summary>
+            /// The offset at which to write the trigger price value.
+            /// </summary>
+            internal const int TriggerPriceOffset = 32;
         }
         
         /// <summary>

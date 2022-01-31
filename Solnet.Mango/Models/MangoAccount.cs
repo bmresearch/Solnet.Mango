@@ -75,49 +75,64 @@ namespace Solnet.Mango.Models
             internal const int SpotOpenOrdersOffset = 600;
 
             /// <summary>
-            /// 
+            /// The offset at which the perpetual markets accounts begin.
             /// </summary>
             internal const int PerpetualAccountsOffset = 1080;
 
             /// <summary>
-            /// 
+            /// The offset at which the order's markets values begin.
             /// </summary>
             internal const int OrderMarketOffset = 2520;
 
             /// <summary>
-            /// 
+            /// The offset at which the order's side values begin.
             /// </summary>
             internal const int OrderSideOffset = 2584;
 
             /// <summary>
-            /// 
+            /// The offset at which the order's ids begin.
             /// </summary>
             internal const int OrderIdsOffset = 2648;
 
             /// <summary>
-            /// 
+            /// The offset at which the order's client ids begin.
             /// </summary>
             internal const int ClientOrderIdsOffset = 3672;
 
             /// <summary>
-            /// 
+            /// The offset at which the account's MSRM amount value begins.
             /// </summary>
             internal const int MegaSerumAmountOffset = 4184;
 
             /// <summary>
-            /// 
+            /// The offset at which the boolean which specifies if the account is being liquidated begins.
             /// </summary>
             internal const int BeingLiquidatedOffset = 4192;
 
             /// <summary>
-            /// 
+            /// The offset at which the boolean which specifies if the account is bankrupt begins.
             /// </summary>
             internal const int BankruptOffset = 4193;
 
             /// <summary>
-            /// 
+            /// The offset at which the account's info string begins.
             /// </summary>
             internal const int InfoOffset = 4194;
+
+            /// <summary>
+            /// The offset at which the advanced orders account public key begins.
+            /// </summary>
+            internal const int AdvancedOrdersOffset = 4226;
+
+            /// <summary>
+            /// The offset at which the upgradeable boolean begins.
+            /// </summary>
+            internal const int NotUpgradeableOffset = 4258;
+
+            /// <summary>
+            /// The offset at which the delegate public key begins.
+            /// </summary>
+            internal const int DelegateOffset = 4259;
         }
 
         /// <summary>
@@ -204,6 +219,21 @@ namespace Solnet.Mango.Models
         /// Account info.
         /// </summary>
         public string AccountInfo { get; set; }
+
+        /// <summary>
+        /// The public key of the <see cref="Models.AdvancedOrdersAccount"/>.
+        /// </summary>
+        public PublicKey AdvancedOrdersAccount { get; set; }
+
+        /// <summary>
+        /// Whether this account can be upgraded to v1 so it can be closed.
+        /// </summary>
+        public bool NotUpgradeable { get; set; }
+
+        /// <summary>
+        /// The alternative authority/signer of transactions associated with this mango account.
+        /// </summary>
+        public PublicKey Delegate { get; set; }
 
         /// <summary>
         /// The loaded open orders accounts.
@@ -1117,8 +1147,11 @@ namespace Solnet.Mango.Models
                 MegaSerumAmount = span.GetU64(Layout.MegaSerumAmountOffset),
                 BeingLiquidated = span.GetU8(Layout.BeingLiquidatedOffset) == 1,
                 Bankrupt = span.GetU8(Layout.BankruptOffset) == 1,
-                AccountInfo = Encoding.UTF8.GetString(span.GetSpan(Layout.InfoOffset, Constants.InfoLength)),
-                OpenOrdersAccounts = new List<OpenOrdersAccount>(Constants.MaxPairs)
+                AccountInfo = Encoding.UTF8.GetString(span.GetSpan(Layout.InfoOffset, Constants.InfoLength)).Trim('\0'),
+                OpenOrdersAccounts = new List<OpenOrdersAccount>(Constants.MaxPairs),
+                AdvancedOrdersAccount = span.GetPubKey(Layout.AdvancedOrdersOffset),
+                NotUpgradeable = span.GetU8(Layout.NotUpgradeableOffset) == 1,
+                Delegate = span.GetPubKey(Layout.DelegateOffset)
             };
         }
     }

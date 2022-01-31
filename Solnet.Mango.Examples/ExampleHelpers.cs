@@ -62,16 +62,15 @@ namespace Solnet.Mango.Examples
         /// Polls the rpc client until a transaction signature has been confirmed.
         /// </summary>
         /// <param name="signature">The first transaction signature.</param>
-        public static async void PollConfirmedTx(IRpcClient rpcClient, string signature)
+        public static async Task<TransactionMetaSlotInfo> PollConfirmedTx(IRpcClient rpcClient, string signature)
         {
-            RequestResult<TransactionMetaSlotInfo> txMeta = await rpcClient.GetConfirmedTransactionAsync(signature);
+            RequestResult<TransactionMetaSlotInfo> txMeta = await rpcClient.GetTransactionAsync(signature);
             while (!txMeta.WasSuccessful)
             {
                 Thread.Sleep(2500);
-                txMeta = await rpcClient.GetConfirmedTransactionAsync(signature);
+                txMeta = await rpcClient.GetTransactionAsync(signature);
             }
+            return txMeta.Result;
         }
-
-
     }
 }

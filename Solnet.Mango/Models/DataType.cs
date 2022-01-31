@@ -48,6 +48,11 @@ namespace Solnet.Mango.Models
         /// <summary>
         /// The event queue account for an on-chain perpetual market.
         /// </summary>
-        EventQueue = 8
+        EventQueue = 8,
+
+        /// <summary>
+        /// An advanced orders account for advanced order types such as conditional trigger orders.
+        /// </summary>
+        AdvancedOrders = 9,
     }
 }

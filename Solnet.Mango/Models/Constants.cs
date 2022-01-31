@@ -1,4 +1,5 @@
 using Solnet.Mango.Models.Matching;
+using Solnet.Rpc;
 using Solnet.Wallet;
 
 namespace Solnet.Mango.Models
@@ -49,6 +50,11 @@ namespace Solnet.Mango.Models
         public const int MaxNumInMarginBasket = 10;
 
         /// <summary>
+        /// The maximum number of advanced orders in an <see cref="AdvancedOrdersAccount"/>.
+        /// </summary>
+        public const int MaxAdvancedOrders = 32;
+
+        /// <summary>
         /// The mango group.
         /// </summary>
         public static readonly PublicKey MangoGroup = new("98pjRuQjK3qA6gXts96PqZT4Ze5QmnCmt3QYjhbUSPue");
@@ -57,5 +63,10 @@ namespace Solnet.Mango.Models
         /// The mango cache.
         /// </summary>
         public static readonly PublicKey MangoCache = new("EBDRoayCDDUvDgCimta45ajQeXbexv7aKqJubruqpyvu");
+
+        /// <summary>
+        /// The mango group for <see cref="Cluster.DevNet"/>.
+        /// </summary>
+        public static readonly PublicKey DevNetMangoGroup = new("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA");
     }
 }

@@ -12,7 +12,7 @@ namespace Solnet.Mango.Examples
     {
         public static void Main(string[] args)
         {
-            InstructionDecoder.Register(MangoProgram.ProgramIdKeyV3, MangoProgram.Decode);
+            InstructionDecoder.Register(MangoProgram.DevNetProgramIdKeyV3, MangoProgram.Decode);
             List<Type> examples = Assembly.GetEntryAssembly().GetExportedTypes().Where(t => t.IsAssignableTo(typeof(IRunnableExample))).ToList();
 
             while (true)

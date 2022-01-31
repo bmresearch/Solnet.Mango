@@ -32,13 +32,14 @@ namespace Solnet.Mango.Examples
         private readonly Wallet.Wallet _wallet;
 
         private readonly IMangoClient _mangoClient;
+        private readonly MangoProgram _mango;
 
         public PlacePerpOrderExample()
         {
             Console.WriteLine($"Initializing {ToString()}");
             // init stuff
             SolanaKeyStoreService keyStore = new();
-
+            _mango = MangoProgram.CreateMainNet();
             // get the wallet
             _wallet = keyStore.RestoreKeystoreFromFile("/path/to/keystore.json");
             _mangoClient = ClientFactory.GetClient(RpcClient, StreamingRpcClient);
@@ -102,7 +103,7 @@ namespace Solnet.Mango.Examples
             TransactionBuilder txBuilder = new TransactionBuilder()
                 .SetFeePayer(Owner)
                 .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
-                .AddInstruction(MangoProgram.PlacePerpOrder(
+                .AddInstruction(_mango.PlacePerpOrder(
                     Constants.MangoGroup,
                     new(mangoAccounts.OriginalRequest.Result[1].PublicKey),
                     Owner,
@@ -113,7 +114,7 @@ namespace Solnet.Mango.Examples
                     perpMarket.ParsedResult.EventQueue,
                     mangoAccounts.ParsedResult[1].SpotOpenOrders,
                     Serum.Models.Side.Sell,
-                    Serum.Models.OrderType.Limit,
+                    PerpOrderType.Limit,
                     nativePrice,
                     nativeQuantity,
                     1_000_002ul
@@ -137,7 +138,7 @@ namespace Solnet.Mango.Examples
             txBuilder = new TransactionBuilder()
                 .SetFeePayer(Owner)
                 .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
-                .AddInstruction(MangoProgram.CancelPerpOrderByClientId(
+                .AddInstruction(_mango.CancelPerpOrderByClientId(
                     Constants.MangoGroup,
                     new(mangoAccounts.OriginalRequest.Result[1].PublicKey),
                     Owner,

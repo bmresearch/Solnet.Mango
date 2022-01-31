@@ -103,6 +103,16 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int FeesVaultOffset = 5968;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            internal const int MaxMangoAccountsOffset = 6000;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            internal const int NumMangoAccountsOffset = 6004;
         }
 
         /// <summary>
@@ -194,6 +204,16 @@ namespace Solnet.Mango.Models
         /// The loaded root banks.
         /// </summary>
         public List<PerpMarket> PerpMarketAccounts;
+
+        /// <summary>
+        /// Maximum number of <see cref="MangoAccount"/>s with <see cref="MetaData.Version"/> 1.
+        /// </summary>
+        public uint MaxMangoAccounts;
+
+        /// <summary>
+        /// The number of <see cref="MangoAccount"/>s with <see cref="MetaData.Version"/> 1.
+        /// </summary>
+        public uint NumMangoAccounts;
 
         /// <summary>
         /// Loads the root banks for this root bank. This is an asynchronous operation.
@@ -489,6 +509,8 @@ namespace Solnet.Mango.Models
                 FeesVault = span.GetPubKey(Layout.FeesVaultOffset),
                 RootBankAccounts = new List<RootBank>(Constants.MaxTokens),
                 PerpMarketAccounts = new List<PerpMarket>(Constants.MaxTokens),
+                MaxMangoAccounts = span.GetU32(Layout.MaxMangoAccountsOffset),
+                NumMangoAccounts = span.GetU32(Layout.NumMangoAccountsOffset)
             };
         }
     }

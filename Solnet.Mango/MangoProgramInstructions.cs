@@ -37,6 +37,17 @@ namespace Solnet.Mango
             { Values.DepositMegaSerum, "Deposit MegaSerum" },
             { Values.WithdrawMegaSerum, "Withdraw MegaSerum" },
             { Values.CancelAllPerpOrders, "Cancel All Perp Orders" },
+            { Values.InitAdvancedOrders, "Initialize Advanced Orders" },
+            { Values.AddPerpTriggerOrder, "Add Perp Trigger Order"},
+            { Values.RemoveAdvancedOrder, "Remove Advanced Order" },
+            { Values.ExecutePerpTriggerOrder, "Execute Perp Trigger Order" },
+            { Values.CloseMangoAccount, "Close Mango Account" },
+            { Values.CloseSpotOpenOrders, "Close Spot Open Orders Account" },
+            { Values.CloseAdvancedOrders, "Close Advanced Orders" },
+            { Values.CreateMangoAccount, "Create Mango Account" },
+            { Values.UpgradeMangoAccountV0V1, "Upgrade Mango Account V0V1" },
+            { Values.CancelPerpOrdersSide, "Cancel Perp Orders Side" },
+            { Values.SetDelegate, "Set Delegate"}
         };
 
         /// <summary>
@@ -172,16 +183,36 @@ namespace Solnet.Mango
             /// Closes the mango account.
             /// </summary>
             CloseMangoAccount = 50,
+
+            /// <summary>
+            /// Closes a spot open orders account.
+            /// </summary>
+            CloseSpotOpenOrders = 51,
             
             /// <summary>
             /// Closes the advanced orders account.
             /// </summary>
             CloseAdvancedOrders = 52,
+
+            /// <summary>
+            /// Creates a mango account using PDAs.
+            /// </summary>
+            CreateMangoAccount = 55,
             
+            /// <summary>
+            /// Upgrades a mango account from v0 to v1.
+            /// </summary>
+            UpgradeMangoAccountV0V1 = 56,
+
             /// <summary>
             /// Cancels all perp orders on the specified side.
             /// </summary>
             CancelPerpOrdersSide = 57,
+
+            /// <summary>
+            /// Set an alternative authority/signer for mango account transactions.
+            /// </summary>
+            SetDelegate = 58,
         };
     }
 }

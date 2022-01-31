@@ -172,7 +172,7 @@ namespace Solnet.Mango
                 new MemCmp { Offset = MangoAccount.Layout.OwnerOffset, Bytes = ownerAccount }
             };
 
-            return await GetProgramAccounts<MangoAccount>(MangoProgram.ProgramIdKeyV3, filters,
+            return await GetProgramAccounts<MangoAccount>(MangoProgram.MainNetProgramIdKeyV3, filters,
                 MangoAccount.Layout.Length,
                 commitment);
         }
@@ -190,7 +190,7 @@ namespace Solnet.Mango
                 new MemCmp { Offset = PerpMarket.Layout.MangoGroupOffset, Bytes = mangoGroup }
             };
 
-            return await GetProgramAccounts<PerpMarket>(MangoProgram.ProgramIdKeyV3, filters, PerpMarket.Layout.Length,
+            return await GetProgramAccounts<PerpMarket>(MangoProgram.MainNetProgramIdKeyV3, filters, PerpMarket.Layout.Length,
                 commitment);
         }
 

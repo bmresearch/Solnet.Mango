@@ -29,12 +29,14 @@ namespace Solnet.Mango.Examples
         private readonly Wallet.Wallet _wallet;
 
         private readonly IMangoClient _mangoClient;
+        private readonly MangoProgram _mango;
 
         public DepositExample()
         {
             Console.WriteLine($"Initializing {ToString()}");
             // init stuff
             SolanaKeyStoreService keyStore = new();
+            _mango = MangoProgram.CreateMainNet();
             // get the wallet
             _wallet = keyStore.RestoreKeystoreFromFile("/path/to/keystore.json");
 
@@ -86,7 +88,7 @@ namespace Solnet.Mango.Examples
                     TokenProgram.TokenAccountDataSize,
                     TokenProgram.ProgramIdKey))
                 .AddInstruction(TokenProgram.InitializeAccount(acc, MarketUtils.WrappedSolMint, Owner))
-                .AddInstruction(MangoProgram.Deposit(
+                .AddInstruction(_mango.Deposit(
                     Constants.MangoGroup,
                     new PublicKey(mangoAccounts.OriginalRequest.Result[1].PublicKey),
                     Owner,

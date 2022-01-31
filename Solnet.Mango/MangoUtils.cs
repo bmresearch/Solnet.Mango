@@ -1,6 +1,9 @@
 ﻿using Solnet.Mango.Models;
 using Solnet.Mango.Types;
+using Solnet.Programs.Utilities;
+using Solnet.Rpc.Utilities;
 using Solnet.Serum.Models;
+using Solnet.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -24,6 +27,25 @@ namespace Solnet.Mango
         public static double HumanizeNative(double value, byte decimals)
         {
             return value / Math.Pow(10, decimals);
+        }
+
+        /// <summary>
+        /// Derives the <see cref="PublicKey"/> of a <see cref="MangoAccount"/> of <see cref="MetaData.Version"/> 1.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="accountNumber">The account number.</param>
+        /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
+        public static PublicKey DeriveMangoAccountAddress(PublicKey programIdKey, PublicKey mangoGroup, PublicKey owner, ulong accountNumber)
+        {
+            byte[] accountNumByteSeed = new byte[8];
+            accountNumByteSeed.WriteU64(accountNumber, 0);
+
+            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() { Constants.DevNetMangoGroup, owner, accountNumByteSeed },
+                programIdKey, out byte[] mangoAccount, out _);
+
+            return success ? new(mangoAccount) : null;
         }
 
         /// <summary>
@@ -82,6 +104,5 @@ namespace Solnet.Mango
                 }
             };
         }
-
     }
 }
