@@ -192,11 +192,11 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quoteDecimals">The quote decimals.</param>
         /// <returns>Convert price lots to humanized number.</returns>
-        public double PriceLotsToNumber(double price, byte baseDecimals, byte quoteDecimals)
+        public decimal PriceLotsToNumber(I80F48 price, byte baseDecimals, byte quoteDecimals)
         {
-            double nativeToUi = Math.Pow(10, baseDecimals - quoteDecimals);
-            double lotsToNative = (double) QuoteLotSize / BaseLotSize;
-            return price * lotsToNative * nativeToUi;
+            decimal nativeToUi = (decimal) Math.Pow(10, baseDecimals - quoteDecimals);
+            decimal lotsToNative = (decimal) QuoteLotSize / BaseLotSize;
+            return price.ToDecimal() * lotsToNative * nativeToUi;
         }
 
         /// <summary>
@@ -205,15 +205,15 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quantity">The quantity.</param>
         /// <returns>Converted base lots to humanized number.</returns>
-        public double BaseLotsToNumber(double quantity, byte baseDecimals)
-            => (quantity * BaseLotSize) / Math.Pow(10, baseDecimals);
+        public decimal BaseLotsToNumber(decimal quantity, byte baseDecimals)
+            => (quantity * BaseLotSize) / (decimal) Math.Pow(10, baseDecimals);
 
         /// <summary>
         /// Get the minimum order size.
         /// </summary>
         /// <param name="baseDecimals">The base decimals.</param>
         /// <returns>The minimum order size.</returns>
-        public double MinOrderSize(byte baseDecimals) => BaseLotsToNumber(1, baseDecimals);
+        public decimal MinOrderSize(byte baseDecimals) => BaseLotsToNumber(1, baseDecimals);
 
         /// <summary>
         /// The tick size.
@@ -221,7 +221,7 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quoteDecimals">The quote decimals.</param>
         /// <returns>The tick size.</returns>
-        public double TickSize(byte baseDecimals, byte quoteDecimals) => PriceLotsToNumber(1, baseDecimals, quoteDecimals);
+        public decimal TickSize(byte baseDecimals, byte quoteDecimals) => PriceLotsToNumber(I80F48.One, baseDecimals, quoteDecimals);
 
         /// <summary>
         /// Conversion for order values.

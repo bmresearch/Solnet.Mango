@@ -138,7 +138,7 @@ namespace Solnet.Mango.Models
                 await rpcClient.GetMultipleAccountsAsync(filteredNodes.Select(x => x.Key).ToList());
             if (!nodeBankAccounts.WasRequestSuccessfullyHandled)
             {
-                logger?.LogInformation("Could not fetch node banks.");
+                logger?.LogInformation($"Could not fetch node bank accounts accounts.");
                 return nodeBankAccounts;
             }
             logger?.LogInformation($"Successfully fetched {nodeBankAccounts.Result.Value.Count} node banks.");
@@ -176,18 +176,30 @@ namespace Solnet.Mango.Models
         /// Gets the total amount of deposits.
         /// </summary>
         /// <returns>The total amount of deposits.</returns>
-        public double GetNativeTotalDeposit()
+        public I80F48 GetNativeTotalDeposit()
         {
-            return NodeBankAccounts.Where(x => x != null).Sum(nodeBank => nodeBank.Deposits.Value) * DepositIndex.Value;
+            var nodeBanks = NodeBankAccounts.Where(x => x != null);
+            var sum = I80F48.Zero;
+            foreach(var nb in nodeBanks)
+            {
+                sum += nb.Deposits;
+            }
+            return sum * DepositIndex;
         }
 
         /// <summary>
         /// Gets the total amount of borrows.
         /// </summary>
         /// <returns>The total amount of borrows.</returns>
-        public double GetNativeTotalBorrows()
+        public I80F48 GetNativeTotalBorrows()
         {
-            return NodeBankAccounts.Where(x => x != null).Sum(nodeBank => nodeBank.Borrows.Value) * BorrowIndex.Value;
+            var nodeBanks = NodeBankAccounts.Where(x => x != null);
+            var sum = I80F48.Zero;
+            foreach (var nb in nodeBanks)
+            {
+                sum += nb.Borrows;
+            }
+            return sum * BorrowIndex;
         }
 
         /// <summary>
@@ -195,7 +207,7 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="decimals">The token's decimals.</param>
         /// <returns>The total amount of deposits.</returns>
-        public double GetUiTotalDeposit(byte decimals)
+        public I80F48 GetUiTotalDeposit(byte decimals)
             => MangoUtils.HumanizeNative(GetNativeTotalDeposit(), decimals);
 
         /// <summary>
@@ -203,36 +215,29 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="decimals">The token's decimals.</param>
         /// <returns>The total amount of borrows.</returns>
-        public double GetUiTotalBorrow(byte decimals)
+        public I80F48 GetUiTotalBorrow(byte decimals)
             => MangoUtils.HumanizeNative(GetNativeTotalBorrows(), decimals);
 
         /// <summary>
         /// Gets the borrow rate for this asset.
         /// </summary>
         /// <returns>The borrow rate.</returns>
-        public double GetBorrowRate(byte decimals)
+        public I80F48 GetBorrowRate(byte decimals)
         {
-            double totalDeposits = GetUiTotalDeposit(decimals);
-            double totalBorrows = GetUiTotalBorrow(decimals);
+            I80F48 totalDeposits = GetUiTotalDeposit(decimals);
+            I80F48 totalBorrows = GetUiTotalBorrow(decimals);
 
-            switch (totalDeposits)
-            {
-                case 0 when totalBorrows == 0:
-                    return 0;
-                case 0:
-                    return double.MaxValue;
-            }
+            I80F48 utilization = (totalBorrows / totalDeposits);
 
-            double utilization = (totalBorrows / totalDeposits);
-            if (utilization > OptimalUtilization.Value)
+            if (utilization > OptimalUtilization)
             {
-                double extraUtil = utilization - OptimalUtilization.Value;
-                double slope = (MaxRate.Value - OptimalRate.Value) / ( 1 - OptimalUtilization.Value);
-                return OptimalRate.Value + (slope * extraUtil);
+                I80F48 extraUtil = utilization - OptimalUtilization;
+                I80F48 slope = (MaxRate - OptimalRate) / (I80F48.One - OptimalUtilization);
+                return OptimalRate + (slope * extraUtil);
             }
             else
             {
-                double slope = OptimalRate.Value / OptimalUtilization.Value;
+                I80F48 slope = OptimalRate / OptimalUtilization;
                 return slope * utilization;
             }
         }
@@ -241,17 +246,20 @@ namespace Solnet.Mango.Models
         /// Gets the deposit rate for this asset.
         /// </summary>
         /// <returns>The deposit rate.</returns>
-        public double GetDepositRate(byte decimals)
+        public I80F48 GetDepositRate(byte decimals)
         {
-            double borrowRate = GetBorrowRate(decimals);
-            double totalDeposits = GetUiTotalDeposit(decimals);
-            double totalBorrows = GetUiTotalBorrow(decimals);
-            return totalDeposits switch
+            I80F48 borrowRate = GetBorrowRate(decimals);
+            I80F48 totalDeposits = GetUiTotalDeposit(decimals);
+            I80F48 totalBorrows = GetUiTotalBorrow(decimals);
+
+            if(totalDeposits == I80F48.Zero)
             {
-                0 when totalBorrows == 0 => 0,
-                0 => double.MaxValue,
-                _ => (totalBorrows / totalDeposits) * borrowRate
-            };
+                if (totalBorrows == I80F48.Zero) return I80F48.Zero;
+                return I80F48.MaxValue;
+            } else
+            {
+                return (totalBorrows / totalDeposits) * borrowRate;
+            }
         }
 
         /// <summary>

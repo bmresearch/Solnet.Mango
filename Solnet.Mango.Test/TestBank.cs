@@ -11,11 +11,20 @@ namespace Solnet.Mango.Test
     public class TestBank : TestBase
     {
         [TestMethod]
-        public void TestRootBank()
+        public void TestOneDepositRootBank()
         {
-            var prefix = "Resources/TokenBank/";
+            var prefix = "Resources/OneDeposit/";
 
-            //test 1 deposit data
+            var rootBank = LoadRootBank(prefix + "RootBank0.txt").Result;
+
+            Assert.AreEqual(0.6999999999999992894572642399m, rootBank.OptimalUtilization.ToDecimal());
+            Assert.AreEqual(0.0599999999999987210230756318m, rootBank.OptimalRate.ToDecimal());
+            Assert.AreEqual(1.5m, rootBank.MaxRate.ToDecimal());
+            Assert.AreEqual(0.0599999999999987210230756318m, rootBank.OptimalRate.ToDecimal());
+            Assert.AreEqual(1UL, rootBank.NumNodeBanks);
+            Assert.AreEqual(1000154.4227660735583071982546m, rootBank.DepositIndex.ToDecimal());
+            Assert.AreEqual(1000219.0086786301008849875416m, rootBank.BorrowIndex.ToDecimal());
+            Assert.AreEqual(1633359485UL, rootBank.LastUpdated);
         }
 
         [TestMethod]
@@ -28,13 +37,8 @@ namespace Solnet.Mango.Test
 
             rootBank.NodeBankAccounts = new List<Models.NodeBank> { nodeBank };
 
-            /*
-             * https://github.com/blockworks-foundation/mango-client-v3/pull/50/files#diff-1d66cd90fc8bc7d5dc3ac7cd3d508660e2a9c554a48f39bc8e4ff9a03256519cR38
-             * The expected values below were adjusted compared to the typescript test suite due to conversion / precision errors when parsing rust's I80F48 to a C# double
-             */
-
-            Assert.AreEqual(0.006096269142805435, rootBank.GetBorrowRate(6));
-            Assert.AreEqual(0.0007432899492304304, rootBank.GetDepositRate(6));
+            Assert.AreEqual(0.0060962691428017024009022862m, rootBank.GetBorrowRate(6).ToDecimal());
+            Assert.AreEqual(0.0007432899492272326824604534m, rootBank.GetDepositRate(6).ToDecimal());
         }
 
         [TestMethod]
@@ -47,13 +51,8 @@ namespace Solnet.Mango.Test
 
             rootBank.NodeBankAccounts = new List<Models.NodeBank> { nodeBank };
 
-            /*
-             * https://github.com/blockworks-foundation/mango-client-v3/pull/50/files#diff-1d66cd90fc8bc7d5dc3ac7cd3d508660e2a9c554a48f39bc8e4ff9a03256519cR56
-             * The expected values below were adjusted compared to the typescript test suite due to conversion / precision errors when parsing rust's I80F48 to a C# double
-             */
-
-            Assert.AreEqual(0.23058349895659447, rootBank.GetBorrowRate(6));
-            Assert.AreEqual(0.16874409787691286, rootBank.GetDepositRate(6));
+            Assert.AreEqual(0.2305834989565909154407563619m, rootBank.GetBorrowRate(6).ToDecimal());
+            Assert.AreEqual(0.1687440978769068067322223214m, rootBank.GetDepositRate(6).ToDecimal());
         }
     }
 }

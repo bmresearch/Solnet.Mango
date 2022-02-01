@@ -151,12 +151,12 @@ namespace Solnet.Mango.Models
         public PublicKey Owner;
 
         /// <summary>
-        /// 
+        /// Whether the asset at the corresponding index is in the margin basket.
         /// </summary>
         public List<bool> InMarginBasket;
 
         /// <summary>
-        /// 
+        /// The number of assets in the margin basket.
         /// </summary>
         public byte NumInMarginBasket;
 
@@ -252,9 +252,12 @@ namespace Solnet.Mango.Models
                 SpotOpenOrders.Where(x => !x.Equals(SystemProgram.ProgramIdKey)).ToList();
             RequestResult<ResponseValue<List<AccountInfo>>> openOrdersAccounts =
                 await rpcClient.GetMultipleAccountsAsync(filteredOpenOrders.Select(x => x.Key).ToList());
-            if (!openOrdersAccounts.WasRequestSuccessfullyHandled) return openOrdersAccounts;
-            logger?.LogInformation(
-                $"Successfully fetched {openOrdersAccounts.Result.Value.Count} open orders accounts.");
+            if (!openOrdersAccounts.WasRequestSuccessfullyHandled)
+            {
+                logger?.LogInformation($"Could not fetch open orders accounts.");
+                return openOrdersAccounts; 
+            }
+            logger?.LogInformation($"Successfully fetched {openOrdersAccounts.Result.Value.Count} open orders accounts.");
 
             SpotOpenOrders.ForEach(key =>
             {
@@ -265,9 +268,7 @@ namespace Solnet.Mango.Models
                     return;
                 }
 
-                OpenOrdersAccounts.Add(
-                    OpenOrdersAccount.Deserialize(
-                        Convert.FromBase64String(openOrdersAccounts.Result.Value[keyIndex].Data[0])));
+                OpenOrdersAccounts.Add(OpenOrdersAccount.Deserialize(Convert.FromBase64String(openOrdersAccounts.Result.Value[keyIndex].Data[0])));
             });
 
             return openOrdersAccounts;
@@ -309,10 +310,10 @@ namespace Solnet.Mango.Models
         /// <param name="rootBank">The root bank.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The amount of native deposit.</returns>
-        public double GetNativeDeposit(RootBank rootBank, int tokenIndex)
+        public I80F48 GetNativeDeposit(RootBank rootBank, int tokenIndex)
         {
-            return rootBank.DepositIndex.Value *
-                   Deposits[tokenIndex].Value;
+            return rootBank.DepositIndex *
+                   Deposits[tokenIndex];
         }
 
         /// <summary>
@@ -321,10 +322,10 @@ namespace Solnet.Mango.Models
         /// <param name="rootBankCache">The root bank cache.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The amount of native deposit.</returns>
-        public double GetNativeDeposit(RootBankCache rootBankCache, int tokenIndex)
+        public I80F48 GetNativeDeposit(RootBankCache rootBankCache, int tokenIndex)
         {
-            return rootBankCache.DepositIndex.Value *
-                   Deposits[tokenIndex].Value;
+            return rootBankCache.DepositIndex *
+                   Deposits[tokenIndex];
         }
 
         /// <summary>
@@ -333,10 +334,10 @@ namespace Solnet.Mango.Models
         /// <param name="rootBank">The root bank.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The amount of native borrow.</returns>
-        public double GetNativeBorrow(RootBank rootBank, int tokenIndex)
+        public I80F48 GetNativeBorrow(RootBank rootBank, int tokenIndex)
         {
-            return rootBank.BorrowIndex.Value *
-                   Borrows[tokenIndex].Value;
+            return rootBank.BorrowIndex *
+                   Borrows[tokenIndex];
         }
 
         /// <summary>
@@ -345,10 +346,10 @@ namespace Solnet.Mango.Models
         /// <param name="rootBankCache">The root bank cache.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The amount of native borrow.</returns>
-        public double GetNativeBorrow(RootBankCache rootBankCache, int tokenIndex)
+        public I80F48 GetNativeBorrow(RootBankCache rootBankCache, int tokenIndex)
         {
-            return rootBankCache.BorrowIndex.Value *
-                   Borrows[tokenIndex].Value;
+            return rootBankCache.BorrowIndex *
+                   Borrows[tokenIndex];
         }
 
         /// <summary>
@@ -358,9 +359,9 @@ namespace Solnet.Mango.Models
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The amount deposited humanized for ui display.</returns>
-        public double GetUiDeposit(RootBank rootBank, MangoGroup mangoGroup, int tokenIndex)
+        public I80F48 GetUiDeposit(RootBank rootBank, MangoGroup mangoGroup, int tokenIndex)
         {
-            return MangoUtils.HumanizeNative(GetNativeDeposit(rootBank, tokenIndex),
+            return MangoUtils.HumanizeNative(GetNativeDeposit(rootBank, tokenIndex).Floor(),
                 mangoGroup.Tokens[tokenIndex].Decimals);
         }
 
@@ -371,7 +372,7 @@ namespace Solnet.Mango.Models
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The amount deposited humanized for ui display.</returns>
-        public double GetUiDeposit(RootBankCache rootBankCache, MangoGroup mangoGroup, int tokenIndex)
+        public I80F48 GetUiDeposit(RootBankCache rootBankCache, MangoGroup mangoGroup, int tokenIndex)
         {
             return MangoUtils.HumanizeNative(GetNativeDeposit(rootBankCache, tokenIndex),
                 mangoGroup.Tokens[tokenIndex].Decimals);
@@ -384,9 +385,9 @@ namespace Solnet.Mango.Models
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The amount borrowed humanized for ui display.</returns>
-        public double GetUiBorrow(RootBank rootBank, MangoGroup mangoGroup, int tokenIndex)
+        public I80F48 GetUiBorrow(RootBank rootBank, MangoGroup mangoGroup, int tokenIndex)
         {
-            return MangoUtils.HumanizeNative(GetNativeBorrow(rootBank, tokenIndex),
+            return MangoUtils.HumanizeNative(GetNativeBorrow(rootBank, tokenIndex).Ceil(),
                 mangoGroup.Tokens[tokenIndex].Decimals);
         }
 
@@ -397,7 +398,7 @@ namespace Solnet.Mango.Models
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The amount borrowed humanized for ui display.</returns>
-        public double GetUiBorrow(RootBankCache rootBankCache, MangoGroup mangoGroup, int tokenIndex)
+        public I80F48 GetUiBorrow(RootBankCache rootBankCache, MangoGroup mangoGroup, int tokenIndex)
         {
             return MangoUtils.HumanizeNative(GetNativeBorrow(rootBankCache, tokenIndex),
                 mangoGroup.Tokens[tokenIndex].Decimals);
@@ -409,10 +410,10 @@ namespace Solnet.Mango.Models
         /// <param name="bankCache">The root bank cache.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The net deposits.</returns>
-        public double GetNet(RootBankCache bankCache, int tokenIndex)
+        public I80F48 GetNet(RootBankCache bankCache, int tokenIndex)
         {
-            return (Deposits[tokenIndex].Value * bankCache.DepositIndex.Value) -
-                   (Borrows[tokenIndex].Value * bankCache.BorrowIndex.Value);
+            return (Deposits[tokenIndex] * bankCache.DepositIndex) -
+                   (Borrows[tokenIndex] * bankCache.BorrowIndex);
         }
 
         /// <summary>
@@ -422,10 +423,10 @@ namespace Solnet.Mango.Models
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The net deposits.</returns>
-        public double GetUiNet(RootBankCache bankCache, MangoGroup mangoGroup, int tokenIndex)
+        public I80F48 GetUiNet(RootBankCache bankCache, MangoGroup mangoGroup, int tokenIndex)
         {
-            return MangoUtils.HumanizeNative(Deposits[tokenIndex].Value * bankCache.DepositIndex.Value -
-                                             Borrows[tokenIndex].Value * bankCache.BorrowIndex.Value,
+            return MangoUtils.HumanizeNative(Deposits[tokenIndex] * bankCache.DepositIndex -
+                                             Borrows[tokenIndex] * bankCache.BorrowIndex,
                 mangoGroup.Tokens[tokenIndex].Decimals);
         }
 
@@ -436,9 +437,9 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="healthType">The health type.</param>
         /// <returns>The health.</returns>
-        public double GetHealth(MangoGroup mangoGroup, MangoCache mangoCache, HealthType healthType)
+        public I80F48 GetHealth(MangoGroup mangoGroup, MangoCache mangoCache, HealthType healthType)
         {
-            (List<double> spot, List<double> perps, double quote) = GetHealthComponents(mangoGroup, mangoCache);
+            (List<I80F48> spot, List<I80F48> perps, I80F48 quote) = GetHealthComponents(mangoGroup, mangoCache);
 
             return GetHealthFromComponents(mangoGroup, mangoCache, spot, perps, quote, healthType);
         }
@@ -451,12 +452,12 @@ namespace Solnet.Mango.Models
         /// <param name="tokenIndex">The token index.</param>
         /// <param name="assetWeight">The asset weight-</param>
         /// <returns>The spot value.</returns>
-        public double GetSpotValue(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex, double assetWeight)
+        public I80F48 GetSpotValue(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex, I80F48 assetWeight)
         {
-            double assetsValue = 0;
-            double price = mangoGroup.GetPrice(mangoCache, tokenIndex);
+            I80F48 assetsValue = I80F48.Zero;
+            I80F48 price = mangoGroup.GetPrice(mangoCache, tokenIndex);
 
-            double deposits =
+            I80F48 deposits =
                 GetUiDeposit(mangoCache.RootBankCaches[tokenIndex],
                     mangoGroup, tokenIndex) * price *
                 assetWeight;
@@ -469,10 +470,9 @@ namespace Solnet.Mango.Models
             if (openOrdersAccount == null)
                 return assetsValue;
 
-            assetsValue += MangoUtils.HumanizeNative(openOrdersAccount.BaseTokenTotal,
+            assetsValue += MangoUtils.HumanizeNative(new I80F48((decimal) openOrdersAccount.BaseTokenTotal),
                 mangoGroup.Tokens[tokenIndex].Decimals) * price * assetWeight;
-            assetsValue += MangoUtils.HumanizeNative(
-                openOrdersAccount.QuoteTokenTotal + openOrdersAccount.ReferrerRebatesAccrued,
+            assetsValue += MangoUtils.HumanizeNative(new I80F48((decimal) openOrdersAccount.QuoteTokenTotal + openOrdersAccount.ReferrerRebatesAccrued),
                 mangoGroup.GetQuoteTokenInfo().Decimals) * price * assetWeight;
 
             return assetsValue;
@@ -485,28 +485,29 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="healthType">The health type.</param>
         /// <returns>The assets value.</returns>
-        public double GetAssetsValue(MangoGroup mangoGroup, MangoCache mangoCache, HealthType? healthType = null)
+        public I80F48 GetAssetsValue(MangoGroup mangoGroup, MangoCache mangoCache, HealthType? healthType = null)
         {
-            double assetsValue = GetUiDeposit(mangoCache.RootBankCaches[Constants.QuoteIndex], mangoGroup,
+            I80F48 assetsValue = GetUiDeposit(mangoCache.RootBankCaches[Constants.QuoteIndex], mangoGroup,
                 Constants.QuoteIndex);
 
             for (int i = 0; i < (int)mangoGroup.NumOracles; i++)
             {
-                double assetWeight = healthType switch
+                I80F48 assetWeight = healthType switch
                 {
-                    HealthType.Maintenance => mangoGroup.SpotMarkets[i].MaintenanceAssetWeight.Value,
-                    HealthType.Initialization => mangoGroup.SpotMarkets[i].InitializationAssetWeight.Value,
-                    _ => 1
+                    HealthType.Maintenance => mangoGroup.SpotMarkets[i].MaintenanceAssetWeight,
+                    HealthType.Initialization => mangoGroup.SpotMarkets[i].InitializationAssetWeight,
+                    _ => I80F48.One
                 };
-
-                assetsValue += GetSpotValue(mangoGroup, mangoCache, i, assetWeight);
-                assetsValue += MangoUtils.HumanizeNative(
+                var spotValue = GetSpotValue(mangoGroup, mangoCache, i, assetWeight);
+                assetsValue += spotValue;
+                var perpsValue = MangoUtils.HumanizeNative(
                     PerpetualAccounts[i].GetAssetValue(
-                        mangoGroup.PerpetualMarkets[i],
-                        mangoCache.PriceCaches[i].Price.Value,
-                        mangoCache.PerpetualMarketCaches[i].ShortFunding.Value,
-                        mangoCache.PerpetualMarketCaches[i].LongFunding.Value),
+                        mangoGroup.PerpetualMarkets[i], 
+                        mangoCache.PriceCaches[i].Price,
+                        mangoCache.PerpetualMarketCaches[i].ShortFunding,
+                        mangoCache.PerpetualMarketCaches[i].LongFunding),
                     mangoGroup.GetQuoteTokenInfo().Decimals);
+                assetsValue += perpsValue;
             }
 
             return assetsValue;
@@ -519,28 +520,33 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="healthType">The health type.</param>
         /// <returns>The liabilities value.</returns>
-        public double GetLiabilitiesValue(MangoGroup mangoGroup, MangoCache mangoCache, HealthType? healthType = null)
+        public I80F48 GetLiabilitiesValue(MangoGroup mangoGroup, MangoCache mangoCache, HealthType? healthType = null)
         {
-            double liabilitiesValue = GetUiBorrow(mangoCache.RootBankCaches[Constants.QuoteIndex], mangoGroup,
+            I80F48 liabilitiesValue = GetUiBorrow(mangoCache.RootBankCaches[Constants.QuoteIndex], mangoGroup,
                 Constants.QuoteIndex);
 
             for (int i = 0; i < (int)mangoGroup.NumOracles; i++)
             {
-                double liabilityWeight = healthType switch
+                I80F48 liabilityWeight = healthType switch
                 {
-                    HealthType.Maintenance => mangoGroup.SpotMarkets[i].MaintenanceLiabilityWeight.Value,
-                    HealthType.Initialization => mangoGroup.SpotMarkets[i].InitializationLiabilityWeight.Value,
-                    _ => 1
+                    HealthType.Maintenance => mangoGroup.SpotMarkets[i].MaintenanceLiabilityWeight,
+                    HealthType.Initialization => mangoGroup.SpotMarkets[i].InitializationLiabilityWeight,
+                    _ => I80F48.One
                 };
-                liabilitiesValue += GetUiBorrow(mangoCache.RootBankCaches[i], mangoGroup, i) *
-                                    mangoGroup.GetPrice(mangoCache, i) * liabilityWeight;
-                liabilitiesValue += MangoUtils.HumanizeNative(
-                    PerpetualAccounts[i].GetAssetValue(
+                var price = mangoGroup.GetPrice(mangoCache, i);
+                var borrowedValue = GetUiBorrow(mangoCache.RootBankCaches[i], mangoGroup, i) *
+                                    price * liabilityWeight;
+                var borrowedValue2 = GetUiBorrow(mangoCache.RootBankCaches[i], mangoGroup, i) *
+                                    (price * liabilityWeight);
+                liabilitiesValue += borrowedValue;
+                var perpsValue = MangoUtils.HumanizeNative(
+                    PerpetualAccounts[i].GetLiabilitiesValue(
                         mangoGroup.PerpetualMarkets[i],
-                        mangoCache.PriceCaches[i].Price.Value,
-                        mangoCache.PerpetualMarketCaches[i].ShortFunding.Value,
-                        mangoCache.PerpetualMarketCaches[i].LongFunding.Value),
+                        mangoCache.PriceCaches[i].Price,
+                        mangoCache.PerpetualMarketCaches[i].ShortFunding,
+                        mangoCache.PerpetualMarketCaches[i].LongFunding),
                     mangoGroup.GetQuoteTokenInfo().Decimals);
+                liabilitiesValue += perpsValue;
             }
 
             return liabilitiesValue;
@@ -553,26 +559,26 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="healthType">The health type.</param>
         /// <returns>The native liabilities value.</returns>
-        public double GetNativeLiabilitiesValue(MangoGroup mangoGroup, MangoCache mangoCache, HealthType? healthType = null)
+        public I80F48 GetNativeLiabilitiesValue(MangoGroup mangoGroup, MangoCache mangoCache, HealthType? healthType = null)
         {
-            double liabilitiesValue =
+            I80F48 liabilitiesValue =
                 GetNativeBorrow(mangoCache.RootBankCaches[Constants.QuoteIndex], Constants.QuoteIndex);
 
             for (int i = 0; i < (int)mangoGroup.NumOracles; i++)
             {
-                double liabilityWeight = healthType switch
+                I80F48 liabilityWeight = healthType switch
                 {
-                    HealthType.Maintenance => mangoGroup.SpotMarkets[i].MaintenanceLiabilityWeight.Value,
-                    HealthType.Initialization => mangoGroup.SpotMarkets[i].InitializationLiabilityWeight.Value,
-                    _ => 1
+                    HealthType.Maintenance => mangoGroup.SpotMarkets[i].MaintenanceLiabilityWeight,
+                    HealthType.Initialization => mangoGroup.SpotMarkets[i].InitializationLiabilityWeight,
+                    _ => I80F48.One
                 };
                 liabilitiesValue += GetNativeBorrow(mangoCache.RootBankCaches[i], i) *
                                     mangoGroup.GetPrice(mangoCache, i) * liabilityWeight;
                 liabilitiesValue += PerpetualAccounts[i].GetAssetValue(
                     mangoGroup.PerpetualMarkets[i],
-                    mangoCache.PriceCaches[i].Price.Value,
-                    mangoCache.PerpetualMarketCaches[i].ShortFunding.Value,
-                    mangoCache.PerpetualMarketCaches[i].LongFunding.Value);
+                    mangoCache.PriceCaches[i].Price,
+                    mangoCache.PerpetualMarketCaches[i].ShortFunding,
+                    mangoCache.PerpetualMarketCaches[i].LongFunding);
             }
 
             return liabilitiesValue;
@@ -588,13 +594,13 @@ namespace Solnet.Mango.Models
         /// <param name="quote">The quote component.</param>
         /// <param name="healthType">The health type.</param>
         /// <returns>The weighted assets and liabilities values.</returns>
-        public (double SpotHealth, double PerpHealth) GetWeightedAssetsLiabilityValues(MangoGroup mangoGroup,
-            MangoCache mangoCache, List<double> spot, List<double> perps, double quote, HealthType healthType)
+        public (I80F48 SpotHealth, I80F48 PerpHealth) GetWeightedAssetsLiabilityValues(MangoGroup mangoGroup,
+            MangoCache mangoCache, List<I80F48> spot, List<I80F48> perps, I80F48 quote, HealthType healthType)
         {
-            double assets = 0;
-            double liabilities = 0;
+            I80F48 assets = I80F48.Zero;
+            I80F48 liabilities = I80F48.Zero;
 
-            if (quote > 0)
+            if (quote > I80F48.Zero)
             {
                 assets += quote;
             }
@@ -606,8 +612,8 @@ namespace Solnet.Mango.Models
             for (int i = 0; i < (int)mangoGroup.NumOracles; i++)
             {
                 Weights w = MangoUtils.GetWeights(mangoGroup, i, healthType);
-                double price = mangoCache.PriceCaches[i].Price.Value;
-                if (spot[i] > 0)
+                I80F48 price = mangoCache.PriceCaches[i].Price;
+                if (spot[i] > I80F48.Zero)
                 {
                     assets = (spot[i] * price * w.SpotAssetWeight) + assets;
                 }
@@ -616,7 +622,7 @@ namespace Solnet.Mango.Models
                     liabilities = (-spot[i] * price * w.SpotLiabilityWeight) + liabilities;
                 }
 
-                if (perps[i] > 0)
+                if (perps[i] > I80F48.Zero)
                 {
                     assets = (perps[i] * price * w.PerpAssetWeight) + assets;
                 }
@@ -636,19 +642,19 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="healthType">The health type.</param>
         /// <returns>The health ratio.</returns>
-        public double GetHealthRatio(MangoGroup mangoGroup, MangoCache mangoCache, HealthType healthType)
+        public I80F48 GetHealthRatio(MangoGroup mangoGroup, MangoCache mangoCache, HealthType healthType)
         {
-            (List<double> spot, List<double> perps, double quote) =
+            (List<I80F48> spot, List<I80F48> perps, I80F48 quote) =
                 GetHealthComponents(mangoGroup, mangoCache);
-            (double assets, double liabilities) =
+            (I80F48 assets, I80F48 liabilities) =
                 GetWeightedAssetsLiabilityValues(mangoGroup, mangoCache, spot, perps, quote, healthType);
 
-            if (liabilities > 0)
+            if (liabilities > I80F48.Zero)
             {
-                return ((assets / liabilities) - 1) * 100;
+                return ((assets / liabilities) - I80F48.One) * I80F48.OneHundred;
             }
 
-            return 100;
+            return I80F48.OneHundred;
         }
         
         /// <summary>
@@ -658,7 +664,7 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The available balance.</returns>
-        public double GetUiAvailableBalance(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex) =>
+        public I80F48 GetUiAvailableBalance(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex) =>
             MangoUtils.HumanizeNative(GetAvailableBalance(mangoGroup, mangoCache, tokenIndex),
                 mangoGroup.GetQuoteTokenInfo().Decimals);
 
@@ -669,21 +675,20 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The available balance.</returns>
-        public double GetAvailableBalance(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex)
+        public I80F48 GetAvailableBalance(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex)
         {
-            double health = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
-            double net =
+            I80F48 health = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
+            I80F48 net =
                 GetNet(mangoCache.RootBankCaches[tokenIndex],
                     tokenIndex);
 
             if (tokenIndex == Constants.QuoteIndex)
             {
-                return Math.Max(Math.Min(health, net), 0);
+                return health.Min(net).Max(I80F48.Zero);
             }
 
             Weights w = MangoUtils.GetWeights(mangoGroup, tokenIndex, HealthType.Initialization);
-            return Math.Max(
-                Math.Min(net, (health / w.SpotAssetWeight) / mangoCache.PriceCaches[tokenIndex].Price.Value), 0);
+            return net.Min((health / w.SpotAssetWeight) / mangoCache.PriceCaches[tokenIndex].Price).Max(I80F48.Zero);
         }
 
         /// <summary>
@@ -696,19 +701,19 @@ namespace Solnet.Mango.Models
         /// <param name="quote">The quote component.</param>
         /// <param name="healthType">The health type.</param>
         /// <returns>The health.</returns>
-        public double GetHealthFromComponents(MangoGroup mangoGroup, MangoCache mangoCache,
-            List<double> spot, List<double> perps, double quote, HealthType healthType)
+        public I80F48 GetHealthFromComponents(MangoGroup mangoGroup, MangoCache mangoCache,
+            List<I80F48> spot, List<I80F48> perps, I80F48 quote, HealthType healthType)
         {
-            double health = quote;
+            I80F48 health = quote;
 
             for (int i = 0; i < (int)mangoGroup.NumOracles; i++)
             {
                 Weights weights = MangoUtils.GetWeights(mangoGroup, i, healthType);
                 I80F48 price = mangoCache.PriceCaches[i].Price;
-                double _spotHealth = spot[i] * price.Value * (spot[i] > 0
+                I80F48 _spotHealth = spot[i] * price * (spot[i].IsPositive()
                     ? weights.SpotAssetWeight
                     : weights.SpotLiabilityWeight);
-                double _perpHealth = perps[i] * price.Value * (perps[i] > 0
+                I80F48 _perpHealth = perps[i] * price * (perps[i].IsPositive()
                     ? weights.PerpAssetWeight
                     : weights.PerpLiabilityWeight);
 
@@ -728,20 +733,20 @@ namespace Solnet.Mango.Models
         /// <param name="quote">The quote component.</param>
         /// <param name="healthType">The health type.</param>
         /// <returns>The health.</returns>
-        public (double SpotHealth, double PerpHealth) GetHealthsFromComponents(MangoGroup mangoGroup,
-            MangoCache mangoCache, List<double> spot, List<double> perps, double quote, HealthType healthType)
+        public (I80F48 SpotHealth, I80F48 PerpHealth) GetHealthsFromComponents(MangoGroup mangoGroup,
+            MangoCache mangoCache, List<I80F48> spot, List<I80F48> perps, I80F48 quote, HealthType healthType)
         {
-            double spotHealth = quote;
-            double perpHealth = quote;
+            I80F48 spotHealth = quote;
+            I80F48 perpHealth = quote;
 
             for (int i = 0; i < (int)mangoGroup.NumOracles; i++)
             {
                 Weights weights = MangoUtils.GetWeights(mangoGroup, i, healthType);
                 I80F48 price = mangoCache.PriceCaches[i].Price;
-                double _spotHealth = spot[i] * price.Value * (spot[i] > 0
+                I80F48 _spotHealth = spot[i] * price * (spot[i] > I80F48.Zero
                     ? weights.SpotAssetWeight
                     : weights.SpotLiabilityWeight);
-                double _perpHealth = perps[i] * price.Value * (perps[i] > 0
+                I80F48 _perpHealth = perps[i] * price * (perps[i] > I80F48.Zero
                     ? weights.PerpAssetWeight
                     : weights.PerpLiabilityWeight);
 
@@ -758,40 +763,45 @@ namespace Solnet.Mango.Models
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="mangoCache">The mango cache.</param>
         /// <returns>The health components.</returns>
-        public (List<double> Spot, List<double> Perps, double Quote) GetHealthComponents(
+        public (List<I80F48> Spot, List<I80F48> Perps, I80F48 Quote) GetHealthComponents(
             MangoGroup mangoGroup, MangoCache mangoCache)
         {
-            double[] spot = new double[(int)mangoGroup.NumOracles];
-            double[] perps = new double[(int)mangoGroup.NumOracles];
-            double quote = GetNet(mangoCache.RootBankCaches[Constants.QuoteIndex], Constants.QuoteIndex);
+            I80F48[] spot = new I80F48[(int)mangoGroup.NumOracles];
+            I80F48[] perps = new I80F48[(int)mangoGroup.NumOracles];
+            I80F48 quote = GetNet(mangoCache.RootBankCaches[Constants.QuoteIndex], Constants.QuoteIndex);
 
             for (int i = 0; i < (int)mangoGroup.NumOracles; i++)
             {
-                if (OpenOrdersAccounts.Count == 0) continue;
-                OpenOrdersAccount ooa = OpenOrdersAccounts[i];
                 RootBankCache bankCache = mangoCache.RootBankCaches[i];
-                double price = mangoCache.PriceCaches[i].Price.Value;
-                double baseNet = GetNet(bankCache, i);
+                I80F48 price = mangoCache.PriceCaches[i].Price;
+                I80F48 baseNet = GetNet(bankCache, i);
 
-
-                if (InMarginBasket[i] && ooa != null)
+                if (OpenOrdersAccounts.Count != 0)
                 {
-                    OpenOrdersStats s = MangoUtils.SplitOpenOrders(ooa);
-                    double bidsBaseNet = baseNet + (s.QuoteLocked / price) + s.BaseFree + s.BaseLocked;
-                    double asksBaseNet = baseNet + s.BaseFree;
-
-                    if (Math.Abs(bidsBaseNet) > Math.Abs(asksBaseNet))
+                    OpenOrdersAccount ooa = OpenOrdersAccounts[i];
+                    if (InMarginBasket[i] && ooa != null)
                     {
-                        spot[i] = bidsBaseNet;
-                        quote += s.QuoteFree;
+                        OpenOrdersStats s = MangoUtils.SplitOpenOrders(ooa);
+                        I80F48 bidsBaseNet = baseNet + (s.QuoteLocked / price) + s.BaseFree + s.BaseLocked;
+                        I80F48 asksBaseNet = baseNet + s.BaseFree;
+
+                        if (bidsBaseNet.Abs() > asksBaseNet.Abs())
+                        {
+                            spot[i] = bidsBaseNet;
+                            quote += s.QuoteFree;
+                        }
+                        else
+                        {
+                            spot[i] = asksBaseNet;
+                            var iadd = (s.BaseLocked * price) + s.QuoteFree + s.QuoteLocked;
+                            quote += iadd;
+                        }
                     }
                     else
                     {
-                        spot[i] = asksBaseNet;
-                        quote = (s.BaseLocked * price) + s.QuoteFree + s.QuoteLocked + quote;
+                        spot[i] = baseNet;
                     }
-                }
-                else
+                } else
                 {
                     spot[i] = baseNet;
                 }
@@ -803,24 +813,26 @@ namespace Solnet.Mango.Models
                     long baseLotSize = mangoGroup.PerpetualMarkets[i].BaseLotSize;
                     long quoteLotSize = mangoGroup.PerpetualMarkets[i].QuoteLotSize;
 
-                    double takerQuote = perpAccount.TakerQuote * quoteLotSize;
-                    double basePos = (perpAccount.BasePosition + perpAccount.TakerBase) * baseLotSize;
-                    double bidsQuantity = perpAccount.BidsQuantity * baseLotSize;
-                    double asksQuantity = perpAccount.AsksQuantity * baseLotSize;
+                    I80F48 takerQuote = new((decimal)perpAccount.TakerQuote * quoteLotSize);
+                    I80F48 basePos = new((decimal) (perpAccount.BasePosition + perpAccount.TakerBase) * baseLotSize);
+                    I80F48 bidsQuantity = new((decimal)perpAccount.BidsQuantity * baseLotSize);
+                    I80F48 asksQuantity = new((decimal)perpAccount.AsksQuantity * baseLotSize);
 
-                    double bidsBaseNet = basePos + bidsQuantity;
-                    double asksBaseNet = basePos - asksQuantity;
+                    I80F48 bidsBaseNet = basePos + bidsQuantity;
+                    I80F48 asksBaseNet = basePos - asksQuantity;
 
-                    if (Math.Abs(bidsBaseNet) > Math.Abs(asksBaseNet))
+                    if (bidsBaseNet.Abs() > asksBaseNet.Abs())
                     {
-                        double quotePos = (perpAccount.GetQuotePosition(marketCache) + takerQuote) -
+                        var quotePosition = perpAccount.GetQuotePosition(marketCache);
+                        I80F48 quotePos = (quotePosition + takerQuote) -
                                           (bidsQuantity * price);
                         quote += quotePos;
                         perps[i] = bidsBaseNet;
                     }
                     else
                     {
-                        double quotePos = (perpAccount.GetQuotePosition(marketCache) + takerQuote) +
+                        var quotePosition = perpAccount.GetQuotePosition(marketCache);
+                        I80F48 quotePos = (quotePosition + takerQuote) +
                                           (asksQuantity * price);
                         quote += quotePos;
                         perps[i] = asksBaseNet;
@@ -828,7 +840,7 @@ namespace Solnet.Mango.Models
                 }
                 else
                 {
-                    perps[i] = 0;
+                    perps[i] = I80F48.Zero;
                 }
             }
 
@@ -843,7 +855,7 @@ namespace Solnet.Mango.Models
         /// <param name="marketIndex">The market index.</param>
         /// <param name="marketType">The market type.</param>
         /// <returns>The margin available.</returns>
-        public double GetUiMarketMarginAvailable(MangoGroup mangoGroup, MangoCache mangoCache, int marketIndex,
+        public I80F48 GetUiMarketMarginAvailable(MangoGroup mangoGroup, MangoCache mangoCache, int marketIndex,
             MarketType marketType) =>
             MangoUtils.HumanizeNative(GetMarketMarginAvailable(mangoGroup, mangoCache, marketIndex, marketType),
                 mangoGroup.GetQuoteTokenInfo().Decimals);
@@ -856,23 +868,23 @@ namespace Solnet.Mango.Models
         /// <param name="marketIndex">The market index.</param>
         /// <param name="marketType">The market type.</param>
         /// <returns>The margin available.</returns>
-        public double GetMarketMarginAvailable(MangoGroup mangoGroup, MangoCache mangoCache, int marketIndex,
+        public I80F48 GetMarketMarginAvailable(MangoGroup mangoGroup, MangoCache mangoCache, int marketIndex,
             MarketType marketType)
         {
-            double health = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
+            I80F48 health = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
 
-            if (health < 0) return 0;
+            if (health < I80F48.Zero) return I80F48.Zero;
 
             Weights w = MangoUtils.GetWeights(mangoGroup, marketIndex, HealthType.Initialization);
-            double weight = marketType == MarketType.Spot ? w.SpotAssetWeight : w.PerpAssetWeight;
+            I80F48 weight = marketType == MarketType.Spot ? w.SpotAssetWeight : w.PerpAssetWeight;
 
-            if (weight > 1)
+            if (weight > I80F48.One)
             {
                 //shouldn't happen
                 return health;
             }
 
-            return health / (1 - weight);
+            return health / (I80F48.Zero - weight);
         }
 
         /// <summary>
@@ -881,17 +893,17 @@ namespace Solnet.Mango.Models
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="mangoCache">The mango cache.</param>
         /// <returns>The leverage.</returns>
-        public double GetLeverage(MangoGroup mangoGroup, MangoCache mangoCache)
+        public I80F48 GetLeverage(MangoGroup mangoGroup, MangoCache mangoCache)
         {
-            double liabilities = GetLiabilitiesValue(mangoGroup, mangoCache);
-            double assets = GetAssetsValue(mangoGroup, mangoCache);
+            I80F48 liabilities = GetLiabilitiesValue(mangoGroup, mangoCache);
+            I80F48 assets = GetAssetsValue(mangoGroup, mangoCache);
 
-            if (assets > 0)
+            if (assets > I80F48.Zero)
             {
                 return liabilities / (assets - liabilities);
             }
 
-            return 0;
+            return I80F48.Zero;
         }
 
         /// <summary>
@@ -906,39 +918,39 @@ namespace Solnet.Mango.Models
         /// <param name="price">The price.</param>
         /// <returns>The leverage stats.</returns>
         public LeverageStats GetMaxLeverageForMarket(MangoGroup mangoGroup, MangoCache mangoCache, int marketIndex,
-            byte decimals, PerpMarket market, Side side, double price)
+            byte decimals, PerpMarket market, Side side, I80F48 price)
         {
-            double initHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
-            double healthDecimals = Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals);
-            double uiInitHealth = initHealth / healthDecimals;
+            I80F48 initHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
+            I80F48 healthDecimals = new I80F48((decimal) Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals));
+            I80F48 uiInitHealth = initHealth / healthDecimals;
 
-            double initLiabilityWeight = mangoGroup.PerpetualMarkets[marketIndex].InitializationLiabilityWeight.Value;
-            double initAssetWeight = mangoGroup.PerpetualMarkets[marketIndex].InitializationAssetWeight.Value;
+            I80F48 initLiabilityWeight = mangoGroup.PerpetualMarkets[marketIndex].InitializationLiabilityWeight;
+            I80F48 initAssetWeight = mangoGroup.PerpetualMarkets[marketIndex].InitializationAssetWeight;
 
-            double deposits = 0, borrows = 0, uiDeposit = 0, uiBorrow = 0;
-            double basePosition = PerpetualAccounts[marketIndex].BasePosition;
+            I80F48 deposits = I80F48.Zero, borrows = I80F48.Zero, uiDeposit = I80F48.Zero, uiBorrow = I80F48.Zero;
+            I80F48 basePosition = new I80F48((decimal)PerpetualAccounts[marketIndex].BasePosition);
 
-            if (basePosition > 0)
+            if (basePosition > I80F48.Zero)
             {
-                deposits = market.BaseLotsToNumber(basePosition, decimals);
+                deposits = new I80F48(market.BaseLotsToNumber(basePosition.ToDecimal(), decimals));
                 uiDeposit = deposits * price;
             }
             else
             {
-                borrows = Math.Abs(market.BaseLotsToNumber(basePosition, decimals));
+                borrows = new I80F48(market.BaseLotsToNumber(basePosition.ToDecimal(), decimals)).Abs();
                 uiBorrow = borrows * price;
             }
 
-            double max;
+            I80F48 max;
             if (side == Side.Buy)
             {
-                double uiHealthAtZero = uiInitHealth + (uiBorrow * (initLiabilityWeight - 1));
-                max = (uiHealthAtZero / (1 - initAssetWeight)) + uiBorrow;
+                I80F48 uiHealthAtZero = uiInitHealth + (uiBorrow * (initLiabilityWeight - I80F48.One));
+                max = (uiHealthAtZero / (I80F48.One - initAssetWeight)) + uiBorrow;
             }
             else
             {
-                double uiHealthAtZero = uiInitHealth + (uiDeposit * (initAssetWeight - 1));
-                max = (uiHealthAtZero / (1 - initLiabilityWeight)) + uiDeposit;
+                I80F48 uiHealthAtZero = uiInitHealth + (uiDeposit * (initAssetWeight - I80F48.One));
+                max = (uiHealthAtZero / (I80F48.One - initLiabilityWeight)) + uiDeposit;
             }
 
             return new LeverageStats
@@ -962,30 +974,30 @@ namespace Solnet.Mango.Models
         /// <param name="price">The price.</param>
         /// <returns>The leverage stats.</returns>
         public LeverageStats GetMaxLeverageForMarket(MangoGroup mangoGroup, MangoCache mangoCache, int marketIndex,
-            Market market, Side side, double price)
+            Market market, Side side, I80F48 price)
         {
-            double initHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
-            double healthDecimals = Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals);
-            double uiInitHealth = initHealth / healthDecimals;
+            I80F48 initHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
+            I80F48 healthDecimals = new((decimal) Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals));
+            I80F48 uiInitHealth = initHealth / healthDecimals;
 
-            double initLiabilityWeight = mangoGroup.SpotMarkets[marketIndex].InitializationLiabilityWeight.Value;
-            double initAssetWeight = mangoGroup.SpotMarkets[marketIndex].InitializationAssetWeight.Value;
+            I80F48 initLiabilityWeight = mangoGroup.SpotMarkets[marketIndex].InitializationLiabilityWeight;
+            I80F48 initAssetWeight = mangoGroup.SpotMarkets[marketIndex].InitializationAssetWeight;
 
-            double deposits = GetUiDeposit(mangoCache.RootBankCaches[marketIndex], mangoGroup, marketIndex);
-            double uiDeposit = deposits * price;
-            double borrows = GetUiBorrow(mangoCache.RootBankCaches[marketIndex], mangoGroup, marketIndex);
-            double uiBorrow = borrows * price;
+            I80F48 deposits = GetUiDeposit(mangoCache.RootBankCaches[marketIndex], mangoGroup, marketIndex);
+            I80F48 uiDeposit = deposits * price;
+            I80F48 borrows = GetUiBorrow(mangoCache.RootBankCaches[marketIndex], mangoGroup, marketIndex);
+            I80F48 uiBorrow = borrows * price;
 
-            double max;
+            I80F48 max;
             if (side == Side.Buy)
             {
-                double uiHealthAtZero = uiInitHealth + (uiBorrow * (initLiabilityWeight - 1));
-                max = (uiHealthAtZero / (1 - initAssetWeight)) + uiBorrow;
+                I80F48 uiHealthAtZero = uiInitHealth + (uiBorrow * (initLiabilityWeight - I80F48.One));
+                max = (uiHealthAtZero / (I80F48.One - initAssetWeight)) + uiBorrow;
             }
             else
             {
-                double uiHealthAtZero = uiInitHealth + (uiDeposit * (initAssetWeight - 1));
-                max = (uiHealthAtZero / (1 - initLiabilityWeight)) + uiDeposit;
+                I80F48 uiHealthAtZero = uiInitHealth + (uiDeposit * (initAssetWeight - I80F48.One));
+                max = (uiHealthAtZero / (I80F48.One - initLiabilityWeight)) + uiDeposit;
             }
 
             return new LeverageStats
@@ -1005,29 +1017,29 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The maximum withdraw amount.</returns>
-        public double GetMaxWithBorrowForToken(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex)
+        public I80F48 GetMaxWithBorrowForToken(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex)
         {
-            double oldInitHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
-            double tokenDeposits =
+            I80F48 oldInitHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
+            I80F48 tokenDeposits =
                 GetNativeDeposit(
                     mangoCache.RootBankCaches[tokenIndex],
                     tokenIndex);
-            double liabWeight, assetWeight, nativePrice;
+            I80F48 liabWeight, assetWeight, nativePrice;
 
             if (tokenIndex == Constants.QuoteIndex)
             {
-                liabWeight = assetWeight = nativePrice = 1;
+                liabWeight = assetWeight = nativePrice = I80F48.One;
             }
             else
             {
-                liabWeight = mangoGroup.SpotMarkets[tokenIndex].InitializationLiabilityWeight.Value;
-                assetWeight = mangoGroup.SpotMarkets[tokenIndex].InitializationAssetWeight.Value;
-                nativePrice = mangoCache.PriceCaches[tokenIndex].Price.Value;
+                liabWeight = mangoGroup.SpotMarkets[tokenIndex].InitializationLiabilityWeight;
+                assetWeight = mangoGroup.SpotMarkets[tokenIndex].InitializationAssetWeight;
+                nativePrice = mangoCache.PriceCaches[tokenIndex].Price;
             }
 
-            double newInitHealth = oldInitHealth - (tokenDeposits * nativePrice * assetWeight);
-            double price = mangoGroup.GetPrice(mangoCache, tokenIndex);
-            double healthDecimals = Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals);
+            I80F48 newInitHealth = oldInitHealth - (tokenDeposits * nativePrice * assetWeight);
+            I80F48 price = mangoGroup.GetPrice(mangoCache, tokenIndex);
+            I80F48 healthDecimals = new ((decimal) Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals));
 
             return (newInitHealth / healthDecimals) / (price * liabWeight);
         }
@@ -1038,9 +1050,20 @@ namespace Solnet.Mango.Models
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="mangoCache">the mango cache.</param>
         /// <returns>The account equity.</returns>
-        public double GetEquity(MangoGroup mangoGroup, MangoCache mangoCache)
+        public I80F48 ComputeValue(MangoGroup mangoGroup, MangoCache mangoCache)
         {
             return GetAssetsValue(mangoGroup, mangoCache) - GetLiabilitiesValue(mangoGroup, mangoCache);
+        }
+
+        /// <summary>
+        /// Gets the account equity in standard UI numbers. E.g. if equity is $100, this returns 100.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">the mango cache.</param>
+        /// <returns>The account equity.</returns>
+        public I80F48 GetUiEquity(MangoGroup mangoGroup, MangoCache mangoCache)
+        {
+            return MangoUtils.HumanizeNative(ComputeValue(mangoGroup, mangoCache), mangoGroup.GetQuoteTokenInfo().Decimals);
         }
 
         /// <summary>
@@ -1051,8 +1074,8 @@ namespace Solnet.Mango.Models
         /// <returns>true if it is, otherwise false.</returns>
         public bool IsLiquidatable(MangoGroup mangoGroup, MangoCache mangoCache)
         {
-            return (BeingLiquidated && (GetHealth(mangoGroup, mangoCache, HealthType.Initialization) < 0)) ||
-                   (GetHealth(mangoGroup, mangoCache, HealthType.Maintenance) < 0);
+            return (BeingLiquidated && (GetHealth(mangoGroup, mangoCache, HealthType.Initialization) < I80F48.Zero)) ||
+                   (GetHealth(mangoGroup, mangoCache, HealthType.Maintenance) < I80F48.Zero);
         }
 
         /// <summary>
