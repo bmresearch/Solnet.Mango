@@ -56,7 +56,8 @@ namespace Solnet.Mango.Models
         /// <returns>The <see cref="MetaData"/> structure.</returns>
         public static MetaData Deserialize(ReadOnlySpan<byte> data)
         {
-            if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
 
             DataType dataType = (DataType)Enum.Parse(typeof(DataType), data.GetU8(Layout.DataTypeOffset).ToString());
 

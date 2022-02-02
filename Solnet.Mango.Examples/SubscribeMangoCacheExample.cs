@@ -1,5 +1,6 @@
 using Solnet.Mango.Models;
-using Solnet.Mango.Models.Perpetuals;
+using Solnet.Mango.Models.Banks;
+using Solnet.Mango.Models.Caches;
 using Solnet.Programs;
 using Solnet.Programs.Models;
 using Solnet.Rpc;

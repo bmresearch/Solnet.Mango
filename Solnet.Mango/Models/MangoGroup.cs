@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Solnet.Mango.Models.Banks;
+using Solnet.Mango.Models.Caches;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Mango.Types;
 using Solnet.Programs;
@@ -25,6 +27,11 @@ namespace Solnet.Mango.Models
         /// </summary>
         internal static class Layout
         {
+            /// <summary>
+            /// The length of the structure.
+            /// </summary>
+            internal const int Length = 6032;
+
             /// <summary>
             /// The offset at which the metadata begins.
             /// </summary>
@@ -445,6 +452,9 @@ namespace Solnet.Mango.Models
         /// <returns>The <see cref="MangoGroup"/> structure.</returns>
         public static MangoGroup Deserialize(byte[] data)
         {
+            if(data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
+
             ReadOnlySpan<byte> span = data.AsSpan();
             List<TokenInfo> tokens = new(Constants.MaxTokens);
             ReadOnlySpan<byte> tokensBytes =

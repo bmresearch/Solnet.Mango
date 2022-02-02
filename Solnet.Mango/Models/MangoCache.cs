@@ -1,5 +1,4 @@
-using Solnet.Mango.Models.Perpetuals;
-using Solnet.Mango.Types;
+using Solnet.Mango.Models.Caches;
 using Solnet.Programs.Utilities;
 using System;
 using System.Collections.Generic;
@@ -69,7 +68,8 @@ namespace Solnet.Mango.Models
         /// <returns>The <see cref="RootBankCache"/> structure.</returns>
         public static MangoCache Deserialize(byte[] data)
         {
-            if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
             ReadOnlySpan<byte> span = data.AsSpan();
 
             List<PriceCache> priceCaches = new(Constants.MaxPairs);

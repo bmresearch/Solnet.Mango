@@ -75,7 +75,8 @@ namespace Solnet.Mango.Models.Matching
             {
                 (byte)NodeType.FreeNode => FreeNode.Deserialize(blob),
                 (byte)NodeType.InnerNode => InnerNode.Deserialize(blob),
-                (byte)NodeType.LeafNode => LeafNode.Deserialize(blob)
+                (byte)NodeType.LeafNode => LeafNode.Deserialize(blob),
+                _ => null
             };
         }
     }

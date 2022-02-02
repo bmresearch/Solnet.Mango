@@ -1,3 +1,4 @@
+using Solnet.Mango.Models.Caches;
 using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using System;
@@ -288,7 +289,8 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <returns>The <see cref="PerpAccount"/> structure.</returns>
         public static PerpAccount Deserialize(ReadOnlySpan<byte> data)
         {
-
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
             return new PerpAccount
             {
                 BasePosition = data.GetS64(Layout.BasePositionOffset),

@@ -73,6 +73,8 @@ namespace Solnet.Mango.Models.Events
         /// <returns>The <see cref="LiquidateEvent"/> structure.</returns>
         public static LiquidateEvent Deserialize(ReadOnlySpan<byte> data)
         {
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
             return new LiquidateEvent
             {
                 EventType = (EventType)Enum.Parse(typeof(EventType), data.GetU8(Layout.EventTypeOffset).ToString()),

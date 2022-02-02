@@ -81,7 +81,7 @@ namespace Solnet.Mango
             PlacePerpOrder = 12,
 
             /// <summary>
-            /// Cancels an order using Serum <see cref="Order"/>'s clientOrderId.
+            /// Cancels an order using <see cref="Models.Matching.OrderBase"/>'s clientOrderId.
             /// </summary>
             CancelPerpOrderByClientId = 13,
 
@@ -91,7 +91,7 @@ namespace Solnet.Mango
             CancelPerpOrder = 14,
 
             /// <summary>
-            /// Consumes events on the Mango Perpetual <see cref="Models.EventQueue"/>.
+            /// Consumes events on the Mango Perpetual <see cref="Models.Events.EventQueue"/>.
             /// </summary>
             ConsumeEvents = 15,
 

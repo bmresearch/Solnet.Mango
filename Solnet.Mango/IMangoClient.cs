@@ -1,4 +1,7 @@
 using Solnet.Mango.Models;
+using Solnet.Mango.Models.Banks;
+using Solnet.Mango.Models.Events;
+using Solnet.Mango.Models.Matching;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs.Models;
 using Solnet.Rpc;
@@ -7,9 +10,6 @@ using Solnet.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using EventQueue = Solnet.Mango.Models.EventQueue;
-using OrderBook = Solnet.Mango.Models.OrderBook;
-using OrderBookSide = Solnet.Mango.Models.OrderBookSide;
 
 namespace Solnet.Mango
 {
@@ -153,11 +153,11 @@ namespace Solnet.Mango
         AccountResultWrapper<PerpMarket> GetPerpMarket(string account, Commitment commitment = Commitment.Finalized);
 
         /// <summary>
-        /// Gets the given <see cref="Models.OrderBookSide"/>. This is an asynchronous operation.
+        /// Gets the given <see cref="OrderBookSide"/>. This is an asynchronous operation.
         /// </summary>
-        /// <param name="account">The <see cref="Models.OrderBookSide"/> public key.</param>
+        /// <param name="account">The <see cref="OrderBookSide"/> public key.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
-        /// <returns>The list of <see cref="Models.OrderBookSide"/>s or null in case an error occurred.</returns>
+        /// <returns>The list of <see cref="OrderBookSide"/>s or null in case an error occurred.</returns>
         Task<AccountResultWrapper<OrderBookSide>> GetOrderBookSideAsync(string account,
             Commitment commitment = Commitment.Finalized);
 
@@ -170,11 +170,11 @@ namespace Solnet.Mango
         AccountResultWrapper<OrderBookSide> GetOrderBookSide(string account, Commitment commitment = Commitment.Finalized);
 
         /// <summary>
-        /// Gets the given <see cref="Models.OrderBook"/>. This is an asynchronous operation.
+        /// Gets the given <see cref="OrderBook"/>. This is an asynchronous operation.
         /// </summary>
         /// <param name="perpMarket">The <see cref="PerpMarket"/>.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
-        /// <returns>The list of <see cref="Models.OrderBook"/>s or null in case an error occurred.</returns>
+        /// <returns>The list of <see cref="OrderBook"/>s or null in case an error occurred.</returns>
         Task<MultipleAccountsResultWrapper<OrderBook>> GetOrderBookAsync(PerpMarket perpMarket,
             Commitment commitment = Commitment.Finalized);
 
@@ -187,11 +187,11 @@ namespace Solnet.Mango
         MultipleAccountsResultWrapper<OrderBook> GetOrderBook(PerpMarket perpMarket, Commitment commitment = Commitment.Finalized);
 
         /// <summary>
-        /// Gets the given <see cref="Models.EventQueue"/>. This is an asynchronous operation.
+        /// Gets the given <see cref="EventQueue"/>. This is an asynchronous operation.
         /// </summary>
-        /// <param name="eventQueueAddress">The <see cref="Models.EventQueue"/> public key.</param>
+        /// <param name="eventQueueAddress">The <see cref="EventQueue"/> public key.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
-        /// <returns>The list of <see cref="Models.EventQueue"/>s or null in case an error occurred.</returns>
+        /// <returns>The list of <see cref="EventQueue"/>s or null in case an error occurred.</returns>
         Task<AccountResultWrapper<EventQueue>> GetEventQueueAsync(string eventQueueAddress,
             Commitment commitment = Commitment.Finalized);
 

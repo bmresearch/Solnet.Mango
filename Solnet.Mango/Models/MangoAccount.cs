@@ -1,4 +1,6 @@
 using Microsoft.Extensions.Logging;
+using Solnet.Mango.Models.Banks;
+using Solnet.Mango.Models.Caches;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Mango.Types;
 using Solnet.Programs;
@@ -7,7 +9,6 @@ using Solnet.Rpc;
 using Solnet.Rpc.Core.Http;
 using Solnet.Rpc.Messages;
 using Solnet.Rpc.Models;
-using Solnet.Serum;
 using Solnet.Serum.Models;
 using Solnet.Wallet;
 using System;
@@ -30,7 +31,7 @@ namespace Solnet.Mango.Models
         public static class Layout
         {
             /// <summary>
-            /// The size of the raw structure.
+            /// The length of the <see cref="MangoAccount"/> structure.
             /// </summary>
             public const int Length = 4296;
 
@@ -75,47 +76,47 @@ namespace Solnet.Mango.Models
             internal const int SpotOpenOrdersOffset = 600;
 
             /// <summary>
-            /// The offset at which the perpetual markets accounts begin.
+            /// The offset at which the perpetual accounts begin.
             /// </summary>
             internal const int PerpetualAccountsOffset = 1080;
 
             /// <summary>
-            /// The offset at which the order's markets values begin.
+            /// The offset at which the markets for the open orders begin.
             /// </summary>
             internal const int OrderMarketOffset = 2520;
 
             /// <summary>
-            /// The offset at which the order's side values begin.
+            /// The offset at which the sides for the open orders begin.
             /// </summary>
             internal const int OrderSideOffset = 2584;
 
             /// <summary>
-            /// The offset at which the order's ids begin.
+            /// The offset at which the order ids begin.
             /// </summary>
             internal const int OrderIdsOffset = 2648;
 
             /// <summary>
-            /// The offset at which the order's client ids begin.
+            /// The offset at which the client order ids begin.
             /// </summary>
             internal const int ClientOrderIdsOffset = 3672;
 
             /// <summary>
-            /// The offset at which the account's MSRM amount value begins.
+            /// The offset at which the account's MSRM amount begins.
             /// </summary>
             internal const int MegaSerumAmountOffset = 4184;
 
             /// <summary>
-            /// The offset at which the boolean which specifies if the account is being liquidated begins.
+            /// The offset at which the boolean which defines if the account is being liquidated begins.
             /// </summary>
             internal const int BeingLiquidatedOffset = 4192;
 
             /// <summary>
-            /// The offset at which the boolean which specifies if the account is bankrupt begins.
+            /// The offset at which the boolean which defines if the account is bankrupt begins.
             /// </summary>
             internal const int BankruptOffset = 4193;
 
             /// <summary>
-            /// The offset at which the account's info string begins.
+            /// The offset at which the account info begins.
             /// </summary>
             internal const int InfoOffset = 4194;
 
@@ -1019,11 +1020,8 @@ namespace Solnet.Mango.Models
         /// <returns>The maximum withdraw amount.</returns>
         public I80F48 GetMaxWithBorrowForToken(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex)
         {
-            I80F48 oldInitHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization);
-            I80F48 tokenDeposits =
-                GetNativeDeposit(
-                    mangoCache.RootBankCaches[tokenIndex],
-                    tokenIndex);
+            I80F48 oldInitHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization).Floor();
+            I80F48 tokenDeposits = GetNativeDeposit(mangoCache.RootBankCaches[tokenIndex], tokenIndex).Floor();
             I80F48 liabWeight, assetWeight, nativePrice;
 
             if (tokenIndex == Constants.QuoteIndex)
@@ -1037,7 +1035,7 @@ namespace Solnet.Mango.Models
                 nativePrice = mangoCache.PriceCaches[tokenIndex].Price;
             }
 
-            I80F48 newInitHealth = oldInitHealth - (tokenDeposits * nativePrice * assetWeight);
+            I80F48 newInitHealth = (oldInitHealth - (tokenDeposits * nativePrice * assetWeight)).Floor();
             I80F48 price = mangoGroup.GetPrice(mangoCache, tokenIndex);
             I80F48 healthDecimals = new ((decimal) Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals));
 
@@ -1085,7 +1083,8 @@ namespace Solnet.Mango.Models
         /// <returns>The <see cref="MangoAccount"/> structure.</returns>
         public static MangoAccount Deserialize(byte[] data)
         {
-            if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
+            if (data.Length != Layout.Length) 
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
             ReadOnlySpan<byte> span = data.AsSpan();
 
             List<bool> inMarginBasket = new(Constants.MaxPairs);
