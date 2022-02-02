@@ -252,7 +252,7 @@ namespace Solnet.Mango.Models
                     return;
                 }
                 RootBank rb = RootBank.Deserialize(Convert.FromBase64String(rootBankAccounts.Result.Value[keyIndex].Data[0]));
-                rb.LoadNodeBanksAsync(rpcClient, logger);
+                rb.LoadNodeBanks(rpcClient, logger);
                 RootBankAccounts.Add(rb);
             });
 
