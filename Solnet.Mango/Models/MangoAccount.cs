@@ -362,7 +362,7 @@ namespace Solnet.Mango.Models
         /// <returns>The amount deposited humanized for ui display.</returns>
         public I80F48 GetUiDeposit(RootBank rootBank, MangoGroup mangoGroup, int tokenIndex)
         {
-            return MangoUtils.HumanizeNative(GetNativeDeposit(rootBank, tokenIndex).Floor(),
+            return MangoUtils.HumanizeNative(GetNativeDeposit(rootBank, tokenIndex).Round(),
                 mangoGroup.Tokens[tokenIndex].Decimals);
         }
 
@@ -388,7 +388,7 @@ namespace Solnet.Mango.Models
         /// <returns>The amount borrowed humanized for ui display.</returns>
         public I80F48 GetUiBorrow(RootBank rootBank, MangoGroup mangoGroup, int tokenIndex)
         {
-            return MangoUtils.HumanizeNative(GetNativeBorrow(rootBank, tokenIndex).Ceil(),
+            return MangoUtils.HumanizeNative(GetNativeBorrow(rootBank, tokenIndex).Round(3),
                 mangoGroup.Tokens[tokenIndex].Decimals);
         }
 
@@ -711,10 +711,10 @@ namespace Solnet.Mango.Models
             {
                 Weights weights = MangoUtils.GetWeights(mangoGroup, i, healthType);
                 I80F48 price = mangoCache.PriceCaches[i].Price;
-                I80F48 _spotHealth = spot[i] * price * (spot[i].IsPositive()
+                I80F48 _spotHealth = spot[i] * price * (spot[i].IsPositive
                     ? weights.SpotAssetWeight
                     : weights.SpotLiabilityWeight);
-                I80F48 _perpHealth = perps[i] * price * (perps[i].IsPositive()
+                I80F48 _perpHealth = perps[i] * price * (perps[i].IsPositive
                     ? weights.PerpAssetWeight
                     : weights.PerpLiabilityWeight);
 
@@ -1020,8 +1020,8 @@ namespace Solnet.Mango.Models
         /// <returns>The maximum withdraw amount.</returns>
         public I80F48 GetMaxWithBorrowForToken(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex)
         {
-            I80F48 oldInitHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization).Floor();
-            I80F48 tokenDeposits = GetNativeDeposit(mangoCache.RootBankCaches[tokenIndex], tokenIndex).Floor();
+            I80F48 oldInitHealth = GetHealth(mangoGroup, mangoCache, HealthType.Initialization).Round();
+            I80F48 tokenDeposits = GetNativeDeposit(mangoCache.RootBankCaches[tokenIndex], tokenIndex).Round();
             I80F48 liabWeight, assetWeight, nativePrice;
 
             if (tokenIndex == Constants.QuoteIndex)
@@ -1035,7 +1035,7 @@ namespace Solnet.Mango.Models
                 nativePrice = mangoCache.PriceCaches[tokenIndex].Price;
             }
 
-            I80F48 newInitHealth = (oldInitHealth - (tokenDeposits * nativePrice * assetWeight)).Floor();
+            I80F48 newInitHealth = (oldInitHealth - (tokenDeposits * nativePrice * assetWeight)).Round();
             I80F48 price = mangoGroup.GetPrice(mangoCache, tokenIndex);
             I80F48 healthDecimals = new ((decimal) Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals));
 

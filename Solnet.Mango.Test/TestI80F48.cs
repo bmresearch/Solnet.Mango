@@ -132,5 +132,95 @@ namespace Solnet.Mango.Test
 
             Assert.AreEqual(0.25m, v5d);
         }
+
+
+        [TestMethod]
+        public void SerDesMax()
+        {
+            var a = I80F48.MaxValue;
+
+            var data = I80F48.Serialize(a);
+            var a1 = I80F48.Deserialize(data);
+
+            Assert.AreEqual(a, a1);
+        }
+
+        [TestMethod]
+        public void SerDesMin()
+        {
+            var a = I80F48.MinValue;
+
+            var data = I80F48.Serialize(a);
+            var a1 = I80F48.Deserialize(data);
+
+            Assert.AreEqual(a, a1);
+        }
+
+        [TestMethod]
+        public void SerDesSmallNumber()
+        {
+            var a = (I80F48)0.00000000876123m;
+
+            var data = I80F48.Serialize(a);
+            var a1 = I80F48.Deserialize(data);
+
+            Assert.AreEqual(a, a1);
+        }
+
+        [TestMethod]
+        public void SerDesInt()
+        {
+            var a = (I80F48)ulong.MaxValue;
+
+            var data = I80F48.Serialize(a);
+            var a1 = I80F48.Deserialize(data);
+
+            Assert.AreEqual(ulong.MaxValue, (ulong)a1);
+        }
+
+        [TestMethod]
+        public void SerDesSmallNumberNeg()
+        {
+            var a = (I80F48)(-0.00000000876123m);
+
+            var data = I80F48.Serialize(a);
+            var a1 = I80F48.Deserialize(data);
+
+
+            var bi = new BigInteger(-1);
+
+            var bytes = new byte[16];
+
+            bi.TryWriteBytes(bytes, out var wr);
+
+            if(wr != 16)
+            {
+                bytes[wr - 1] = (byte)(bytes[wr - 1] & 0x7F);
+                while (wr < 16) bytes[wr++] = 0xFF;
+            }
+
+            var bi2 = new BigInteger(bytes);
+
+            Assert.AreEqual(a, a1);
+        }
+
+        [TestMethod]
+        public void SerDesIntNeg()
+        {
+            var b = (I80F48)ulong.MaxValue;
+
+            var data2 = I80F48.Serialize(b);
+            var b1 = I80F48.Deserialize(data2);
+
+            Assert.AreEqual(ulong.MaxValue, (ulong)b1);
+
+
+            var a = (I80F48)int.MinValue;
+
+            var data = I80F48.Serialize(a);
+            var a1 = I80F48.Deserialize(data);
+
+            Assert.AreEqual(int.MinValue, (int)a1);
+        }
     }
 }

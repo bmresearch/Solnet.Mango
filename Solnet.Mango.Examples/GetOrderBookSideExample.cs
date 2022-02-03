@@ -29,11 +29,11 @@ namespace Solnet.Mango.Examples
             {
                 if (t.Market.Key == SystemProgram.ProgramIdKey.Key) continue;
                 Console.WriteLine($"Perp Market: {t.Market}\n" +
-                                  $"Maintenance\n\tAssetWeight: {t.MaintenanceAssetWeight.Value}\n" +
-                                  $"\tLiabilityWeight: {t.MaintenanceLiabilityWeight.Value}\n" +
-                                  $"Initialization\n\tAssetWeight: {t.InitializationAssetWeight.Value}\n" +
-                                  $"\tLiabilityWeight: {t.InitializationLiabilityWeight.Value}\n" +
-                                  $"Fees\n\tMaker: {t.MakerFee.Value}\tTaker: {t.TakerFee.Value}");
+                                  $"Maintenance\n\tAssetWeight: {t.MaintenanceAssetWeight.ToDecimal()}\n" +
+                                  $"\tLiabilityWeight: {t.MaintenanceLiabilityWeight.ToDecimal()}\n" +
+                                  $"Initialization\n\tAssetWeight: {t.InitializationAssetWeight.ToDecimal()}\n" +
+                                  $"\tLiabilityWeight: {t.InitializationLiabilityWeight.ToDecimal()}\n" +
+                                  $"Fees\n\tMaker: {t.MakerFee.ToDecimal()}\tTaker: {t.TakerFee.ToDecimal()}");
 
                 AccountResultWrapper<PerpMarket> perpMarket = _mangoClient.GetPerpMarket(t.Market);
                 Console.WriteLine($"Bids: {perpMarket.ParsedResult.Bids}\n" +
@@ -41,8 +41,8 @@ namespace Solnet.Mango.Examples
                                   $"EventQueue: {perpMarket.ParsedResult.EventQueue}\n" +
                                   $"Quote Lot Size: {perpMarket.ParsedResult.QuoteLotSize}\n" +
                                   $"Base Lot Size: {perpMarket.ParsedResult.BaseLotSize}\n" +
-                                  $"Long Funding: {perpMarket.ParsedResult.LongFunding.Value}\n" +
-                                  $"Short Funding: {perpMarket.ParsedResult.ShortFunding.Value}\n" +
+                                  $"Long Funding: {perpMarket.ParsedResult.LongFunding.ToDecimal()}\n" +
+                                  $"Short Funding: {perpMarket.ParsedResult.ShortFunding.ToDecimal()}\n" +
                                   $"Open Interest: {perpMarket.ParsedResult.OpenInterest}\n");
 
                 Task.Delay(200).Wait();
