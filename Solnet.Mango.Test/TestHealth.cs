@@ -100,8 +100,8 @@ namespace Solnet.Mango.Test
 
             LogAccountStatus(mangoGroup, mangoCache, mangoAccount);
 
-            Assert.AreEqual(7516159604.9885432195310457359m, mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal());
-            Assert.AreEqual(9618709877.520870773008571319m, mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal());
+            Assert.AreEqual(7516159604.8491833454509567503m, mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal());
+            Assert.AreEqual(9618709877.451190835968525050m, mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal());
             Assert.AreEqual(24.806800043657162291310669389m, mangoAccount.GetHealthRatio(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal());
             Assert.AreEqual(31.746187568175088244970538653m, mangoAccount.GetHealthRatio(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal());
             Assert.AreEqual(11915.529421941821698993635437m, mangoAccount.ComputeValue(mangoGroup, mangoCache).ToDecimal());

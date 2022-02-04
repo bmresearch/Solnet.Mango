@@ -1054,17 +1054,6 @@ namespace Solnet.Mango.Models
         }
 
         /// <summary>
-        /// Gets the account equity in standard UI numbers. E.g. if equity is $100, this returns 100.
-        /// </summary>
-        /// <param name="mangoGroup">The mango group.</param>
-        /// <param name="mangoCache">the mango cache.</param>
-        /// <returns>The account equity.</returns>
-        public I80F48 GetUiEquity(MangoGroup mangoGroup, MangoCache mangoCache)
-        {
-            return MangoUtils.HumanizeNative(ComputeValue(mangoGroup, mangoCache), mangoGroup.GetQuoteTokenInfo().Decimals);
-        }
-
-        /// <summary>
         /// Whether the mango account is liquidatable.
         /// </summary>
         /// <param name="mangoGroup">The mango group.</param>

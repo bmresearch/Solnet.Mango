@@ -62,7 +62,6 @@ namespace Solnet.Mango.Examples
 
             Console.WriteLine(
                 $"Account Value: {mangoAccount.ComputeValue(mangoGroup, mangoCache).ToDecimal():N6}\n" +
-                $"Account Equity UI: {mangoAccount.GetUiEquity(mangoGroup, mangoCache).ToDecimal():N6}\n" +
                 $"Account Maintenance Health: {mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N6}\n" +
                 $"Account Initialization Health: {mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal():N6}\n" +
                 $"Account Maintenance Health Ratio: {mangoAccount.GetHealthRatio(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N6}\n" +
