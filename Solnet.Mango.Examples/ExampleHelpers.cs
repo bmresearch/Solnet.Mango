@@ -1,5 +1,6 @@
-﻿using Solnet.Programs;
-using Solnet.Programs.Utilities;
+﻿using Solnet.Mango.Models;
+using Solnet.Mango.Types;
+using Solnet.Programs;
 using Solnet.Rpc;
 using Solnet.Rpc.Core.Http;
 using Solnet.Rpc.Messages;
@@ -16,6 +17,57 @@ namespace Solnet.Mango.Examples
 {
     public static class ExampleHelpers
     {
+        public static void LogAccountStatus(IMangoClient mangoClient, MangoGroup mangoGroup, MangoCache mangoCache, MangoAccount mangoAccount,
+            List<I80F48> breakEvenPrices = null)
+        {
+            if (mangoGroup.RootBankAccounts.Count != 0)
+            {
+                Console.WriteLine($"- - - - - - - - - - ACCOUNT DEPOSITS - - - - - - - - - -");
+                for (int token = 0; token < mangoGroup.Tokens.Count; token++)
+                {
+                    if (mangoGroup.Tokens[token].RootBank.Key == SystemProgram.ProgramIdKey.Key) continue;
+                    Console.WriteLine(
+                        //$"Token: {mangoGroup.Tokens[token].Mint,-50}" +
+                        $"Deposits: {mangoAccount.GetUiDeposit(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal(),-25:N4}" +
+                        $"Borrows: {mangoAccount.GetUiBorrow(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal(),-25:N4}" +
+                        $"MaxWithBorrow: {mangoAccount.GetMaxWithBorrowForToken(mangoGroup, mangoCache, token).ToDecimal(),-25:N4}" +
+                        $"Net: {mangoAccount.GetUiNet(mangoCache.RootBankCaches[token], mangoGroup, token).ToDecimal(),-25:N4}");
+                }
+            }
+
+               Console.WriteLine($"- - - - - - ACCOUNT PERP POSITIONS - - - - - -");
+            for (int p = 0; p < mangoGroup.PerpetualMarkets.Count; p++)
+            {
+                if (mangoGroup.PerpetualMarkets[p].Market.Equals(SystemProgram.ProgramIdKey)) continue;
+                var perpMarket = mangoClient.GetPerpMarket(mangoGroup.PerpetualMarkets[p].Market);
+                var notional = mangoAccount.PerpetualAccounts[p].GetNotionalSize(mangoGroup, mangoCache, perpMarket.ParsedResult, p);
+                var absNotional = notional < 0 ? notional * -1 : notional;
+                var msg = //$"Market: {mangoGroup.PerpetualMarkets[p].Market,-49}" +
+                    $"Position Size: {mangoAccount.PerpetualAccounts[p].GetUiBasePosition(perpMarket.ParsedResult, mangoGroup.Tokens[p].Decimals),-25:N4}" +
+                    $"Notional Size: ${absNotional,-25:N4}";
+
+                msg += breakEvenPrices != null ?
+                    $"PNL: {mangoAccount.PerpetualAccounts[p].GetProfitAndLoss(mangoGroup, mangoCache, perpMarket.ParsedResult, breakEvenPrices[p], p),-25:N4}" : "";
+
+                Console.WriteLine(msg);
+
+            }
+
+            Console.WriteLine($"- - - - - - - - - - ACCOUNT STATUS - - - - - - - - - -");
+            Console.WriteLine(
+                $"Account Value: ${mangoAccount.ComputeValue(mangoGroup, mangoCache).ToDecimal():N4}\n" +
+                $"Account Maintenance Health: {mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N4}\n" +
+                $"Account Initialization Health: {mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal():N4}\n" +
+                $"Account Maintenance Health Ratio: {mangoAccount.GetHealthRatio(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N4}\n" +
+                $"Account Initialization Health Ratio: {mangoAccount.GetHealthRatio(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal():N4}\n" +
+                $"Leverage: x{mangoAccount.GetLeverage(mangoGroup, mangoCache).ToDecimal():N4}\n" +
+                $"Assets Value: {mangoAccount.GetAssetsValue(mangoGroup, mangoCache).ToDecimal():N4}\n" +
+                $"Liabilities Value: {mangoAccount.GetLiabilitiesValue(mangoGroup, mangoCache).ToDecimal():N4}\n" +
+                $"Assets Maintenance Value: {mangoAccount.GetAssetsValue(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N4}\n" +
+                $"Liabilities Maintenance Value: {mangoAccount.GetLiabilitiesValue(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N4}\n" +
+                $"Assets Initialization Value: {mangoAccount.GetAssetsValue(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal():N4}\n" +
+                $"Liabilities Initialization Value: {mangoAccount.GetLiabilitiesValue(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal():N4}\n");
+        }
         public static async Task<TransactionMetaSlotInfo> RequestAirdrop(IRpcClient rpcClient, PublicKey dest, ulong amount)
         {
             var airdropTxSig = rpcClient.RequestAirdrop(dest, amount).Result;

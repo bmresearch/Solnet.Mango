@@ -114,13 +114,16 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <summary>
         /// Gets profit and loss adjusted for unsettled funding.
         /// </summary>
-        /// <param name="perpMarketInfo">The perpetual market's info.</param>
-        /// <param name="perpMarketCache">The perpetual market's cache.</param>
-        /// <param name="price">The current price.</param>
-        /// <returns>The PNL value.</returns>
-        public I80F48 GetProfitAndLoss(PerpMarketInfo perpMarketInfo, PerpMarketCache perpMarketCache, I80F48 price)
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="market">The market.</param>
+        /// <param name="breakEvenPrice">The break-even price.</param>
+        /// <param name="tokenIndex">The token index.</param>
+        /// <returns>The adjusted PnL.</returns>
+        public decimal GetProfitAndLoss(MangoGroup mangoGroup, MangoCache mangoCache, PerpMarket market, I80F48 breakEvenPrice, int tokenIndex)
         {
-            return new I80F48((decimal)BasePosition * perpMarketInfo.BaseLotSize) * price + GetQuotePosition(perpMarketCache);
+            return market.BaseLotsToNumber(BasePosition, mangoGroup.Tokens[tokenIndex].Decimals) * 
+                (mangoGroup.GetPrice(mangoCache, tokenIndex) - breakEvenPrice).ToDecimal();
         }
 
         /// <summary>
@@ -148,11 +151,24 @@ namespace Solnet.Mango.Models.Perpetuals
         }
 
         /// <summary>
+        /// Gets the notional size of the position.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="market">The market.</param>
+        /// <param name="tokenIndex">The token index.</param>
+        /// <returns>The notional size of the position.</returns>
+        public decimal GetNotionalSize(MangoGroup mangoGroup, MangoCache mangoCache, PerpMarket market, int tokenIndex)
+            => GetUiBasePosition(market, mangoGroup.Tokens[tokenIndex].Decimals) * mangoGroup.GetPrice(mangoCache, tokenIndex).ToDecimal();
+
+        /// <summary>
         /// Gets the base position value converted for ui display.
         /// </summary>
-        /// <returns></returns>
-        public decimal GetUiBasePosition(PerpMarket market, byte decimals) =>
-            market.BaseLotsToNumber(BasePosition, decimals);
+        /// <param name="market">The market.</param>
+        /// <param name="baseDecimals">The decimals of the base token.</param>
+        /// <returns>The base position size for ui display.</returns>
+        public decimal GetUiBasePosition(PerpMarket market, byte baseDecimals) =>
+            market.BaseLotsToNumber(BasePosition, baseDecimals);
 
         /// <summary>
         /// Simulates the position health against the given base position change.

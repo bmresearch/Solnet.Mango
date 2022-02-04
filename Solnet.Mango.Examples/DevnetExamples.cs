@@ -60,7 +60,7 @@ namespace Solnet.Mango.Examples
             _serum = SerumProgram.CreateDevNet();
 
             // the clients
-            _rpcClient = Rpc.ClientFactory.GetClient(Cluster.DevNet, _logger);
+            _rpcClient = Rpc.ClientFactory.GetClient(Cluster.DevNet);
             _streamingRpcClient = Rpc.ClientFactory.GetStreamingClient(Cluster.DevNet);
             _mangoClient = ClientFactory.GetClient(_rpcClient, _streamingRpcClient, _logger, _mango.ProgramIdKey);
             _serumClient = Serum.ClientFactory.GetClient(_rpcClient, _streamingRpcClient, _logger);
@@ -76,23 +76,22 @@ namespace Solnet.Mango.Examples
             ulong balance = _rpcClient.GetBalance(_wallet.Account.PublicKey).Result.Value;
             Console.WriteLine($"Account {_wallet.Account.PublicKey}\tBalance {(decimal)balance / SolHelper.LAMPORTS_PER_SOL}");
             
+            var mangoAccountAddress = _mango.DeriveMangoAccountAddress(_wallet.Account, 1);
 
             var mangoGroup = _mangoClient.GetMangoGroup(Constants.DevNetMangoGroup);
             mangoGroup.ParsedResult.LoadRootBanks(_rpcClient, _logger);
             var mangoCache = _mangoClient.GetMangoCache(mangoGroup.ParsedResult.MangoCache);
 
-            Console.ReadLine();
-
-            var mangoAccountAddress = _mango.DeriveMangoAccountAddress(_wallet.Account, 1);
-
-            var mangoAccount = _mangoClient.GetMangoAccount(mangoAccountAddress);
+            var mangoAccount = _mangoClient.GetMangoAccount("DRUZRfLQtki4ZYvRXhi5yGmyqCf6iMfTzxtBpxo6rbHu");
             mangoAccount.ParsedResult.LoadOpenOrdersAccounts(_rpcClient, _logger);
+            
+            //var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
 
-            var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
-           
+            ExampleHelpers.LogAccountStatus(_mangoClient, mangoGroup.ParsedResult, mangoCache.ParsedResult, mangoAccount.ParsedResult);
 
-            var msg = SettleFeesSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
+            var msg = MarketBuySOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
 
+            Console.ReadLine();
             ExampleHelpers.DecodeAndLogMessage(msg);
 
             var txBytes = SignAndAssembleTx(msg);
@@ -159,7 +158,7 @@ namespace Solnet.Mango.Examples
             var market = _mangoClient.GetPerpMarket(mangoGroup.PerpetualMarkets[tokenIndex].Market);
 
             return PlacePerpOrder(mangoGroup, mangoAccount, mangoAccountAddress, wrappedSolTokenInfo, quoteTokenInfo,
-                market.ParsedResult, mangoGroup.PerpetualMarkets[tokenIndex].Market, Side.Buy, PerpOrderType.IOC, 250, 112, false);
+                market.ParsedResult, mangoGroup.PerpetualMarkets[tokenIndex].Market, Side.Buy, PerpOrderType.IOC, 100, 112, false);
         }
 
         private byte[] MarketSellSpotSOLUSDC(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress)
@@ -667,14 +666,14 @@ namespace Solnet.Mango.Examples
         /// </summary>
         /// <param name="mangoAccount"></param>
         /// <returns></returns>
-        private byte[] CreateMangoAccountIx(PublicKey mangoAccount)
+        private byte[] CreateMangoAccountIx(PublicKey mangoAccount, int index)
         {
             var blockhash = _rpcClient.GetRecentBlockHash();
 
             TransactionBuilder txBuilder = new TransactionBuilder()
                 .SetFeePayer(_wallet.Account)
                 .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
-                .AddInstruction(_mango.CreateMangoAccount(Constants.DevNetMangoGroup, mangoAccount, _wallet.Account, 1))
+                .AddInstruction(_mango.CreateMangoAccount(Constants.DevNetMangoGroup, mangoAccount, _wallet.Account, (ulong) index))
                 .AddInstruction(_mango.AddMangoAccountInfo(Constants.DevNetMangoGroup, mangoAccount, _wallet.Account, "Solnet Test v1"));
 
             return txBuilder.CompileMessage();
