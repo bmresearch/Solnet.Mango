@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Solnet.Rpc;
+using Solnet.Wallet;
 
 namespace Solnet.Mango
 {
@@ -15,14 +16,15 @@ namespace Solnet.Mango
         /// <param name="logger">The logger.</param>
         /// <param name="rpcClient">The RPC Client instance.</param>
         /// <param name="streamingRpcClient">The Streaming RPC Client instance.</param>
+        /// <param name="programId">The program id.</param>
         /// <returns>The Serum Client.</returns>
         public static IMangoClient GetClient(IRpcClient rpcClient = null, IStreamingRpcClient streamingRpcClient = null,
-            ILogger logger = null)
+            ILogger logger = null, PublicKey programId = null)
         {
 #if DEBUG
             logger ??= GetDebugLogger();
 #endif
-            return new MangoClient(logger, rpcClient, streamingRpcClient);
+            return new MangoClient(logger, rpcClient, streamingRpcClient, programId);
         }
 
 #if DEBUG

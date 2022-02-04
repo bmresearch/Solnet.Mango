@@ -1,4 +1,5 @@
 ﻿using Solnet.Mango.Models;
+using Solnet.Mango.Models.Perpetuals;
 using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using Solnet.Rpc.Utilities;
@@ -17,7 +18,6 @@ namespace Solnet.Mango
     /// </summary>
     public static class MangoUtils
     {
-
         /// <summary>
         /// Humanizes a native <see cref="I80F48"/> value.
         /// </summary>
@@ -46,6 +46,20 @@ namespace Solnet.Mango
                 programIdKey, out byte[] mangoAccount, out _);
 
             return success ? new(mangoAccount) : null;
+        }
+
+        /// <summary>
+        /// Derives the <see cref="PublicKey"/> of a <see cref="AdvancedOrdersAccount"/>.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
+        public static PublicKey DeriveAdvancedOrdersAccountAddress(PublicKey programIdKey, PublicKey mangoAccount)
+        {
+            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() { mangoAccount },
+                programIdKey, out byte[] advancedOrdersAccount, out _);
+
+            return success ? new(advancedOrdersAccount) : null;
         }
 
         /// <summary>

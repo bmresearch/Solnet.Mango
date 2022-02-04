@@ -22,6 +22,7 @@ namespace Solnet.Mango
             { Values.Deposit, "Deposit" },
             { Values.Withdraw, "Withdraw" },
             { Values.PlaceSpotOrder, "Place Spot Order" },
+            { Values.PlaceSpotOrder2, "Place Spot Order2" },
             { Values.PlacePerpOrder, "Place Perp Order" },
             { Values.CancelPerpOrderByClientId, "Cancel Perp Order By Client Id" },
             { Values.CancelPerpOrder, "Cancel Perp Order" },
@@ -29,7 +30,6 @@ namespace Solnet.Mango
             { Values.SettleFunds, "Settle Funds" },
             { Values.CancelSpotOrder, "Cancel Spot Order" },
             { Values.SettleProfitAndLoss, "Settle Profit & Loss" },
-            { Values.SettleBorrow, "Settle Borrow" },
             { Values.SettleFees, "Settle Fees" },
             { Values.InitSpotOpenOrders, "Initialize Spot Open Orders Account" },
             { Values.RedeemMango, "Redeem Mango" },
@@ -37,7 +37,7 @@ namespace Solnet.Mango
             { Values.DepositMegaSerum, "Deposit MegaSerum" },
             { Values.WithdrawMegaSerum, "Withdraw MegaSerum" },
             { Values.CancelAllPerpOrders, "Cancel All Perp Orders" },
-            { Values.InitAdvancedOrders, "Initialize Advanced Orders" },
+            { Values.InitAdvancedOrders, "Initialize Advanced Orders Account" },
             { Values.AddPerpTriggerOrder, "Add Perp Trigger Order"},
             { Values.RemoveAdvancedOrder, "Remove Advanced Order" },
             { Values.ExecutePerpTriggerOrder, "Execute Perp Trigger Order" },
@@ -109,11 +109,6 @@ namespace Solnet.Mango
             /// Take two MangoAccounts and settle profits and losses between them for a perp market.
             /// </summary>
             SettleProfitAndLoss = 22,
-
-            /// <summary>
-            /// Uses this token's position and deposits to reduce borrows.
-            /// </summary>
-            SettleBorrow = 23,
 
             /// <summary>
             /// Take an account that has losses in the selected perp market to account for fees accrued.

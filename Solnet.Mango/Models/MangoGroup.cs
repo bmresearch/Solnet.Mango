@@ -227,9 +227,13 @@ namespace Solnet.Mango.Models
                 .Select(x => x.RootBank).ToList();
             RequestResult<ResponseValue<List<AccountInfo>>> rootBankAccounts =
                 await rpcClient.GetMultipleAccountsAsync(filteredRootBanks.Select(x => x.Key).ToList());
-            if (!rootBankAccounts.WasRequestSuccessfullyHandled) return rootBankAccounts;
+            if (!rootBankAccounts.WasRequestSuccessfullyHandled)
+            {
+                logger?.LogInformation($"Could not fetch root banks.");
+                return rootBankAccounts;
+            }
             logger?.LogInformation(
-                $"Successfully fetched {rootBankAccounts.Result.Value.Count} open orders accounts.");
+                $"Successfully fetched {rootBankAccounts.Result.Value.Count} root banks.");
 
             Tokens.ForEach(key =>
             {

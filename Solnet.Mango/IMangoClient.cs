@@ -3,6 +3,7 @@ using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs.Models;
 using Solnet.Rpc;
 using Solnet.Rpc.Types;
+using Solnet.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -26,6 +27,11 @@ namespace Solnet.Mango
         /// The <see cref="IStreamingRpcClient"/> instance.
         /// </summary>
         IStreamingRpcClient StreamingRpcClient { get; }
+
+        /// <summary>
+        /// The program id.
+        /// </summary>
+        PublicKey ProgramId { get; }
 
         /// <summary>
         /// Gets the given <see cref="MangoGroup"/>. This is an asynchronous operation.
@@ -196,6 +202,42 @@ namespace Solnet.Mango
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="EventQueue"/>s.</returns>
         AccountResultWrapper<EventQueue> GetEventQueue(string eventQueueAddress, Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the given Mango Account. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="account">The account's public key.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The <see cref="MangoAccount"/>s or null in case an error occurred.</returns>
+        Task<AccountResultWrapper<MangoAccount>> GetMangoAccountAsync(string account,
+            Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the given Mango Account.
+        /// </summary>
+        /// <param name="account">The account's public key.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The <see cref="MangoAccount"/>s or null in case an error occurred.</returns>
+        AccountResultWrapper<MangoAccount> GetMangoAccount(string account,
+            Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the given Advanced Orders Account. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="account">The account's public key.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The <see cref="AdvancedOrdersAccount"/>s or null in case an error occurred.</returns>
+        Task<AccountResultWrapper<AdvancedOrdersAccount>> GetAdvancedOrdersAccountAsync(string account,
+            Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the given Advanced Orders Account.
+        /// </summary>
+        /// <param name="account">The account's public key.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The <see cref="AdvancedOrdersAccount"/>s or null in case an error occurred.</returns>
+        AccountResultWrapper<AdvancedOrdersAccount> GetAdvancedOrdersAccount(string account,
+            Commitment commitment = Commitment.Finalized);
 
         /// <summary>
         /// Gets the Mango accounts for the given owner. This is an asynchronous operation.

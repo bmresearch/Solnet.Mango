@@ -74,21 +74,29 @@ namespace Solnet.Mango
         /// <summary>
         /// Initializes an instruction to initialize a given account as a <see cref="MangoAccount"/>.
         /// </summary>
+        /// <remarks>
+        /// DEPRECATED: If you use this method after Mango v3.3 you will not be able to upgrade and close your account.
+        /// </remarks>
         /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
         /// <param name="mangoAccount">The public key of the account to initialize as <see cref="MangoAccount"/>.</param>
         /// <param name="owner">The public key of the owner of the <see cref="MangoAccount"/>.</param>
         /// <returns>The transaction instruction.</returns>
+        [Obsolete("Please use CreateMangoAccount whenever possible instead. If you use this method after Mango v3.3 you will not be able to upgrade and close your account.")]
         public TransactionInstruction InitializeMangoAccount(PublicKey mangoGroup, PublicKey mangoAccount,
             PublicKey owner) => InitializeMangoAccount(ProgramIdKey, mangoGroup, mangoAccount, owner);
 
         /// <summary>
         /// Initializes an instruction to initialize a given account as a <see cref="MangoAccount"/>.
         /// </summary>
+        /// <remarks>
+        /// DEPRECATED: If you use this method after Mango v3.3 you will not be able to upgrade and close your account.
+        /// </remarks>
         /// <param name="programIdKey">The public key of the program.</param>
         /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
         /// <param name="mangoAccount">The public key of the account to initialize as <see cref="MangoAccount"/>.</param>
         /// <param name="owner">The public key of the owner of the <see cref="MangoAccount"/>.</param>
         /// <returns>The transaction instruction.</returns>
+        [Obsolete("Please use CreateMangoAccount whenever possible instead. If you use this method after Mango v3.3 you will not be able to upgrade and close your account.")]
         public static TransactionInstruction InitializeMangoAccount(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner)
         {
@@ -240,14 +248,13 @@ namespace Solnet.Mango
         /// <param name="mangoAccount">The mango account.</param>
         /// <param name="owner">The owner of the mango account.</param>
         /// <param name="mangoCache">The mango cache.</param>
-        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
         /// <param name="spotMarket">The spot market account.</param>
         /// <param name="bids">The spot market bids account.</param>
         /// <param name="asks">The spot market asks account.</param>
         /// <param name="dexRequestQueue">The spot market request queue.</param>
         /// <param name="dexEventQueue">The spot market event queue.</param>
-        /// <param name="dexBase">The spot market base mint.</param>
-        /// <param name="dexQuote">The spot market quote mint.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
         /// <param name="baseRootBank">The root bank of the base mint.</param>
         /// <param name="baseNodeBank">The node bank of the base mint.</param>
         /// <param name="baseVault">The vault of the base mint's node bank.</param>
@@ -261,13 +268,14 @@ namespace Solnet.Mango
         /// <param name="marketIndex">The market's index.</param>
         /// <param name="order">The order.</param>
         /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        [Obsolete("This method is sub optimal, please use PlaceSpotOrder2 instead.")]
         public TransactionInstruction PlaceSpotOrder(PublicKey mangoGroup, PublicKey mangoAccount,
-            PublicKey owner, PublicKey mangoCache, PublicKey dexProgramIdKey, PublicKey spotMarket, PublicKey bids, PublicKey asks,
+            PublicKey owner, PublicKey mangoCache, PublicKey spotMarket, PublicKey bids, PublicKey asks,
             PublicKey dexRequestQueue, PublicKey dexEventQueue, PublicKey dexBase, PublicKey dexQuote,
             PublicKey baseRootBank, PublicKey baseNodeBank, PublicKey baseVault, PublicKey quoteRootBank,
             PublicKey quoteNodeBank, PublicKey quoteVault, PublicKey signer, PublicKey dexSigner, PublicKey serumVault,
-            IList<PublicKey> openOrdersAccounts, ulong marketIndex, Order order)
-            => PlaceSpotOrder(ProgramIdKey, mangoGroup, mangoAccount, owner, mangoCache, dexProgramIdKey,
+            IList<PublicKey> openOrdersAccounts, int marketIndex, Order order)
+            => PlaceSpotOrder(ProgramIdKey, mangoGroup, mangoAccount, owner, mangoCache, _dexProgramIdKey,
                 spotMarket, bids, asks, dexRequestQueue, dexEventQueue, dexBase, dexQuote, baseRootBank, baseNodeBank,
                 baseVault, quoteRootBank, quoteNodeBank, quoteVault, signer, dexSigner, serumVault, openOrdersAccounts,
                 marketIndex, order);
@@ -286,8 +294,8 @@ namespace Solnet.Mango
         /// <param name="asks">The spot market asks account.</param>
         /// <param name="dexRequestQueue">The spot market request queue.</param>
         /// <param name="dexEventQueue">The spot market event queue.</param>
-        /// <param name="dexBase">The spot market base mint.</param>
-        /// <param name="dexQuote">The spot market quote mint.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
         /// <param name="baseRootBank">The root bank of the base mint.</param>
         /// <param name="baseNodeBank">The node bank of the base mint.</param>
         /// <param name="baseVault">The vault of the base mint's node bank.</param>
@@ -301,12 +309,13 @@ namespace Solnet.Mango
         /// <param name="marketIndex">The market's index.</param>
         /// <param name="order">The order.</param>
         /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        [Obsolete("This method is sub optimal, please use PlaceSpotOrder2 instead.")]
         public static TransactionInstruction PlaceSpotOrder(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey dexProgramIdKey, PublicKey spotMarket,
             PublicKey bids, PublicKey asks, PublicKey dexRequestQueue, PublicKey dexEventQueue, PublicKey dexBase,
             PublicKey dexQuote, PublicKey baseRootBank, PublicKey baseNodeBank, PublicKey baseVault, PublicKey quoteRootBank,
             PublicKey quoteNodeBank, PublicKey quoteVault, PublicKey signer, PublicKey dexSigner, PublicKey serumVault,
-            IList<PublicKey> openOrdersAccounts, ulong marketIndex, Order order)
+            IList<PublicKey> openOrdersAccounts, int marketIndex, Order order)
         {
             List<AccountMeta> keys = new()
             {
@@ -335,7 +344,7 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(serumVault, false)
             };
 
-            keys.AddRange(openOrdersAccounts.Select((t, i) => (ulong)i == marketIndex
+            keys.AddRange(openOrdersAccounts.Select((t, i) => i == marketIndex
                 ? AccountMeta.Writable(t, false)
                 : AccountMeta.ReadOnly(t, false)));
 
@@ -359,8 +368,8 @@ namespace Solnet.Mango
         /// <param name="asks">The spot market asks account.</param>
         /// <param name="dexRequestQueue">The spot market request queue.</param>
         /// <param name="dexEventQueue">The spot market event queue.</param>
-        /// <param name="dexBase">The spot market base mint.</param>
-        /// <param name="dexQuote">The spot market quote mint.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
         /// <param name="baseRootBank">The root bank of the base mint.</param>
         /// <param name="baseNodeBank">The node bank of the base mint.</param>
         /// <param name="baseVault">The vault of the base mint's node bank.</param>
@@ -399,8 +408,8 @@ namespace Solnet.Mango
         /// <param name="asks">The spot market asks account.</param>
         /// <param name="dexRequestQueue">The spot market request queue.</param>
         /// <param name="dexEventQueue">The spot market event queue.</param>
-        /// <param name="dexBase">The spot market base mint.</param>
-        /// <param name="dexQuote">The spot market quote mint.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
         /// <param name="baseRootBank">The root bank of the base mint.</param>
         /// <param name="baseNodeBank">The node bank of the base mint.</param>
         /// <param name="baseVault">The vault of the base mint's node bank.</param>
@@ -448,17 +457,9 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(dexSigner, false),
                 AccountMeta.ReadOnly(serumVault, false)
             };
-
-            if (openOrdersAccounts.Count == 1)
-            {
-                keys.Add(AccountMeta.Writable(openOrdersAccounts[0], false));
-            }
-            else
-            {
-                keys.AddRange(openOrdersAccounts.Select((t, i) => i == marketIndex
-                    ? AccountMeta.Writable(t, false)
-                    : AccountMeta.ReadOnly(t, false)));
-            }
+            keys.AddRange(openOrdersAccounts.Select((t, i) => i == marketIndex
+                ? AccountMeta.Writable(t, false)
+                : AccountMeta.ReadOnly(t, false)));
 
             return new TransactionInstruction
             {
@@ -651,12 +652,11 @@ namespace Solnet.Mango
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="mangoAccount">The mango account.</param>
         /// <param name="owner">The mango account owner.</param>
-        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
         /// <param name="spotMarket">The spot market.</param>
         /// <param name="openOrders">The open orders accounts.</param>
         /// <param name="signer">The mango group signer.</param>
-        /// <param name="dexBase">The spot market base mint.</param>
-        /// <param name="dexQuote">The spot market quote mint.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
         /// <param name="baseRootBank">The root bank of the base mint.</param>
         /// <param name="baseNodeBank">The node bank of the base mint.</param>
         /// <param name="quoteRootBank">The root bank of the quote mint.</param>
@@ -666,11 +666,11 @@ namespace Solnet.Mango
         /// <param name="dexSigner">The dex signer (derived from the spot market's vault signer nonce).</param>
         /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public TransactionInstruction SettleFunds(PublicKey mangoGroup, PublicKey mangoCache,
-            PublicKey mangoAccount, PublicKey owner, PublicKey dexProgramIdKey, PublicKey spotMarket,
+            PublicKey mangoAccount, PublicKey owner, PublicKey spotMarket,
             PublicKey openOrders, PublicKey signer, PublicKey dexBase, PublicKey dexQuote, PublicKey baseRootBank,
             PublicKey baseNodeBank, PublicKey quoteRootBank, PublicKey quoteNodeBank, PublicKey baseVault,
             PublicKey quoteVault, PublicKey dexSigner)
-            => SettleFunds(ProgramIdKey, mangoGroup, mangoCache, mangoAccount, owner, dexProgramIdKey, spotMarket,
+            => SettleFunds(ProgramIdKey, mangoGroup, mangoCache, mangoAccount, owner, _dexProgramIdKey, spotMarket,
                 openOrders, signer, dexBase, dexQuote, baseRootBank, baseNodeBank, quoteRootBank, quoteNodeBank,
                 baseVault, quoteVault, dexSigner);
 
@@ -686,8 +686,8 @@ namespace Solnet.Mango
         /// <param name="spotMarket">The spot market.</param>
         /// <param name="openOrders">The open orders accounts.</param>
         /// <param name="signer">The mango group signer.</param>
-        /// <param name="dexBase">The spot market base mint.</param>
-        /// <param name="dexQuote">The spot market quote mint.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
         /// <param name="baseRootBank">The root bank of the base mint.</param>
         /// <param name="baseNodeBank">The node bank of the base mint.</param>
         /// <param name="quoteRootBank">The root bank of the quote mint.</param>
@@ -727,6 +727,64 @@ namespace Solnet.Mango
             {
                 Keys = keys,
                 Data = MangoProgramData.EncodeSettleFundsData(),
+                ProgramId = programIdKey
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SettleFees"/> method.
+        /// </summary>
+        /// <param name="mangoGroup"></param>
+        /// <param name="mangoCache"></param>
+        /// <param name="perpMarket"></param>
+        /// <param name="mangoAccount"></param>
+        /// <param name="rootBank"></param>
+        /// <param name="nodeBank"></param>
+        /// <param name="bankVault"></param>
+        /// <param name="feesVault"></param>
+        /// <param name="signer">The mango signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction SettleFees(PublicKey mangoGroup, PublicKey mangoCache,
+            PublicKey perpMarket, PublicKey mangoAccount, PublicKey rootBank, PublicKey nodeBank,
+            PublicKey bankVault, PublicKey feesVault, PublicKey signer)
+            => SettleFees(ProgramIdKey, mangoGroup, mangoCache, perpMarket, mangoAccount,
+                rootBank, nodeBank, bankVault, feesVault, signer);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SettleFees"/> method.
+        /// </summary>
+        /// <param name="programIdKey"></param>
+        /// <param name="mangoGroup"></param>
+        /// <param name="mangoCache"></param>
+        /// <param name="perpMarket"></param>
+        /// <param name="mangoAccount"></param>
+        /// <param name="rootBank"></param>
+        /// <param name="nodeBank"></param>
+        /// <param name="bankVault"></param>
+        /// <param name="feesVault"></param>
+        /// <param name="signer">The mango signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction SettleFees(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoCache, PublicKey perpMarket, PublicKey mangoAccount, PublicKey rootBank, PublicKey nodeBank,
+            PublicKey bankVault, PublicKey feesVault, PublicKey signer)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.ReadOnly(mangoCache, false),
+                AccountMeta.Writable(perpMarket, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(rootBank, false),
+                AccountMeta.Writable(nodeBank, false),
+                AccountMeta.Writable(bankVault, false),
+                AccountMeta.Writable(feesVault, false),
+                AccountMeta.ReadOnly(signer, false),
+                AccountMeta.ReadOnly(TokenProgram.ProgramIdKey, false)
+            };
+            return new TransactionInstruction
+            {
+                Keys = keys,
+                Data = MangoProgramData.EncodeSettleFeesData(),
                 ProgramId = programIdKey
             };
         }
@@ -851,14 +909,13 @@ namespace Solnet.Mango
         /// <param name="mangoGroup">The mango group.</param>
         /// <param name="mangoAccount">The mango account</param>
         /// <param name="owner">The mango account owner.</param>
-        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
         /// <param name="openOrders">The open orders account.</param>
         /// <param name="spotMarket">The spot market.</param>
         /// <param name="signer">The mango group signer.</param>
         /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public TransactionInstruction InitSpotOpenOrders(PublicKey mangoGroup, PublicKey mangoAccount,
-            PublicKey owner, PublicKey dexProgramIdKey, PublicKey openOrders, PublicKey spotMarket, PublicKey signer)
-            => InitSpotOpenOrders(ProgramIdKey, mangoGroup, mangoAccount, owner, dexProgramIdKey,
+            PublicKey owner, PublicKey openOrders, PublicKey spotMarket, PublicKey signer)
+            => InitSpotOpenOrders(ProgramIdKey, mangoGroup, mangoAccount, owner, _dexProgramIdKey,
                 openOrders, spotMarket, signer);
 
         /// <summary>
@@ -1381,7 +1438,7 @@ namespace Solnet.Mango
             {
                 ProgramId = programIdKey,
                 Keys = keys,
-                Data = MangoProgramData.EncodeCloseAdvancedOrdersData()
+                Data = MangoProgramData.EncodeCloseSpotOpenOrdersData()
             };
         }
 
@@ -1554,6 +1611,25 @@ namespace Solnet.Mango
         }
 
         /// <summary>
+        /// Derives the <see cref="PublicKey"/> of an <see cref="AdvancedOrdersAccount"/>.
+        /// </summary>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
+        public PublicKey DeriveAdvancedOrdersAccountAddress(PublicKey mangoAccount)
+        {
+            if (ProgramIdKey == MainNetProgramIdKeyV3)
+            {
+                return MangoUtils.DeriveAdvancedOrdersAccountAddress(ProgramIdKey, mangoAccount);
+            }
+            else if (ProgramIdKey == DevNetProgramIdKeyV3)
+            {
+                return MangoUtils.DeriveAdvancedOrdersAccountAddress(ProgramIdKey, mangoAccount);
+            }
+
+            return MangoUtils.DeriveAdvancedOrdersAccountAddress(ProgramIdKey, mangoAccount);
+        }
+
+        /// <summary>
         /// Derives the <see cref="PublicKey"/> of a <see cref="MangoAccount"/> of <see cref="MetaData.Version"/> 1.
         /// </summary>
         /// <param name="owner">The owner of the mango account.</param>
@@ -1609,6 +1685,9 @@ namespace Solnet.Mango
                 case MangoProgramInstructions.Values.PlaceSpotOrder:
                     MangoProgramData.DecodePlaceSpotOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
+                case MangoProgramInstructions.Values.PlaceSpotOrder2:
+                    MangoProgramData.DecodePlaceSpotOrder2Data(decodedInstruction, data, keys, keyIndices);
+                    break;
                 case MangoProgramInstructions.Values.PlacePerpOrder:
                     MangoProgramData.DecodePlacePerpOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
@@ -1620,6 +1699,9 @@ namespace Solnet.Mango
                     break;
                 case MangoProgramInstructions.Values.SettleFunds:
                     MangoProgramData.DecodeSettleFundsData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.SettleFees:
+                    MangoProgramData.DecodeSettleFeesData(decodedInstruction, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CancelSpotOrder:
                     MangoProgramData.DecodeCancelSpotOrderData(decodedInstruction, data, keys, keyIndices);

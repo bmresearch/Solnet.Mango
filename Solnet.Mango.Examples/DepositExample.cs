@@ -2,6 +2,7 @@ using Solnet.KeyStore;
 using Solnet.Mango.Models;
 using Solnet.Programs;
 using Solnet.Programs.Models;
+using Solnet.Programs.Utilities;
 using Solnet.Rpc;
 using Solnet.Rpc.Builders;
 using Solnet.Rpc.Core.Http;
@@ -96,7 +97,7 @@ namespace Solnet.Mango.Examples
                     wrappedSolTokenInfo.RootBank,
                     nodeBankKey,
                     nodeBank.ParsedResult.Vault,
-                    acc, 1_000_000
+                    acc, 10 * SolHelper.LAMPORTS_PER_SOL
                 ))
                 .AddInstruction(TokenProgram.CloseAccount(acc, Owner, Owner, TokenProgram.ProgramIdKey));
 

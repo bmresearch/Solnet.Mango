@@ -24,4 +24,19 @@
         <ProjectReference Include="..\Solnet.Mango\Solnet.Mango.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Resources\MangoClient\GetAdvancedOrdersAccountAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetMangoAccountAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetMangoCacheAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetMangoGroupAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

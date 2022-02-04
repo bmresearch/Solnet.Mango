@@ -11,12 +11,12 @@ namespace Solnet.Mango.Models
         /// <summary>
         /// The layout of the <see cref="AdvancedOrdersAccount"/>.
         /// </summary>
-        internal static class Layout
+        public static class Layout
         {
             /// <summary>
             /// The length of the <see cref="AdvancedOrdersAccount"/> structure.
             /// </summary>
-            internal const int Length = 2568;
+            public const int Length = 2568;
 
             /// <summary>
             /// The length at which the account metadata begins.
@@ -44,22 +44,26 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="data">The data to deserialize into the structure.</param>
         /// <returns>The <see cref="AdvancedOrdersAccount"/> structure.</returns>
-        public static AdvancedOrdersAccount Deserialize(ReadOnlySpan<byte> data)
+        public static AdvancedOrdersAccount Deserialize(byte[] data)
         {
             if (data.Length != Layout.Length)
                 throw new ArgumentException($"invalid data length, expected {Layout.Length}, got {data.Length}");
+            ReadOnlySpan<byte> span = data.AsSpan();
 
             List<AdvancedOrder> orders = new();
             for (int i = 0; i < Constants.MaxAdvancedOrders; i++)
             {
-                orders.Add(AdvancedOrder.Deserialize(
-                        data.Slice(i * AdvancedOrder.Layout.Length + Layout.AdvancedOrdersOffset,
-                        AdvancedOrder.Layout.Length)));
+                AdvancedOrder order = AdvancedOrder.Deserialize(
+                        span.Slice(i * AdvancedOrder.Layout.Length + Layout.AdvancedOrdersOffset,
+                        AdvancedOrder.Layout.Length));
+                if (order.IsActive)
+                    orders.Add(order);
             }
 
             return new AdvancedOrdersAccount
             {
-                Metadata = MetaData.Deserialize(data.Slice(Layout.MetadataOffset, MetaData.Layout.Length)),
+                Metadata = MetaData.Deserialize(span.Slice(Layout.MetadataOffset, MetaData.Layout.Length)),
+                AdvancedOrders = orders,
             };
         }
     }

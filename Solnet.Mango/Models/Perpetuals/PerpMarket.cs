@@ -236,8 +236,8 @@ namespace Solnet.Mango.Models.Perpetuals
             var baseUnit = Math.Pow(10, baseDecimals);
             var quoteUnit = Math.Pow(10, quoteDecimals);
 
-            var nativePrice = (long)((price * quoteUnit * BaseLotSize) / (QuoteLotSize / baseUnit));
-            var nativeQuantity = (long)((quantity * baseUnit) / BaseLotSize);
+            var nativePrice = (long)(price * quoteUnit * BaseLotSize / (QuoteLotSize * baseUnit));
+            var nativeQuantity = (long)(quantity * baseUnit / BaseLotSize);
 
             return (nativePrice, nativeQuantity);
         }
