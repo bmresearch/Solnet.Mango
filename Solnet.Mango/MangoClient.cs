@@ -26,7 +26,12 @@ namespace Solnet.Mango
         /// <summary>
         /// The logger instance.
         /// </summary>
-        private ILogger _logger;
+        private readonly ILogger _logger;
+
+        /// <summary>
+        /// The program id.
+        /// </summary>
+        private readonly PublicKey _programId;
 
         /// <summary>
         /// The list of <see cref="EventQueue"/> subscriptions.
@@ -54,16 +59,21 @@ namespace Solnet.Mango
         /// <param name="logger">The logger.</param>
         /// <param name="rpcClient">The RPC client instance.</param>
         /// <param name="streamingRpcClient">The streaming RPC client.</param>
+        /// <param name="programId">The program id.</param>
         /// <returns>The Mango Client.</returns>
         internal MangoClient(ILogger logger = null, IRpcClient rpcClient = default,
-            IStreamingRpcClient streamingRpcClient = default) : base(rpcClient, streamingRpcClient)
+            IStreamingRpcClient streamingRpcClient = default, PublicKey programId = null) : base(rpcClient, streamingRpcClient)
         {
             _logger = logger;
             _eventQueueSubscriptions = new List<SubscriptionWrapper<EventQueue>>();
             _mangoAccountSubscriptions = new List<SubscriptionWrapper<MangoAccount>>();
             _mangoCacheSubscriptions = new List<SubscriptionWrapper<MangoCache>>();
             _orderBookSideSubscriptions = new List<SubscriptionWrapper<OrderBookSide>>();
+            _programId = programId != null ? programId : MangoProgram.MainNetProgramIdKeyV3;
         }
+
+        /// <inheritdoc cref="IMangoClient.ProgramId"/>
+        public PublicKey ProgramId { get => _programId; }
 
         /// <inheritdoc cref="IMangoClient.GetMangoGroupAsync(string, Commitment)"/>
         public async Task<AccountResultWrapper<MangoGroup>> GetMangoGroupAsync(string account,
@@ -163,6 +173,24 @@ namespace Solnet.Mango
         public AccountResultWrapper<EventQueue> GetEventQueue(string eventQueueAddress, Commitment commitment = Commitment.Finalized)
             => GetEventQueueAsync(eventQueueAddress, commitment).Result;
 
+        /// <inheritdoc cref="IMangoClient.GetMangoAccountAsync(string,Commitment)"/>
+        public async Task<AccountResultWrapper<MangoAccount>> GetMangoAccountAsync(string account,
+            Commitment commitment = Commitment.Finalized)
+            => await GetAccount<MangoAccount>(account, commitment);
+
+        /// <inheritdoc cref="IMangoClient.GetMangoAccount(string,Commitment)"/>
+        public AccountResultWrapper<MangoAccount> GetMangoAccount(string account, Commitment commitment = Commitment.Finalized)
+            => GetMangoAccountAsync(account, commitment).Result;
+
+        /// <inheritdoc cref="IMangoClient.GetAdvancedOrdersAccountAsync(string,Commitment)"/>
+        public async Task<AccountResultWrapper<AdvancedOrdersAccount>> GetAdvancedOrdersAccountAsync(string account,
+            Commitment commitment = Commitment.Finalized)
+            => await GetAccount<AdvancedOrdersAccount>(account, commitment);
+
+        /// <inheritdoc cref="IMangoClient.GetAdvancedOrdersAccount(string,Commitment)"/>
+        public AccountResultWrapper<AdvancedOrdersAccount> GetAdvancedOrdersAccount(string account, Commitment commitment = Commitment.Finalized)
+            => GetAdvancedOrdersAccountAsync(account, commitment).Result;
+
         /// <inheritdoc cref="IMangoClient.GetMangoAccountsAsync(string, Commitment)"/>
         public async Task<ProgramAccountsResultWrapper<List<MangoAccount>>> GetMangoAccountsAsync(string ownerAccount,
             Commitment commitment = Commitment.Finalized)
@@ -172,9 +200,7 @@ namespace Solnet.Mango
                 new MemCmp { Offset = MangoAccount.Layout.OwnerOffset, Bytes = ownerAccount }
             };
 
-            return await GetProgramAccounts<MangoAccount>(MangoProgram.ProgramIdKeyV3, filters,
-                MangoAccount.Layout.Length,
-                commitment);
+            return await GetProgramAccounts<MangoAccount>(_programId, filters, MangoAccount.Layout.Length, commitment);
         }
 
         /// <inheritdoc cref="IMangoClient.GetMangoAccounts(string, Commitment)"/>
@@ -190,8 +216,7 @@ namespace Solnet.Mango
                 new MemCmp { Offset = PerpMarket.Layout.MangoGroupOffset, Bytes = mangoGroup }
             };
 
-            return await GetProgramAccounts<PerpMarket>(MangoProgram.ProgramIdKeyV3, filters, PerpMarket.Layout.Length,
-                commitment);
+            return await GetProgramAccounts<PerpMarket>(_programId, filters, PerpMarket.Layout.Length, commitment);
         }
 
         /// <inheritdoc cref="IMangoClient.GetPerpMarkets(string, Commitment)"/>

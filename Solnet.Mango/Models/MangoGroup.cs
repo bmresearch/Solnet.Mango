@@ -103,6 +103,16 @@ namespace Solnet.Mango.Models
             /// 
             /// </summary>
             internal const int FeesVaultOffset = 5968;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            internal const int MaxMangoAccountsOffset = 6000;
+
+            /// <summary>
+            /// 
+            /// </summary>
+            internal const int NumMangoAccountsOffset = 6004;
         }
 
         /// <summary>
@@ -196,6 +206,16 @@ namespace Solnet.Mango.Models
         public List<PerpMarket> PerpMarketAccounts;
 
         /// <summary>
+        /// Maximum number of <see cref="MangoAccount"/>s with <see cref="MetaData.Version"/> 1.
+        /// </summary>
+        public uint MaxMangoAccounts;
+
+        /// <summary>
+        /// The number of <see cref="MangoAccount"/>s with <see cref="MetaData.Version"/> 1.
+        /// </summary>
+        public uint NumMangoAccounts;
+
+        /// <summary>
         /// Loads the root banks for this root bank. This is an asynchronous operation.
         /// </summary>
         /// <param name="rpcClient">A rpc client instance.</param>
@@ -207,9 +227,13 @@ namespace Solnet.Mango.Models
                 .Select(x => x.RootBank).ToList();
             RequestResult<ResponseValue<List<AccountInfo>>> rootBankAccounts =
                 await rpcClient.GetMultipleAccountsAsync(filteredRootBanks.Select(x => x.Key).ToList());
-            if (!rootBankAccounts.WasRequestSuccessfullyHandled) return rootBankAccounts;
+            if (!rootBankAccounts.WasRequestSuccessfullyHandled)
+            {
+                logger?.LogInformation($"Could not fetch root banks.");
+                return rootBankAccounts;
+            }
             logger?.LogInformation(
-                $"Successfully fetched {rootBankAccounts.Result.Value.Count} open orders accounts.");
+                $"Successfully fetched {rootBankAccounts.Result.Value.Count} root banks.");
 
             Tokens.ForEach(key =>
             {
@@ -489,6 +513,8 @@ namespace Solnet.Mango.Models
                 FeesVault = span.GetPubKey(Layout.FeesVaultOffset),
                 RootBankAccounts = new List<RootBank>(Constants.MaxTokens),
                 PerpMarketAccounts = new List<PerpMarket>(Constants.MaxTokens),
+                MaxMangoAccounts = span.GetU32(Layout.MaxMangoAccountsOffset),
+                NumMangoAccounts = span.GetU32(Layout.NumMangoAccountsOffset)
             };
         }
     }

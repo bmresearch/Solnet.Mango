@@ -13,22 +13,23 @@ namespace Solnet.Mango.Examples
     public class GetMangoAccountExample : IRunnableExample
     {
         private static readonly PublicKey Owner = new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
-        private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient(Cluster.MainNet);
+        private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient("https://mango.devnet.rpcpool.com");
 
         private static readonly IStreamingRpcClient StreamingRpcClient =
-            Solnet.Rpc.ClientFactory.GetStreamingClient(Cluster.MainNet);
+            Solnet.Rpc.ClientFactory.GetStreamingClient("wss://mango.devnet.rpcpool.com");
 
         private readonly IMangoClient _mangoClient;
 
         public GetMangoAccountExample()
         {
-            _mangoClient = ClientFactory.GetClient(RpcClient, StreamingRpcClient);
+            Console.WriteLine($"Initializing {ToString()}");
+            _mangoClient = ClientFactory.GetClient(RpcClient, StreamingRpcClient, programId: MangoProgram.DevNetProgramIdKeyV3);
         }
 
         public void Run()
         {
-            AccountResultWrapper<MangoGroup> mangoGroup = _mangoClient.GetMangoGroup(Constants.MangoGroup);
-            MangoCache mangoCache = _mangoClient.GetMangoCache(Constants.MangoCache).ParsedResult;
+            AccountResultWrapper<MangoGroup> mangoGroup = _mangoClient.GetMangoGroup(Constants.DevNetMangoGroup);
+            MangoCache mangoCache = _mangoClient.GetMangoCache(mangoGroup.ParsedResult.MangoCache).ParsedResult;
             mangoGroup.ParsedResult.LoadRootBanks(RpcClient);
 
             ProgramAccountsResultWrapper<List<MangoAccount>> mangoAccounts = _mangoClient.GetMangoAccounts(Owner);

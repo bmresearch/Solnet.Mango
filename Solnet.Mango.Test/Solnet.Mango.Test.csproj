@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
@@ -15,13 +15,28 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Solnet.Rpc" Version="0.4.17" />
-        <PackageReference Include="Solnet.Wallet" Version="0.4.17" />
-        <PackageReference Include="Solnet.Serum" Version="1.0.7" />
+        <PackageReference Include="Solnet.Rpc" Version="0.5.0" />
+        <PackageReference Include="Solnet.Wallet" Version="0.5.0" />
+        <PackageReference Include="Solnet.Serum" Version="1.2.0" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Solnet.Mango\Solnet.Mango.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Resources\MangoClient\GetAdvancedOrdersAccountAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetMangoAccountAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetMangoCacheAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetMangoGroupAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

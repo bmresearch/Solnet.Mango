@@ -21,6 +21,7 @@ namespace Solnet.Mango.Examples
         private static readonly IStreamingRpcClient StreamingRpcClient = Solnet.Rpc.ClientFactory.GetStreamingClient(Cluster.MainNet);
 
         private readonly Wallet.Wallet _wallet;
+        private readonly MangoProgram _mango;
 
         private IMangoClient _mangoClient;
 
@@ -29,6 +30,7 @@ namespace Solnet.Mango.Examples
             Console.WriteLine($"Initializing {ToString()}");
             // init stuff
             SolanaKeyStoreService keyStore = new();
+            _mango = MangoProgram.CreateMainNet();
 
             // get the wallet
             _wallet = keyStore.RestoreKeystoreFromFile("/home/murlux/hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh.json");
@@ -51,9 +53,9 @@ namespace Solnet.Mango.Examples
                     acc,
                     minBalance.Result,
                     MangoAccount.Layout.Length,
-                    MangoProgram.ProgramIdKeyV3))
-                .AddInstruction(MangoProgram.InitializeMangoAccount(Constants.MangoGroup, acc, Owner))
-                .AddInstruction(MangoProgram.AddMangoAccountInfo(Constants.MangoGroup, acc, Owner, "Solnet Test"));
+                    MangoProgram.MainNetProgramIdKeyV3))
+                .AddInstruction(_mango.InitializeMangoAccount(Constants.MangoGroup, acc, Owner))
+                .AddInstruction(_mango.AddMangoAccountInfo(Constants.MangoGroup, acc, Owner, "Solnet Test"));
 
             byte[] msg = txBuilder.CompileMessage();
 

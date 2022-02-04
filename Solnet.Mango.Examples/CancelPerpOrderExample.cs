@@ -24,12 +24,14 @@ namespace Solnet.Mango.Examples
             Solnet.Rpc.ClientFactory.GetStreamingClient("wss://solana-api.projectserum.com");
 
         private readonly IMangoClient _mangoClient;
+        private readonly MangoProgram _mango;
 
         private readonly Wallet.Wallet _wallet;
 
         public CancelPerpOrderExample()
         {
-
+            Console.WriteLine($"Initializing {ToString()}");
+            _mango = MangoProgram.CreateMainNet();
             SolanaKeyStoreService keyStore = new();
             // get the wallet
             _wallet = keyStore.RestoreKeystoreFromFile("/path/to/keystore.json");
@@ -81,7 +83,7 @@ namespace Solnet.Mango.Examples
                         bids.FirstOrDefault(x => x.OrderId == order.OrderId) : asks.FirstOrDefault(x => x.OrderId == order.OrderId);
                     Console.WriteLine($"Order {order.OrderId} - {order.Side} - Size: {orderBookOrder.RawQuantity} - Price: {orderBookOrder.RawQuantity} - Market: {order.MarketIndex} - Client Id: {order.ClientOrderId}");
 
-                    txBuilder.AddInstruction(MangoProgram.CancelPerpOrder(
+                    txBuilder.AddInstruction(_mango.CancelPerpOrder(
                         Constants.MangoGroup,
                         new(mangoAccounts.OriginalRequest.Result[i].PublicKey),
                         Owner,

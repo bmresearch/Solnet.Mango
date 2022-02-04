@@ -2,6 +2,7 @@ using Solnet.KeyStore;
 using Solnet.Mango.Models;
 using Solnet.Programs;
 using Solnet.Programs.Models;
+using Solnet.Programs.Utilities;
 using Solnet.Rpc;
 using Solnet.Rpc.Builders;
 using Solnet.Rpc.Core.Http;
@@ -29,12 +30,14 @@ namespace Solnet.Mango.Examples
         private readonly Wallet.Wallet _wallet;
 
         private readonly IMangoClient _mangoClient;
+        private readonly MangoProgram _mango;
 
         public DepositExample()
         {
             Console.WriteLine($"Initializing {ToString()}");
             // init stuff
             SolanaKeyStoreService keyStore = new();
+            _mango = MangoProgram.CreateMainNet();
             // get the wallet
             _wallet = keyStore.RestoreKeystoreFromFile("/path/to/keystore.json");
 
@@ -86,7 +89,7 @@ namespace Solnet.Mango.Examples
                     TokenProgram.TokenAccountDataSize,
                     TokenProgram.ProgramIdKey))
                 .AddInstruction(TokenProgram.InitializeAccount(acc, MarketUtils.WrappedSolMint, Owner))
-                .AddInstruction(MangoProgram.Deposit(
+                .AddInstruction(_mango.Deposit(
                     Constants.MangoGroup,
                     new PublicKey(mangoAccounts.OriginalRequest.Result[1].PublicKey),
                     Owner,
@@ -94,7 +97,7 @@ namespace Solnet.Mango.Examples
                     wrappedSolTokenInfo.RootBank,
                     nodeBankKey,
                     nodeBank.ParsedResult.Vault,
-                    acc, 1_000_000
+                    acc, 10 * SolHelper.LAMPORTS_PER_SOL
                 ))
                 .AddInstruction(TokenProgram.CloseAccount(acc, Owner, Owner, TokenProgram.ProgramIdKey));
 

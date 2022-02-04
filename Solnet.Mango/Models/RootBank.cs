@@ -136,7 +136,11 @@ namespace Solnet.Mango.Models
             IEnumerable<PublicKey> filteredNodes = NodeBanks.Where(x => !x.Equals(SystemProgram.ProgramIdKey));
             RequestResult<ResponseValue<List<AccountInfo>>> nodeBankAccounts =
                 await rpcClient.GetMultipleAccountsAsync(filteredNodes.Select(x => x.Key).ToList());
-            if (!nodeBankAccounts.WasRequestSuccessfullyHandled) return nodeBankAccounts;
+            if (!nodeBankAccounts.WasRequestSuccessfullyHandled)
+            {
+                logger?.LogInformation("Could not fetch node banks.");
+                return nodeBankAccounts;
+            }
             logger?.LogInformation($"Successfully fetched {nodeBankAccounts.Result.Value.Count} node banks.");
             foreach (AccountInfo account in nodeBankAccounts.Result.Value)
             {

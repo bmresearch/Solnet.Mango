@@ -1,6 +1,8 @@
 using Solnet.Mango.Models;
 using Solnet.Programs;
+using Solnet.Programs.Abstract;
 using Solnet.Programs.Utilities;
+using Solnet.Rpc;
 using Solnet.Rpc.Models;
 using Solnet.Serum;
 using Solnet.Serum.Models;
@@ -16,49 +18,85 @@ namespace Solnet.Mango
     /// Implements the Mango Program methods.
     /// <remarks>
     /// For more information see:
-    /// https://github.com/blockworks-foundation/mango/
+    /// https://github.com/blockworks-foundation/
     /// </remarks>
     /// </summary>
-    public class MangoProgram
+    public class MangoProgram : BaseProgram
     {
-        /// <summary>
-        /// 
-        /// </summary>
-        public static readonly PublicKey SysVarClock = new("SysvarC1ock11111111111111111111111111111111");
-
         /// <summary>
         /// The public key of the MNGO token mint.
         /// </summary>
         public static readonly PublicKey MangoToken = new("MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac");
 
         /// <summary>
-        /// The public key of the Mango V3 program.
+        /// The public key of the Mango V3 program on <see cref="Cluster.DevNet"/>.
         /// </summary>
-        public static readonly PublicKey ProgramIdKeyV3 = new("mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68");
+        public static readonly PublicKey DevNetProgramIdKeyV3 = new("4skJ85cdxQAFVKbcGgfun8iZPL7BadVYXG3kGEGkufqA");
+
+        /// <summary>
+        /// The public key of the Mango V3 program on <see cref="Cluster.MainNet"/>.
+        /// </summary>
+        public static readonly PublicKey MainNetProgramIdKeyV3 = new("mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68");
 
         /// <summary>
         /// The program's name.
         /// </summary>
-        private const string ProgramName = "Mango Program V3";
+        private const string DefaultProgramName = "Mango Program V3";
+
+        /// <summary>
+        /// The dex program id key.
+        /// </summary>
+        private PublicKey _dexProgramIdKey;
+
+        /// <summary>
+        /// Initialize the <see cref="MangoProgram"/> with the given program id key and program name.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
+        /// <param name="programName">The program name.</param>
+        public MangoProgram(PublicKey programIdKey, PublicKey dexProgramIdKey, string programName = DefaultProgramName) : base(programIdKey, programName) 
+        {
+            _dexProgramIdKey = dexProgramIdKey;
+        }
+
+        /// <summary>
+        /// Initialize the <see cref="MangoProgram"/> for <see cref="Cluster.DevNet"/>.
+        /// </summary>
+        /// <returns>The <see cref="MangoProgram"/> instance.</returns>
+        public static MangoProgram CreateDevNet() => new MangoProgram(DevNetProgramIdKeyV3, SerumProgram.DevNetProgramIdKeyV3);
+
+        /// <summary>
+        /// Initialize the <see cref="MangoProgram"/> for <see cref="Cluster.MainNet"/>.
+        /// </summary>
+        /// <returns>The <see cref="MangoProgram"/> instance.</returns>
+        public static MangoProgram CreateMainNet() => new MangoProgram(MainNetProgramIdKeyV3, SerumProgram.MainNetProgramIdKeyV3);
 
         /// <summary>
         /// Initializes an instruction to initialize a given account as a <see cref="MangoAccount"/>.
         /// </summary>
+        /// <remarks>
+        /// DEPRECATED: If you use this method after Mango v3.3 you will not be able to upgrade and close your account.
+        /// </remarks>
         /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
         /// <param name="mangoAccount">The public key of the account to initialize as <see cref="MangoAccount"/>.</param>
         /// <param name="owner">The public key of the owner of the <see cref="MangoAccount"/>.</param>
         /// <returns>The transaction instruction.</returns>
-        public static TransactionInstruction InitializeMangoAccount(PublicKey mangoGroup, PublicKey mangoAccount,
-            PublicKey owner) => InitializeMangoAccount(ProgramIdKeyV3, mangoGroup, mangoAccount, owner);
+        [Obsolete("Please use CreateMangoAccount whenever possible instead. If you use this method after Mango v3.3 you will not be able to upgrade and close your account.")]
+        public TransactionInstruction InitializeMangoAccount(PublicKey mangoGroup, PublicKey mangoAccount,
+            PublicKey owner) => InitializeMangoAccount(ProgramIdKey, mangoGroup, mangoAccount, owner);
 
         /// <summary>
         /// Initializes an instruction to initialize a given account as a <see cref="MangoAccount"/>.
         /// </summary>
+        /// <remarks>
+        /// DEPRECATED: If you use this method after Mango v3.3 you will not be able to upgrade and close your account.
+        /// </remarks>
         /// <param name="programIdKey">The public key of the program.</param>
         /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
         /// <param name="mangoAccount">The public key of the account to initialize as <see cref="MangoAccount"/>.</param>
         /// <param name="owner">The public key of the owner of the <see cref="MangoAccount"/>.</param>
         /// <returns>The transaction instruction.</returns>
+        [Obsolete("Please use CreateMangoAccount whenever possible instead. If you use this method after Mango v3.3 you will not be able to upgrade and close your account.")]
         public static TransactionInstruction InitializeMangoAccount(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner)
         {
@@ -78,41 +116,41 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.Deposit"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="rootBank"></param>
-        /// <param name="nodeBank"></param>
-        /// <param name="vault"></param>
-        /// <param name="ownerTokenAccount"></param>
-        /// <param name="quantity"></param>
-        /// <returns></returns>
-        public static TransactionInstruction Deposit(PublicKey mangoGroup, PublicKey mangoAccount, PublicKey owner,
-            PublicKey mangoCache, PublicKey rootBank, PublicKey nodeBank, PublicKey vault, PublicKey ownerTokenAccount,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="rootBank">The root bank.</param>
+        /// <param name="nodeBank">The node bank.</param>
+        /// <param name="nodeBankVault">The node bank's vault.</param>
+        /// <param name="ownerTokenAccount">The owner's token account.</param>
+        /// <param name="quantity">The amount to deposit.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction Deposit(PublicKey mangoGroup, PublicKey mangoAccount, PublicKey owner,
+            PublicKey mangoCache, PublicKey rootBank, PublicKey nodeBank, PublicKey nodeBankVault, PublicKey ownerTokenAccount,
             ulong quantity)
-            => Deposit(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, mangoCache, rootBank, nodeBank, vault,
+            => Deposit(ProgramIdKey, mangoGroup, mangoAccount, owner, mangoCache, rootBank, nodeBank, nodeBankVault,
                 ownerTokenAccount, quantity);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.Deposit"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="rootBank"></param>
-        /// <param name="nodeBank"></param>
-        /// <param name="vault"></param>
-        /// <param name="ownerTokenAccount"></param>
-        /// <param name="quantity"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="rootBank">The root bank.</param>
+        /// <param name="nodeBank">The node bank.</param>
+        /// <param name="nodeBankVault">The node bank's vault.</param>
+        /// <param name="ownerTokenAccount">The owner's token account.</param>
+        /// <param name="quantity">The amount to deposit.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction Deposit(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey rootBank,
-            PublicKey nodeBank, PublicKey vault, PublicKey ownerTokenAccount, ulong quantity)
+            PublicKey nodeBank, PublicKey nodeBankVault, PublicKey ownerTokenAccount, ulong quantity)
         {
             List<AccountMeta> keys = new()
             {
@@ -122,7 +160,7 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(mangoCache, false),
                 AccountMeta.ReadOnly(rootBank, false),
                 AccountMeta.Writable(nodeBank, false),
-                AccountMeta.Writable(vault, false),
+                AccountMeta.Writable(nodeBankVault, false),
                 AccountMeta.ReadOnly(TokenProgram.ProgramIdKey, false),
                 AccountMeta.Writable(ownerTokenAccount, false)
             };
@@ -135,48 +173,48 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.Withdraw"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="rootBank"></param>
-        /// <param name="nodeBank"></param>
-        /// <param name="vault"></param>
-        /// <param name="ownerTokenAccount"></param>
-        /// <param name="signer"></param>
-        /// <param name="openOrdersAccounts"></param>
-        /// <param name="quantity"></param>
-        /// <param name="allowBorrow"></param>
-        /// <returns></returns>
-        public static TransactionInstruction Withdraw(PublicKey mangoGroup,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="rootBank">The root bank.</param>
+        /// <param name="nodeBank">The node bank.</param>
+        /// <param name="nodeBankVault">The node bank's vault.</param>
+        /// <param name="ownerTokenAccount">The owner's token account.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="quantity">The amount to withdraw.</param>
+        /// <param name="allowBorrow">Whether to allow borrowing or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction Withdraw(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey rootBank,
-            PublicKey nodeBank, PublicKey vault, PublicKey ownerTokenAccount, PublicKey signer,
+            PublicKey nodeBank, PublicKey nodeBankVault, PublicKey ownerTokenAccount, PublicKey signer,
             IList<PublicKey> openOrdersAccounts, ulong quantity, bool allowBorrow)
-            => Withdraw(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, mangoCache, rootBank, nodeBank, vault,
+            => Withdraw(ProgramIdKey, mangoGroup, mangoAccount, owner, mangoCache, rootBank, nodeBank, nodeBankVault,
                 ownerTokenAccount, signer, openOrdersAccounts, quantity, allowBorrow);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.Withdraw"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="rootBank"></param>
-        /// <param name="nodeBank"></param>
-        /// <param name="vault"></param>
-        /// <param name="ownerTokenAccount"></param>
-        /// <param name="signer"></param>
-        /// <param name="openOrdersAccounts"></param>
-        /// <param name="quantity"></param>
-        /// <param name="allowBorrow"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="rootBank">The root bank.</param>
+        /// <param name="nodeBank">The node bank.</param>
+        /// <param name="nodeBankVault">The node bank's vault.</param>
+        /// <param name="ownerTokenAccount">The owner's token account.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="quantity">The amount to withdraw.</param>
+        /// <param name="allowBorrow">Whether to allow borrowing or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction Withdraw(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey rootBank,
-            PublicKey nodeBank, PublicKey vault, PublicKey ownerTokenAccount, PublicKey signer,
+            PublicKey nodeBank, PublicKey nodeBankVault, PublicKey ownerTokenAccount, PublicKey signer,
             IList<PublicKey> openOrdersAccounts, ulong quantity, bool allowBorrow)
         {
             List<AccountMeta> keys = new()
@@ -187,7 +225,7 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(mangoCache, false),
                 AccountMeta.ReadOnly(rootBank, false),
                 AccountMeta.Writable(nodeBank, false),
-                AccountMeta.Writable(vault, false),
+                AccountMeta.Writable(nodeBankVault, false),
                 AccountMeta.Writable(ownerTokenAccount, false),
                 AccountMeta.ReadOnly(signer, false),
                 AccountMeta.ReadOnly(TokenProgram.ProgramIdKey, false)
@@ -204,78 +242,80 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="dexRequestQueue"></param>
-        /// <param name="dexEventQueue"></param>
-        /// <param name="dexBase"></param>
-        /// <param name="dexQuote"></param>
-        /// <param name="baseRootBank"></param>
-        /// <param name="baseNodeBank"></param>
-        /// <param name="baseVault"></param>
-        /// <param name="quoteRootBank"></param>
-        /// <param name="quoteNodeBank"></param>
-        /// <param name="quoteVault"></param>
-        /// <param name="signer"></param>
-        /// <param name="dexSigner"></param>
-        /// <param name="serumVault"></param>
-        /// <param name="openOrdersAccounts"></param>
-        /// <param name="marketIndex"></param>
-        /// <param name="order"></param>
-        /// <returns></returns>
-        public static TransactionInstruction PlaceSpotOrder(PublicKey mangoGroup, PublicKey mangoAccount,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="spotMarket">The spot market account.</param>
+        /// <param name="bids">The spot market bids account.</param>
+        /// <param name="asks">The spot market asks account.</param>
+        /// <param name="dexRequestQueue">The spot market request queue.</param>
+        /// <param name="dexEventQueue">The spot market event queue.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
+        /// <param name="baseRootBank">The root bank of the base mint.</param>
+        /// <param name="baseNodeBank">The node bank of the base mint.</param>
+        /// <param name="baseVault">The vault of the base mint's node bank.</param>
+        /// <param name="quoteRootBank">The root bank of the quote mint.</param>
+        /// <param name="quoteNodeBank">The node bank of the quote mint.</param>
+        /// <param name="quoteVault">The vault of the quote mint's node bank.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="dexSigner">The dex signer (derived from the spot market's vault signer nonce).</param>
+        /// <param name="serumVault">The spot market's vault.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="marketIndex">The market's index.</param>
+        /// <param name="order">The order.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        [Obsolete("This method is sub optimal, please use PlaceSpotOrder2 instead.")]
+        public TransactionInstruction PlaceSpotOrder(PublicKey mangoGroup, PublicKey mangoAccount,
             PublicKey owner, PublicKey mangoCache, PublicKey spotMarket, PublicKey bids, PublicKey asks,
             PublicKey dexRequestQueue, PublicKey dexEventQueue, PublicKey dexBase, PublicKey dexQuote,
             PublicKey baseRootBank, PublicKey baseNodeBank, PublicKey baseVault, PublicKey quoteRootBank,
             PublicKey quoteNodeBank, PublicKey quoteVault, PublicKey signer, PublicKey dexSigner, PublicKey serumVault,
-            IList<PublicKey> openOrdersAccounts, ulong marketIndex, Order order)
-            => PlaceSpotOrder(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, mangoCache, SerumProgram.ProgramIdKey,
+            IList<PublicKey> openOrdersAccounts, int marketIndex, Order order)
+            => PlaceSpotOrder(ProgramIdKey, mangoGroup, mangoAccount, owner, mangoCache, _dexProgramIdKey,
                 spotMarket, bids, asks, dexRequestQueue, dexEventQueue, dexBase, dexQuote, baseRootBank, baseNodeBank,
                 baseVault, quoteRootBank, quoteNodeBank, quoteVault, signer, dexSigner, serumVault, openOrdersAccounts,
                 marketIndex, order);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="dexProgramIdKey"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="dexRequestQueue"></param>
-        /// <param name="dexEventQueue"></param>
-        /// <param name="dexBase"></param>
-        /// <param name="dexQuote"></param>
-        /// <param name="baseRootBank"></param>
-        /// <param name="baseNodeBank"></param>
-        /// <param name="baseVault"></param>
-        /// <param name="quoteRootBank"></param>
-        /// <param name="quoteNodeBank"></param>
-        /// <param name="quoteVault"></param>
-        /// <param name="signer"></param>
-        /// <param name="dexSigner"></param>
-        /// <param name="serumVault"></param>
-        /// <param name="openOrdersAccounts"></param>
-        /// <param name="marketIndex"></param>
-        /// <param name="order"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
+        /// <param name="spotMarket">The spot market account.</param>
+        /// <param name="bids">The spot market bids account.</param>
+        /// <param name="asks">The spot market asks account.</param>
+        /// <param name="dexRequestQueue">The spot market request queue.</param>
+        /// <param name="dexEventQueue">The spot market event queue.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
+        /// <param name="baseRootBank">The root bank of the base mint.</param>
+        /// <param name="baseNodeBank">The node bank of the base mint.</param>
+        /// <param name="baseVault">The vault of the base mint's node bank.</param>
+        /// <param name="quoteRootBank">The root bank of the quote mint.</param>
+        /// <param name="quoteNodeBank">The node bank of the quote mint.</param>
+        /// <param name="quoteVault">The vault of the quote mint's node bank.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="dexSigner">The dex signer (derived from the spot market's vault signer nonce).</param>
+        /// <param name="serumVault">The spot market's vault.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="marketIndex">The market's index.</param>
+        /// <param name="order">The order.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        [Obsolete("This method is sub optimal, please use PlaceSpotOrder2 instead.")]
         public static TransactionInstruction PlaceSpotOrder(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey dexProgramIdKey, PublicKey spotMarket,
             PublicKey bids, PublicKey asks, PublicKey dexRequestQueue, PublicKey dexEventQueue, PublicKey dexBase,
             PublicKey dexQuote, PublicKey baseRootBank, PublicKey baseNodeBank, PublicKey baseVault, PublicKey quoteRootBank,
             PublicKey quoteNodeBank, PublicKey quoteVault, PublicKey signer, PublicKey dexSigner, PublicKey serumVault,
-            IList<PublicKey> openOrdersAccounts, ulong marketIndex, Order order)
+            IList<PublicKey> openOrdersAccounts, int marketIndex, Order order)
         {
             List<AccountMeta> keys = new()
             {
@@ -304,7 +344,7 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(serumVault, false)
             };
 
-            keys.AddRange(openOrdersAccounts.Select((t, i) => (ulong)i == marketIndex
+            keys.AddRange(openOrdersAccounts.Select((t, i) => i == marketIndex
                 ? AccountMeta.Writable(t, false)
                 : AccountMeta.ReadOnly(t, false)));
 
@@ -315,75 +355,74 @@ namespace Solnet.Mango
                 ProgramId = programIdKey,
             };
         }
-        
+
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder2"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="dexRequestQueue"></param>
-        /// <param name="dexEventQueue"></param>
-        /// <param name="dexBase"></param>
-        /// <param name="dexQuote"></param>
-        /// <param name="baseRootBank"></param>
-        /// <param name="baseNodeBank"></param>
-        /// <param name="baseVault"></param>
-        /// <param name="quoteRootBank"></param>
-        /// <param name="quoteNodeBank"></param>
-        /// <param name="quoteVault"></param>
-        /// <param name="signer"></param>
-        /// <param name="dexSigner"></param>
-        /// <param name="serumVault"></param>
-        /// <param name="openOrdersAccounts"></param>
-        /// <param name="marketIndex"></param>
-        /// <param name="order"></param>
-        /// <returns></returns>
-        public static TransactionInstruction PlaceSpotOrder2(PublicKey mangoGroup, PublicKey mangoAccount,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="spotMarket">The spot market account.</param>
+        /// <param name="bids">The spot market bids account.</param>
+        /// <param name="asks">The spot market asks account.</param>
+        /// <param name="dexRequestQueue">The spot market request queue.</param>
+        /// <param name="dexEventQueue">The spot market event queue.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
+        /// <param name="baseRootBank">The root bank of the base mint.</param>
+        /// <param name="baseNodeBank">The node bank of the base mint.</param>
+        /// <param name="baseVault">The vault of the base mint's node bank.</param>
+        /// <param name="quoteRootBank">The root bank of the quote mint.</param>
+        /// <param name="quoteNodeBank">The node bank of the quote mint.</param>
+        /// <param name="quoteVault">The vault of the quote mint's node bank.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="dexSigner">The dex signer (derived from the spot market's vault signer nonce).</param>
+        /// <param name="serumVault">The spot market's vault.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="marketIndex">The market's index.</param>
+        /// <param name="order">The order.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction PlaceSpotOrder2(PublicKey mangoGroup, PublicKey mangoAccount,
             PublicKey owner, PublicKey mangoCache, PublicKey spotMarket, PublicKey bids, PublicKey asks,
             PublicKey dexRequestQueue, PublicKey dexEventQueue, PublicKey dexBase, PublicKey dexQuote,
             PublicKey baseRootBank, PublicKey baseNodeBank, PublicKey baseVault, PublicKey quoteRootBank,
             PublicKey quoteNodeBank, PublicKey quoteVault, PublicKey signer, PublicKey dexSigner, PublicKey serumVault,
             IList<PublicKey> openOrdersAccounts, int marketIndex, Order order)
-            => PlaceSpotOrder2(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, mangoCache,
-                SerumProgram.ProgramIdKey,
-                spotMarket, bids, asks, dexRequestQueue, dexEventQueue, dexBase, dexQuote, baseRootBank, baseNodeBank,
-                baseVault, quoteRootBank, quoteNodeBank, quoteVault, signer, dexSigner, serumVault, openOrdersAccounts,
-                marketIndex, order);
+            => PlaceSpotOrder2(ProgramIdKey, mangoGroup, mangoAccount, owner, mangoCache,
+                _dexProgramIdKey, spotMarket, bids, asks, dexRequestQueue, dexEventQueue, dexBase, dexQuote,
+                baseRootBank, baseNodeBank,baseVault, quoteRootBank, quoteNodeBank, quoteVault, signer, dexSigner,
+                serumVault, openOrdersAccounts, marketIndex, order);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder2"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="dexProgramIdKey"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="dexRequestQueue"></param>
-        /// <param name="dexEventQueue"></param>
-        /// <param name="dexBase"></param>
-        /// <param name="dexQuote"></param>
-        /// <param name="baseRootBank"></param>
-        /// <param name="baseNodeBank"></param>
-        /// <param name="baseVault"></param>
-        /// <param name="quoteRootBank"></param>
-        /// <param name="quoteNodeBank"></param>
-        /// <param name="quoteVault"></param>
-        /// <param name="signer"></param>
-        /// <param name="dexSigner"></param>
-        /// <param name="serumVault"></param>
-        /// <param name="openOrdersAccounts"></param>
-        /// <param name="marketIndex"></param>
-        /// <param name="order"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
+        /// <param name="spotMarket">The spot market account.</param>
+        /// <param name="bids">The spot market bids account.</param>
+        /// <param name="asks">The spot market asks account.</param>
+        /// <param name="dexRequestQueue">The spot market request queue.</param>
+        /// <param name="dexEventQueue">The spot market event queue.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
+        /// <param name="baseRootBank">The root bank of the base mint.</param>
+        /// <param name="baseNodeBank">The node bank of the base mint.</param>
+        /// <param name="baseVault">The vault of the base mint's node bank.</param>
+        /// <param name="quoteRootBank">The root bank of the quote mint.</param>
+        /// <param name="quoteNodeBank">The node bank of the quote mint.</param>
+        /// <param name="quoteVault">The vault of the quote mint's node bank.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="dexSigner">The dex signer (derived from the spot market's vault signer nonce).</param>
+        /// <param name="serumVault">The spot market's vault.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="marketIndex">The market's index.</param>
+        /// <param name="order">The order.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction PlaceSpotOrder2(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey dexProgramIdKey,
             PublicKey spotMarket,
@@ -418,17 +457,9 @@ namespace Solnet.Mango
                 AccountMeta.ReadOnly(dexSigner, false),
                 AccountMeta.ReadOnly(serumVault, false)
             };
-
-            if (openOrdersAccounts.Count == 1)
-            {
-                keys.Add(AccountMeta.Writable(openOrdersAccounts[0], false));
-            }
-            else
-            {
-                keys.AddRange(openOrdersAccounts.Select((t, i) => i == marketIndex
-                    ? AccountMeta.Writable(t, false)
-                    : AccountMeta.ReadOnly(t, false)));
-            }
+            keys.AddRange(openOrdersAccounts.Select((t, i) => i == marketIndex
+                ? AccountMeta.Writable(t, false)
+                : AccountMeta.ReadOnly(t, false)));
 
             return new TransactionInstruction
             {
@@ -439,55 +470,55 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.PlacePerpOrder"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="eventQueue"></param>
-        /// <param name="openOrdersAccounts"></param>
-        /// <param name="side"></param>
-        /// <param name="orderType"></param>
-        /// <param name="price"></param>
-        /// <param name="quantity"></param>
-        /// <param name="clientOrderId"></param>
-        /// <param name="reduceOnly"></param>
-        /// <returns></returns>
-        public static TransactionInstruction PlacePerpOrder(PublicKey mangoGroup,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="eventQueue">The perp market event queue.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="side">The side of the order.</param>
+        /// <param name="orderType">The order type.</param>
+        /// <param name="price">The price.</param>
+        /// <param name="quantity">The quantity.</param>
+        /// <param name="clientOrderId">The client order id.</param>
+        /// <param name="reduceOnly">Whether the order is reduce only or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction PlacePerpOrder(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
             PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
-            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false)
-            => PlacePerpOrder(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, mangoCache, perpetualMarket,
+            Side side, PerpOrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false)
+            => PlacePerpOrder(ProgramIdKey, mangoGroup, mangoAccount, owner, mangoCache, perpetualMarket,
                 bids, asks, eventQueue, openOrdersAccounts, side, orderType, price, quantity, clientOrderId, reduceOnly);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.PlacePerpOrder"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="eventQueue"></param>
-        /// <param name="openOrdersAccounts"></param>
-        /// <param name="side"></param>
-        /// <param name="orderType"></param>
-        /// <param name="price"></param>
-        /// <param name="quantity"></param>
-        /// <param name="clientOrderId"></param>
-        /// <param name="reduceOnly"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="eventQueue">The perp market event queue.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="side">The side of the order.</param>
+        /// <param name="orderType">The order type.</param>
+        /// <param name="price">The price.</param>
+        /// <param name="quantity">The quantity.</param>
+        /// <param name="clientOrderId">The client order id.</param>
+        /// <param name="reduceOnly">Whether the order is reduce only or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction PlacePerpOrder(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
             PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
-            Side side, OrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false)
+            Side side, PerpOrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false)
         {
             List<AccountMeta> keys = new()
             {
@@ -511,36 +542,36 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelPerpOrderByClientId"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="clientOrderId"></param>
-        /// <param name="invalidIdOk"></param>
-        /// <returns></returns>
-        public static TransactionInstruction CancelPerpOrderByClientId(PublicKey mangoGroup,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="clientOrderId">The client order id.</param>
+        /// <param name="invalidIdOk">Whether an invalid id is ok or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction CancelPerpOrderByClientId(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey perpetualMarket, PublicKey bids,
             PublicKey asks, ulong clientOrderId, bool invalidIdOk)
-            => CancelPerpOrderByClientId(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, perpetualMarket,
+            => CancelPerpOrderByClientId(ProgramIdKey, mangoGroup, mangoAccount, owner, perpetualMarket,
                 bids, asks, clientOrderId, invalidIdOk);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelPerpOrderByClientId"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="clientOrderId"></param>
-        /// <param name="invalidIdOk"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="clientOrderId">The client order id.</param>
+        /// <param name="invalidIdOk">Whether an invalid id is ok or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction CancelPerpOrderByClientId(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey perpetualMarket, PublicKey bids,
             PublicKey asks, ulong clientOrderId, bool invalidIdOk)
@@ -563,36 +594,36 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelPerpOrder"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="orderId"></param>
-        /// <param name="invalidIdOk"></param>
-        /// <returns></returns>
-        public static TransactionInstruction CancelPerpOrder(PublicKey mangoGroup,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="orderId">The order id.</param>
+        /// <param name="invalidIdOk">Whether an invalid id is ok or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction CancelPerpOrder(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey perpetualMarket, PublicKey bids,
             PublicKey asks, BigInteger orderId, bool invalidIdOk)
-            => CancelPerpOrder(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, perpetualMarket, bids, asks, orderId,
+            => CancelPerpOrder(ProgramIdKey, mangoGroup, mangoAccount, owner, perpetualMarket, bids, asks, orderId,
                 invalidIdOk);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelPerpOrder"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="orderId"></param>
-        /// <param name="invalidIdOk"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="orderId">The order id.</param>
+        /// <param name="invalidIdOk">Whether an invalid id is ok or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction CancelPerpOrder(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey perpetualMarket, PublicKey bids,
             PublicKey asks, BigInteger orderId, bool invalidIdOk)
@@ -615,57 +646,56 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SettleFunds"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="dexProgramIdKey"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="openOrders"></param>
-        /// <param name="signer"></param>
-        /// <param name="dexBase"></param>
-        /// <param name="dexQuote"></param>
-        /// <param name="baseRootBank"></param>
-        /// <param name="baseNodeBank"></param>
-        /// <param name="quoteRootBank"></param>
-        /// <param name="quoteNodeBank"></param>
-        /// <param name="baseVault"></param>
-        /// <param name="quoteVault"></param>
-        /// <param name="dexSigner"></param>
-        /// <returns></returns>
-        public static TransactionInstruction SettleFunds(PublicKey mangoGroup, PublicKey mangoCache,
-            PublicKey mangoAccount, PublicKey owner, PublicKey dexProgramIdKey, PublicKey spotMarket,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="spotMarket">The spot market.</param>
+        /// <param name="openOrders">The open orders accounts.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
+        /// <param name="baseRootBank">The root bank of the base mint.</param>
+        /// <param name="baseNodeBank">The node bank of the base mint.</param>
+        /// <param name="quoteRootBank">The root bank of the quote mint.</param>
+        /// <param name="quoteNodeBank">The node bank of the quote mint.</param>
+        /// <param name="baseVault">The vault of the base mint's node bank.</param>
+        /// <param name="quoteVault">The vault of the quote mint's node bank.</param>
+        /// <param name="dexSigner">The dex signer (derived from the spot market's vault signer nonce).</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction SettleFunds(PublicKey mangoGroup, PublicKey mangoCache,
+            PublicKey mangoAccount, PublicKey owner, PublicKey spotMarket,
             PublicKey openOrders, PublicKey signer, PublicKey dexBase, PublicKey dexQuote, PublicKey baseRootBank,
             PublicKey baseNodeBank, PublicKey quoteRootBank, PublicKey quoteNodeBank, PublicKey baseVault,
             PublicKey quoteVault, PublicKey dexSigner)
-            => SettleFunds(ProgramIdKeyV3, mangoGroup, mangoCache, mangoAccount, owner, dexProgramIdKey, spotMarket,
+            => SettleFunds(ProgramIdKey, mangoGroup, mangoCache, mangoAccount, owner, _dexProgramIdKey, spotMarket,
                 openOrders, signer, dexBase, dexQuote, baseRootBank, baseNodeBank, quoteRootBank, quoteNodeBank,
                 baseVault, quoteVault, dexSigner);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SettleFunds"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="dexProgramIdKey"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="openOrders"></param>
-        /// <param name="signer"></param>
-        /// <param name="dexBase"></param>
-        /// <param name="dexQuote"></param>
-        /// <param name="baseRootBank"></param>
-        /// <param name="baseNodeBank"></param>
-        /// <param name="quoteRootBank"></param>
-        /// <param name="quoteNodeBank"></param>
-        /// <param name="baseVault"></param>
-        /// <param name="quoteVault"></param>
-        /// <param name="dexSigner"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
+        /// <param name="spotMarket">The spot market.</param>
+        /// <param name="openOrders">The open orders accounts.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="dexBase">The spot market base vault.</param>
+        /// <param name="dexQuote">The spot market quote vault.</param>
+        /// <param name="baseRootBank">The root bank of the base mint.</param>
+        /// <param name="baseNodeBank">The node bank of the base mint.</param>
+        /// <param name="quoteRootBank">The root bank of the quote mint.</param>
+        /// <param name="quoteNodeBank">The node bank of the quote mint.</param>
+        /// <param name="baseVault">The vault of the base mint's node bank.</param>
+        /// <param name="quoteVault">The vault of the quote mint's node bank.</param>
+        /// <param name="dexSigner">The dex signer (derived from the spot market's vault signer nonce).</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction SettleFunds(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoCache, PublicKey mangoAccount, PublicKey owner, PublicKey dexProgramIdKey,
             PublicKey spotMarket, PublicKey openOrders, PublicKey signer, PublicKey dexBase, PublicKey dexQuote,
@@ -702,43 +732,101 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SettleFees"/> method.
         /// </summary>
         /// <param name="mangoGroup"></param>
-        /// <param name="owner"></param>
+        /// <param name="mangoCache"></param>
+        /// <param name="perpMarket"></param>
         /// <param name="mangoAccount"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="openOrders"></param>
-        /// <param name="signer"></param>
-        /// <param name="eventQueue"></param>
-        /// <param name="orderId"></param>
-        /// <param name="side"></param>
-        /// <returns></returns>
-        public static TransactionInstruction CancelSpotOrder(PublicKey mangoGroup,
-            PublicKey owner, PublicKey mangoAccount, PublicKey spotMarket,
-            PublicKey bids, PublicKey asks, PublicKey openOrders, PublicKey signer, PublicKey eventQueue,
-            BigInteger orderId, Side side) => CancelSpotOrder(ProgramIdKeyV3, mangoGroup, owner, mangoAccount,
-            SerumProgram.ProgramIdKey, spotMarket, bids, asks, openOrders, signer, eventQueue, orderId, side);
+        /// <param name="rootBank"></param>
+        /// <param name="nodeBank"></param>
+        /// <param name="bankVault"></param>
+        /// <param name="feesVault"></param>
+        /// <param name="signer">The mango signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction SettleFees(PublicKey mangoGroup, PublicKey mangoCache,
+            PublicKey perpMarket, PublicKey mangoAccount, PublicKey rootBank, PublicKey nodeBank,
+            PublicKey bankVault, PublicKey feesVault, PublicKey signer)
+            => SettleFees(ProgramIdKey, mangoGroup, mangoCache, perpMarket, mangoAccount,
+                rootBank, nodeBank, bankVault, feesVault, signer);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SettleFees"/> method.
         /// </summary>
         /// <param name="programIdKey"></param>
         /// <param name="mangoGroup"></param>
-        /// <param name="owner"></param>
+        /// <param name="mangoCache"></param>
+        /// <param name="perpMarket"></param>
         /// <param name="mangoAccount"></param>
-        /// <param name="dexProgramIdKey"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="openOrders"></param>
-        /// <param name="signer"></param>
-        /// <param name="eventQueue"></param>
-        /// <param name="orderId"></param>
-        /// <param name="side"></param>
-        /// <returns></returns>
+        /// <param name="rootBank"></param>
+        /// <param name="nodeBank"></param>
+        /// <param name="bankVault"></param>
+        /// <param name="feesVault"></param>
+        /// <param name="signer">The mango signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction SettleFees(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoCache, PublicKey perpMarket, PublicKey mangoAccount, PublicKey rootBank, PublicKey nodeBank,
+            PublicKey bankVault, PublicKey feesVault, PublicKey signer)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.ReadOnly(mangoCache, false),
+                AccountMeta.Writable(perpMarket, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(rootBank, false),
+                AccountMeta.Writable(nodeBank, false),
+                AccountMeta.Writable(bankVault, false),
+                AccountMeta.Writable(feesVault, false),
+                AccountMeta.ReadOnly(signer, false),
+                AccountMeta.ReadOnly(TokenProgram.ProgramIdKey, false)
+            };
+            return new TransactionInstruction
+            {
+                Keys = keys,
+                Data = MangoProgramData.EncodeSettleFeesData(),
+                ProgramId = programIdKey
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelSpotOrder"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="spotMarket">The spot market.</param>
+        /// <param name="bids">The spot market bids.</param>
+        /// <param name="asks">The spot market asks.</param>
+        /// <param name="openOrders">The open orders accounts.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="eventQueue">The spot market event queue</param>
+        /// <param name="orderId">The order id.</param>
+        /// <param name="side">The side of the order.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction CancelSpotOrder(PublicKey mangoGroup,
+            PublicKey owner, PublicKey mangoAccount, PublicKey spotMarket,
+            PublicKey bids, PublicKey asks, PublicKey openOrders, PublicKey signer, PublicKey eventQueue,
+            BigInteger orderId, Side side) => CancelSpotOrder(ProgramIdKey, mangoGroup, owner, mangoAccount,
+            _dexProgramIdKey, spotMarket, bids, asks, openOrders, signer, eventQueue, orderId, side);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelSpotOrder"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
+        /// <param name="spotMarket">The spot market.</param>
+        /// <param name="bids">The spot market bids.</param>
+        /// <param name="asks">The spot market asks.</param>
+        /// <param name="openOrders">The open orders accounts.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <param name="eventQueue">The spot market event queue</param>
+        /// <param name="orderId">The order id.</param>
+        /// <param name="side">The side of the order.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction CancelSpotOrder(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey owner, PublicKey mangoAccount, PublicKey dexProgramIdKey, PublicKey spotMarket,
             PublicKey bids, PublicKey asks, PublicKey openOrders, PublicKey signer, PublicKey eventQueue,
@@ -767,33 +855,33 @@ namespace Solnet.Mango
 
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SettleProfitAndLoss"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccountA"></param>
-        /// <param name="mangoAccountB"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="rootBank"></param>
-        /// <param name="nodeBank"></param>
-        /// <param name="marketIndex"></param>
-        /// <returns></returns>
-        public static TransactionInstruction SettleProfitAndLoss(PublicKey mangoGroup, PublicKey mangoAccountA,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccountA">The mango account A.</param>
+        /// <param name="mangoAccountB">The mango account B.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="rootBank">The root bank.</param>
+        /// <param name="nodeBank">The node bank.</param>
+        /// <param name="marketIndex">The market's index.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction SettleProfitAndLoss(PublicKey mangoGroup, PublicKey mangoAccountA,
             PublicKey mangoAccountB, PublicKey mangoCache, PublicKey rootBank, PublicKey nodeBank, ulong marketIndex)
-            => SettleProfitAndLoss(ProgramIdKeyV3, mangoGroup, mangoAccountA, mangoAccountB, mangoCache, rootBank,
+            => SettleProfitAndLoss(ProgramIdKey, mangoGroup, mangoAccountA, mangoAccountB, mangoCache, rootBank,
                 nodeBank, marketIndex);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SettleProfitAndLoss"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccountA"></param>
-        /// <param name="mangoAccountB"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="rootBank"></param>
-        /// <param name="nodeBank"></param>
-        /// <param name="marketIndex"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccountA">The mango account A.</param>
+        /// <param name="mangoAccountB">The mango account B.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="rootBank">The root bank.</param>
+        /// <param name="nodeBank">The node bank.</param>
+        /// <param name="marketIndex">The market's index.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction SettleProfitAndLoss(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccountA,
             PublicKey mangoAccountB, PublicKey mangoCache, PublicKey rootBank, PublicKey nodeBank, ulong marketIndex)
@@ -816,33 +904,32 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.InitSpotOpenOrders"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="dexProgramIdKey"></param>
-        /// <param name="openOrders"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="signer"></param>
-        /// <returns></returns>
-        public static TransactionInstruction InitSpotOpenOrders(PublicKey mangoGroup, PublicKey mangoAccount,
-            PublicKey owner, PublicKey dexProgramIdKey, PublicKey openOrders, PublicKey spotMarket, PublicKey signer)
-            => InitSpotOpenOrders(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, dexProgramIdKey,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="openOrders">The open orders account.</param>
+        /// <param name="spotMarket">The spot market.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction InitSpotOpenOrders(PublicKey mangoGroup, PublicKey mangoAccount,
+            PublicKey owner, PublicKey openOrders, PublicKey spotMarket, PublicKey signer)
+            => InitSpotOpenOrders(ProgramIdKey, mangoGroup, mangoAccount, owner, _dexProgramIdKey,
                 openOrders, spotMarket, signer);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.InitSpotOpenOrders"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="dexProgramIdKey"></param>
-        /// <param name="openOrders"></param>
-        /// <param name="spotMarket"></param>
-        /// <param name="signer"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
+        /// <param name="openOrders">The open orders account.</param>
+        /// <param name="spotMarket">The spot market.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction InitSpotOpenOrders(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount,
             PublicKey owner, PublicKey dexProgramIdKey, PublicKey openOrders, PublicKey spotMarket, PublicKey signer)
@@ -868,40 +955,40 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.RedeemMango"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="mangoPerpetualVault"></param>
-        /// <param name="mangoRootBank"></param>
-        /// <param name="mangoNodeBank"></param>
-        /// <param name="mangoBankVault"></param>
-        /// <param name="signer"></param>
-        /// <returns></returns>
-        public static TransactionInstruction RedeemMango(PublicKey mangoGroup, PublicKey mangoCache,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">the mango cache.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="mangoPerpetualVault">The mango perp vault.</param>
+        /// <param name="mangoRootBank">The mango token root bank.</param>
+        /// <param name="mangoNodeBank">The mango token node bank</param>
+        /// <param name="mangoBankVault">The mango token's node bank's vault.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction RedeemMango(PublicKey mangoGroup, PublicKey mangoCache,
             PublicKey mangoAccount, PublicKey owner, PublicKey perpetualMarket, PublicKey mangoPerpetualVault,
             PublicKey mangoRootBank, PublicKey mangoNodeBank, PublicKey mangoBankVault, PublicKey signer)
-            => RedeemMango(ProgramIdKeyV3, mangoGroup, mangoCache, mangoAccount, owner, perpetualMarket, mangoPerpetualVault,
+            => RedeemMango(ProgramIdKey, mangoGroup, mangoCache, mangoAccount, owner, perpetualMarket, mangoPerpetualVault,
                 mangoRootBank, mangoNodeBank, mangoBankVault, signer);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.RedeemMango"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoCache"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="mangoPerpetualVault"></param>
-        /// <param name="mangoRootBank"></param>
-        /// <param name="mangoNodeBank"></param>
-        /// <param name="mangoBankVault"></param>
-        /// <param name="signer"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">the mango cache.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="mangoPerpetualVault">The mango perp vault.</param>
+        /// <param name="mangoRootBank">The mango token root bank.</param>
+        /// <param name="mangoNodeBank">The mango token node bank</param>
+        /// <param name="mangoBankVault">The mango token's node bank's vault.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction RedeemMango(PublicKey programIdKey, PublicKey mangoGroup, PublicKey mangoCache,
             PublicKey mangoAccount, PublicKey owner, PublicKey perpetualMarket, PublicKey mangoPerpetualVault,
             PublicKey mangoRootBank, PublicKey mangoNodeBank, PublicKey mangoBankVault, PublicKey signer)
@@ -929,26 +1016,26 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.AddMangoAccountInfo"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
-        public static TransactionInstruction AddMangoAccountInfo(PublicKey mangoGroup,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="info">The info to add to the account.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction AddMangoAccountInfo(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, string info) =>
-            AddMangoAccountInfo(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, info);
+            AddMangoAccountInfo(ProgramIdKey, mangoGroup, mangoAccount, owner, info);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.AddMangoAccountInfo"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="info"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="info">The info to add to the account.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction AddMangoAccountInfo(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, string info)
         {
@@ -967,32 +1054,32 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelAllPerpOrders"/> method.
         /// </summary>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="limit"></param>
-        /// <returns></returns>
-        public static TransactionInstruction CancelAllPerpOrders(PublicKey mangoGroup,
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="limit">The maximum number of orders to cancel.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction CancelAllPerpOrders(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey perpetualMarket, PublicKey bids, PublicKey asks,
-            byte limit) => CancelAllPerpOrders(ProgramIdKeyV3, mangoGroup, mangoAccount, owner, perpetualMarket, bids, asks, limit);
+            byte limit) => CancelAllPerpOrders(ProgramIdKey, mangoGroup, mangoAccount, owner, perpetualMarket, bids, asks, limit);
 
         /// <summary>
-        /// 
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelAllPerpOrders"/> method.
         /// </summary>
-        /// <param name="programIdKey"></param>
-        /// <param name="mangoGroup"></param>
-        /// <param name="mangoAccount"></param>
-        /// <param name="owner"></param>
-        /// <param name="perpetualMarket"></param>
-        /// <param name="bids"></param>
-        /// <param name="asks"></param>
-        /// <param name="limit"></param>
-        /// <returns></returns>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="limit">The maximum number of orders to cancel.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction CancelAllPerpOrders(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey perpetualMarket, PublicKey bids, PublicKey asks,
             byte limit)
@@ -1015,6 +1102,553 @@ namespace Solnet.Mango
         }
 
         /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.InitAdvancedOrders"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction InitAdvancedOrders(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders)
+            => InitAdvancedOrders(ProgramIdKey, mangoGroup, mangoAccount, owner, advancedOrders);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.InitAdvancedOrders"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction InitAdvancedOrders(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+                AccountMeta.Writable(advancedOrders, false),
+                AccountMeta.ReadOnly(SystemProgram.ProgramIdKey, false),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeInitAdvancedOrdersData()
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.AddPerpTriggerOrder"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpMarket">The perp market.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="orderType">The order type.</param>
+        /// <param name="side">The side of the order.</param>
+        /// <param name="price">The price.</param>
+        /// <param name="quantity">The quantity.</param>
+        /// <param name="triggerCondition">The trigger condition.</param>
+        /// <param name="triggerPrice">The trigger price.</param>
+        /// <param name="clientOrderId">The client order id.</param>
+        /// <param name="reduceOnly">Whether the order is reduce only or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction AddPerpTriggerOrder(PublicKey mangoGroup, PublicKey mangoAccount,
+            PublicKey owner, PublicKey advancedOrders, PublicKey mangoCache, PublicKey perpMarket,
+            List<PublicKey> openOrdersAccounts, PerpOrderType orderType, Side side, long price, long quantity,
+            TriggerCondition triggerCondition, long triggerPrice, ulong clientOrderId, bool reduceOnly = false)
+            => AddPerpTriggerOrder(ProgramIdKey, mangoGroup, mangoAccount, owner, advancedOrders, mangoCache,
+                perpMarket, openOrdersAccounts, orderType, side, price, quantity, triggerCondition, triggerPrice, clientOrderId, reduceOnly);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.AddPerpTriggerOrder"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpMarket">The perp market.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="orderType">The order type.</param>
+        /// <param name="side">The side of the order.</param>
+        /// <param name="price">The price.</param>
+        /// <param name="quantity">The quantity.</param>
+        /// <param name="triggerCondition">The trigger condition.</param>
+        /// <param name="triggerPrice">The trigger price.</param>
+        /// <param name="clientOrderId">The client order id.</param>
+        /// <param name="reduceOnly">Whether the order is reduce only or not.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction AddPerpTriggerOrder(PublicKey programIdKey, PublicKey mangoGroup, PublicKey mangoAccount,
+            PublicKey owner, PublicKey advancedOrders, PublicKey mangoCache, PublicKey perpMarket,
+            List<PublicKey> openOrdersAccounts, PerpOrderType orderType, Side side, long price, long quantity,
+            TriggerCondition triggerCondition, BigInteger triggerPrice, ulong clientOrderId, bool reduceOnly = false)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.ReadOnly(mangoAccount, false),
+                AccountMeta.Writable(owner, true),
+                AccountMeta.Writable(advancedOrders, false),
+                AccountMeta.ReadOnly(mangoCache, false),
+                AccountMeta.ReadOnly(perpMarket, false),
+                AccountMeta.ReadOnly(SystemProgram.ProgramIdKey, false)
+            };
+            keys.AddRange(openOrdersAccounts.Select(key => AccountMeta.ReadOnly(key, false)));
+
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeAddPerpTriggerOrderData(orderType, side, triggerCondition, reduceOnly, clientOrderId, price, quantity, triggerPrice)
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.RemoveAdvancedOrder"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <param name="orderIndex">The order index.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction RemoveAdvancedOrder(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders, byte orderIndex)
+            => RemoveAdvancedOrder(ProgramIdKey, mangoGroup, mangoAccount, owner, advancedOrders, orderIndex);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.RemoveAdvancedOrder"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <param name="orderIndex">The order index.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction RemoveAdvancedOrder(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders, byte orderIndex)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.ReadOnly(mangoAccount, false),
+                AccountMeta.Writable(owner, true),
+                AccountMeta.Writable(advancedOrders, false),
+                AccountMeta.ReadOnly(SystemProgram.ProgramIdKey, false)
+            };
+
+            return new TransactionInstruction()
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeRemoveAdvancedOrderData(orderIndex)
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.ExecutePerpTriggerOrder"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <param name="agent">The agent.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="eventQueue">The perp market event queue.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="orderIndex">The order index.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction ExecutePerpTriggerOrder(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey advancedOrders, PublicKey agent, PublicKey mangoCache, PublicKey perpMarket,
+            PublicKey bids, PublicKey asks, PublicKey eventQueue, List<PublicKey> openOrdersAccounts, byte orderIndex)
+            => ExecutePerpTriggerOrder(ProgramIdKey, mangoGroup, mangoAccount, advancedOrders, agent, mangoCache, perpMarket,
+                bids, asks, eventQueue, openOrdersAccounts, orderIndex);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.ExecutePerpTriggerOrder"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <param name="agent">The agent.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="eventQueue">The perp market event queue.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="orderIndex">The order index.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction ExecutePerpTriggerOrder(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey advancedOrders, PublicKey agent, PublicKey mangoCache, PublicKey perpMarket,
+            PublicKey bids, PublicKey asks, PublicKey eventQueue, List<PublicKey> openOrdersAccounts, byte orderIndex)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.Writable(advancedOrders, false),
+                AccountMeta.Writable(agent, true),
+                AccountMeta.ReadOnly(mangoCache, false),
+                AccountMeta.Writable(perpMarket, false),
+                AccountMeta.Writable(bids, false),
+                AccountMeta.Writable(asks, false),
+                AccountMeta.Writable(eventQueue, false),
+            };
+            keys.AddRange(openOrdersAccounts.Select(x => AccountMeta.ReadOnly(x, false)));
+
+            return new TransactionInstruction()
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeExecutePerpTriggerOrderData(orderIndex)
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CloseMangoAccount"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction CloseMangoAccount(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner)
+            => CloseMangoAccount(ProgramIdKey, mangoGroup, mangoAccount, owner);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CloseMangoAccount"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction CloseMangoAccount(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.Writable(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.Writable(owner, true),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCloseMangoAccountData()
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CloseAdvancedOrders"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction CloseAdvancedOrders(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders)
+            => CloseAdvancedOrders(ProgramIdKey, mangoGroup, mangoAccount, owner, advancedOrders);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CloseAdvancedOrders"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="advancedOrders">The advanced orders account.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction CloseAdvancedOrders(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey advancedOrders)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.Writable(owner, true),
+                AccountMeta.Writable(advancedOrders, false),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCloseAdvancedOrdersData()
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CloseSpotOpenOrders"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="openOrdersAccount">The open orders account.</param>
+        /// <param name="spotMarket">The spot market.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction CloseSpotOpenOrders(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey openOrdersAccount, PublicKey spotMarket,
+            PublicKey signer)
+            => CloseSpotOpenOrders(ProgramIdKey, mangoGroup, mangoAccount, owner, _dexProgramIdKey, openOrdersAccount, spotMarket, signer);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CloseSpotOpenOrders"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="dexProgramIdKey">The serum dex program id key.</param>
+        /// <param name="openOrdersAccount">The open orders account.</param>
+        /// <param name="spotMarket">The spot market.</param>
+        /// <param name="signer">The mango group signer.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction CloseSpotOpenOrders(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey dexProgramIdKey, PublicKey openOrdersAccount, PublicKey spotMarket,
+            PublicKey signer)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.Writable(owner, true),
+                AccountMeta.ReadOnly(dexProgramIdKey, false),
+                AccountMeta.Writable(openOrdersAccount, false),
+                AccountMeta.ReadOnly(spotMarket, false),
+                AccountMeta.ReadOnly(signer, false)
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCloseSpotOpenOrdersData()
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelPerpOrdersSide"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="perpMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="side">The order side.</param>
+        /// <param name="limit">The maximum number of orders to close.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction CancelPerpOrdersSide(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey perpMarket, PublicKey bids,
+            PublicKey asks, Side side, byte limit)
+            => CancelPerpOrdersSide(ProgramIdKey, mangoGroup, mangoAccount, owner, perpMarket, bids, asks, side, limit);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelPerpOrdersSide"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="perpMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="side">The order side.</param>
+        /// <param name="limit">The maximum number of orders to close.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction CancelPerpOrdersSide(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey perpMarket, PublicKey bids,
+            PublicKey asks, Side side, byte limit)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+                AccountMeta.Writable(perpMarket, false),
+                AccountMeta.Writable(bids, false),
+                AccountMeta.Writable(asks, false),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCancelPerpOrdersSideData(side, limit)
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CreateMangoAccount"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="accountNum">The account number for the PDA seeds.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction CreateMangoAccount(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, ulong accountNum)
+            => CreateMangoAccount(ProgramIdKey, mangoGroup, mangoAccount, owner, accountNum);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CreateMangoAccount"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="accountNum">The account number for the PDA seeds.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction CreateMangoAccount(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, ulong accountNum)
+        {
+
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.Writable(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+                AccountMeta.ReadOnly(SystemProgram.ProgramIdKey, false)
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCreateMangoAccountData(accountNum)
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.UpgradeMangoAccountV0V1"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction UpgradeMangoAccountV0V1(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner)
+            => UpgradeMangoAccountV0V1(ProgramIdKey, mangoGroup, mangoAccount, owner);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.UpgradeMangoAccountV0V1"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction UpgradeMangoAccountV0V1(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner)
+        {
+
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.Writable(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeUpgradeMangoAccountV0V1Data()
+            };
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SetDelegate"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="delegateAccount">The delegate account.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction SetDelegate(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey delegateAccount)
+            => SetDelegate(ProgramIdKey, mangoGroup, mangoAccount, owner, delegateAccount);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SetDelegate"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="delegateAccount">The delegate account.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction SetDelegate(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey delegateAccount)
+        {
+
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+                AccountMeta.ReadOnly(delegateAccount, false)
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeSetDelegateData()
+            };
+        }
+
+        /// <summary>
+        /// Derives the <see cref="PublicKey"/> of an <see cref="AdvancedOrdersAccount"/>.
+        /// </summary>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
+        public PublicKey DeriveAdvancedOrdersAccountAddress(PublicKey mangoAccount)
+        {
+            if (ProgramIdKey == MainNetProgramIdKeyV3)
+            {
+                return MangoUtils.DeriveAdvancedOrdersAccountAddress(ProgramIdKey, mangoAccount);
+            }
+            else if (ProgramIdKey == DevNetProgramIdKeyV3)
+            {
+                return MangoUtils.DeriveAdvancedOrdersAccountAddress(ProgramIdKey, mangoAccount);
+            }
+
+            return MangoUtils.DeriveAdvancedOrdersAccountAddress(ProgramIdKey, mangoAccount);
+        }
+
+        /// <summary>
+        /// Derives the <see cref="PublicKey"/> of a <see cref="MangoAccount"/> of <see cref="MetaData.Version"/> 1.
+        /// </summary>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="accountNumber">The account number.</param>
+        /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
+        public PublicKey DeriveMangoAccountAddress(PublicKey owner, ulong accountNumber)
+        {
+            if(ProgramIdKey == MainNetProgramIdKeyV3)
+            {
+                return MangoUtils.DeriveMangoAccountAddress(ProgramIdKey, Constants.MangoGroup, owner, accountNumber);
+            } else if(ProgramIdKey == DevNetProgramIdKeyV3)
+            {
+                return MangoUtils.DeriveMangoAccountAddress(ProgramIdKey, Constants.DevNetMangoGroup, owner, accountNumber);
+            }
+
+            return MangoUtils.DeriveMangoAccountAddress(ProgramIdKey, Constants.MangoGroup, owner, accountNumber);
+        }
+
+        /// <summary>
         /// Decodes an instruction created by the System Program.
         /// </summary>
         /// <param name="data">The instruction data to decode.</param>
@@ -1030,9 +1664,9 @@ namespace Solnet.Mango
 
             DecodedInstruction decodedInstruction = new()
             {
-                PublicKey = ProgramIdKeyV3,
+                PublicKey = DevNetProgramIdKeyV3,
                 InstructionName = MangoProgramInstructions.Names[instructionValue],
-                ProgramName = ProgramName,
+                ProgramName = DefaultProgramName,
                 Values = new Dictionary<string, object>(),
                 InnerInstructions = new List<DecodedInstruction>()
             };
@@ -1051,6 +1685,9 @@ namespace Solnet.Mango
                 case MangoProgramInstructions.Values.PlaceSpotOrder:
                     MangoProgramData.DecodePlaceSpotOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
+                case MangoProgramInstructions.Values.PlaceSpotOrder2:
+                    MangoProgramData.DecodePlaceSpotOrder2Data(decodedInstruction, data, keys, keyIndices);
+                    break;
                 case MangoProgramInstructions.Values.PlacePerpOrder:
                     MangoProgramData.DecodePlacePerpOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
@@ -1062,6 +1699,9 @@ namespace Solnet.Mango
                     break;
                 case MangoProgramInstructions.Values.SettleFunds:
                     MangoProgramData.DecodeSettleFundsData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.SettleFees:
+                    MangoProgramData.DecodeSettleFeesData(decodedInstruction, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CancelSpotOrder:
                     MangoProgramData.DecodeCancelSpotOrderData(decodedInstruction, data, keys, keyIndices);
@@ -1080,6 +1720,39 @@ namespace Solnet.Mango
                     break;
                 case MangoProgramInstructions.Values.CancelAllPerpOrders:
                     MangoProgramData.DecodeCancelAllPerpOrdersData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.InitAdvancedOrders:
+                    MangoProgramData.DecodeInitAdvancedOrdersData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.AddPerpTriggerOrder:
+                    MangoProgramData.DecodeAddPerpTriggerOrderData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.RemoveAdvancedOrder:
+                    MangoProgramData.DecodeRemoveAdvancedOrderData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.ExecutePerpTriggerOrder:
+                    MangoProgramData.DecodeExecutePerpTriggerOrderData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CloseAdvancedOrders:
+                    MangoProgramData.DecodeCloseAdvancedOrdersData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CloseMangoAccount:
+                    MangoProgramData.DecodeCloseMangoAccountData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CloseSpotOpenOrders:
+                    MangoProgramData.DecodeCloseSpotOpenOrdersData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CreateMangoAccount:
+                    MangoProgramData.DecodeCreateMangoAccountData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.UpgradeMangoAccountV0V1:
+                    MangoProgramData.DecodeUpgradeMangoAccountV0V1Data(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CancelPerpOrdersSide:
+                    MangoProgramData.DecodeCancelPerpOrdersSideData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.SetDelegate:
+                    MangoProgramData.DecodeSetDelegateData(decodedInstruction, keys, keyIndices);
                     break;
             }
 

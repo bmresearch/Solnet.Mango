@@ -22,6 +22,7 @@ namespace Solnet.Mango
             { Values.Deposit, "Deposit" },
             { Values.Withdraw, "Withdraw" },
             { Values.PlaceSpotOrder, "Place Spot Order" },
+            { Values.PlaceSpotOrder2, "Place Spot Order2" },
             { Values.PlacePerpOrder, "Place Perp Order" },
             { Values.CancelPerpOrderByClientId, "Cancel Perp Order By Client Id" },
             { Values.CancelPerpOrder, "Cancel Perp Order" },
@@ -29,7 +30,6 @@ namespace Solnet.Mango
             { Values.SettleFunds, "Settle Funds" },
             { Values.CancelSpotOrder, "Cancel Spot Order" },
             { Values.SettleProfitAndLoss, "Settle Profit & Loss" },
-            { Values.SettleBorrow, "Settle Borrow" },
             { Values.SettleFees, "Settle Fees" },
             { Values.InitSpotOpenOrders, "Initialize Spot Open Orders Account" },
             { Values.RedeemMango, "Redeem Mango" },
@@ -37,6 +37,17 @@ namespace Solnet.Mango
             { Values.DepositMegaSerum, "Deposit MegaSerum" },
             { Values.WithdrawMegaSerum, "Withdraw MegaSerum" },
             { Values.CancelAllPerpOrders, "Cancel All Perp Orders" },
+            { Values.InitAdvancedOrders, "Initialize Advanced Orders Account" },
+            { Values.AddPerpTriggerOrder, "Add Perp Trigger Order"},
+            { Values.RemoveAdvancedOrder, "Remove Advanced Order" },
+            { Values.ExecutePerpTriggerOrder, "Execute Perp Trigger Order" },
+            { Values.CloseMangoAccount, "Close Mango Account" },
+            { Values.CloseSpotOpenOrders, "Close Spot Open Orders Account" },
+            { Values.CloseAdvancedOrders, "Close Advanced Orders" },
+            { Values.CreateMangoAccount, "Create Mango Account" },
+            { Values.UpgradeMangoAccountV0V1, "Upgrade Mango Account V0V1" },
+            { Values.CancelPerpOrdersSide, "Cancel Perp Orders Side" },
+            { Values.SetDelegate, "Set Delegate"}
         };
 
         /// <summary>
@@ -100,11 +111,6 @@ namespace Solnet.Mango
             SettleProfitAndLoss = 22,
 
             /// <summary>
-            /// Uses this token's position and deposits to reduce borrows.
-            /// </summary>
-            SettleBorrow = 23,
-
-            /// <summary>
             /// Take an account that has losses in the selected perp market to account for fees accrued.
             /// </summary>
             SettleFees = 29,
@@ -144,9 +150,64 @@ namespace Solnet.Mango
             CancelAllPerpOrders = 39,
             
             /// <summary>
-            /// Cancel spot order v2
+            /// Place spot order v2
             /// </summary>
             PlaceSpotOrder2 = 41,
+
+            /// <summary>
+            /// Initialize the advanced orders account.
+            /// </summary>
+            InitAdvancedOrders = 42,
+
+            /// <summary>
+            /// Add a perp trigger order.
+            /// </summary>
+            AddPerpTriggerOrder = 43,
+
+            /// <summary>
+            /// Remove an advanced order.
+            /// </summary>
+            RemoveAdvancedOrder = 44,
+
+            /// <summary>
+            /// Execute the perp trigger order.
+            /// </summary>
+            ExecutePerpTriggerOrder = 45,
+
+            /// <summary>
+            /// Closes the mango account.
+            /// </summary>
+            CloseMangoAccount = 50,
+
+            /// <summary>
+            /// Closes a spot open orders account.
+            /// </summary>
+            CloseSpotOpenOrders = 51,
+            
+            /// <summary>
+            /// Closes the advanced orders account.
+            /// </summary>
+            CloseAdvancedOrders = 52,
+
+            /// <summary>
+            /// Creates a mango account using PDAs.
+            /// </summary>
+            CreateMangoAccount = 55,
+            
+            /// <summary>
+            /// Upgrades a mango account from v0 to v1.
+            /// </summary>
+            UpgradeMangoAccountV0V1 = 56,
+
+            /// <summary>
+            /// Cancels all perp orders on the specified side.
+            /// </summary>
+            CancelPerpOrdersSide = 57,
+
+            /// <summary>
+            /// Set an alternative authority/signer for mango account transactions.
+            /// </summary>
+            SetDelegate = 58,
         };
     }
 }
