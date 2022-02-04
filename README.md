@@ -75,7 +75,8 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
 The [Solnet.Mango.Examples](https://github.com/bmresearch/Solnet.Mango/tree/master/Solnet.Mango.Examples) project features some examples on how to use the [IMangoClient](https://github.com/bmresearch/Solnet.Mango/tree/master/Solnet.Mango/IMangoClient.cs), these examples include:
 - Getting all mango accounts owned by a specific address
 - Streaming market data and various structures
-- Submitting orders
+- Submitting orders (spot, perps)
+- Cancelling orders (spot, perps)
 - Creating new mango accounts
 
 ## Contribution
