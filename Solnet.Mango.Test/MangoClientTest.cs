@@ -7,8 +7,11 @@ using Solnet.Rpc.Core.Http;
 using Solnet.Rpc.Messages;
 using Solnet.Rpc.Models;
 using Solnet.Rpc.Types;
+using Solnet.Wallet;
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Text.Json;
@@ -25,6 +28,20 @@ namespace Solnet.Mango.Test
             Converters = { new JsonStringEnumConverter(JsonNamingPolicy.CamelCase) }
         };
 
+        private Queue<string> ResponseQueue;
+
+        [TestInitialize]
+        public void SetupTest()
+        {
+            ResponseQueue = new Queue<string>();
+        }
+
+        private void EnqueueResponseFromFile(string pathToFile)
+        {
+            string data = File.ReadAllText(pathToFile);
+            ResponseQueue.Enqueue(data);
+        }
+
         /// <summary>
         /// Setup the JSON RPC test with the request and response data.
         /// </summary>
@@ -35,7 +52,7 @@ namespace Solnet.Mango.Test
         private static Mock<IRpcClient> SetupGetAccountInfo(string responseContent, string address, string network,
             Commitment commitment = Commitment.Finalized)
         {
-            var rpcMock = new Mock<IRpcClient>(MockBehavior.Strict) { };
+            var rpcMock = new Mock<IRpcClient>(MockBehavior.Loose) { };
             rpcMock
                 .Setup(s => s.NodeAddress)
                 .Returns(new Uri(network))
@@ -57,6 +74,60 @@ namespace Solnet.Mango.Test
                     return res;
                 })
                 .Verifiable();
+            return rpcMock;
+        }
+
+        /// <summary>
+        /// Setup the JSON RPC test with the request and response data.
+        /// </summary>
+        /// <param name="responseContent">The response content.</param>
+        /// <param name="address">The address parameter for <c>GetAccountInfo</c>.</param>
+        /// <param name="commitment">The commitment parameter for the <c>GetAccountInfo</c>.</param>
+        /// <param name="network">The network address for the <c>GetAccountInfo</c> request.</param>
+        private static Mock<IRpcClient> SetupGetMultipleAccounts(Mock<IRpcClient> rpcMock, string responseContent, List<PublicKey> addresses, 
+            Commitment commitment = Commitment.Finalized)
+        {
+            rpcMock.Setup(s => s.GetMultipleAccountsAsync(
+               It.Is<List<string>>(s => addresses.TrueForAll(x => s.Contains(x))),
+               It.Is<Commitment>(c => c == commitment)))
+            .ReturnsAsync(() =>
+            {
+                var res = new RequestResult<ResponseValue<List<AccountInfo>>>(
+                        new HttpResponseMessage(HttpStatusCode.OK),
+                        JsonSerializer.Deserialize<ResponseValue<List<AccountInfo>>>(responseContent, JsonSerializerOptions))
+                    {
+                        WasRequestSuccessfullyHandled = true
+                    };
+                return res;
+            })
+            .Verifiable();
+            return rpcMock;
+        }
+
+        /// <summary>
+        /// Setup the JSON RPC test with the request and response data.
+        /// </summary>
+        /// <param name="responseContent">The response content.</param>
+        /// <param name="address">The address parameter for <c>GetAccountInfo</c>.</param>
+        /// <param name="commitment">The commitment parameter for the <c>GetAccountInfo</c>.</param>
+        /// <param name="network">The network address for the <c>GetAccountInfo</c> request.</param>
+        private Mock<IRpcClient> SetupGetMultipleAccountsFromQueue(Mock<IRpcClient> rpcMock, List<PublicKey> addresses,
+            Commitment commitment = Commitment.Finalized)
+        {
+            rpcMock.Setup(s => s.GetMultipleAccountsAsync(
+               It.Is<List<string>>(s => addresses.TrueForAll(x => s.Contains(x))),
+               It.Is<Commitment>(c => c == commitment)))
+            .ReturnsAsync(() =>
+            {
+                var res = new RequestResult<ResponseValue<List<AccountInfo>>>(
+                        new HttpResponseMessage(HttpStatusCode.OK),
+                        JsonSerializer.Deserialize<ResponseValue<List<AccountInfo>>>(ResponseQueue.Dequeue(), JsonSerializerOptions))
+                {
+                    WasRequestSuccessfullyHandled = true
+                };
+                return res;
+            })
+            .Verifiable();
             return rpcMock;
         }
 
@@ -95,6 +166,57 @@ namespace Solnet.Mango.Test
         }
 
         [TestMethod]
+        public void GetMangoGroupAndLoadRootBanks()
+        {
+            string response = File.ReadAllText("Resources/MangoClient/GetMangoGroupAccountInfo.json");
+            var rpc = SetupGetAccountInfo(response, Constants.DevNetMangoGroup, "https://api.devnet.solana.com");
+
+            var mangoClient = ClientFactory.GetClient(rpc.Object);
+
+            var mangoGroup = mangoClient.GetMangoGroup(Constants.DevNetMangoGroup);
+
+            Assert.IsNotNull(mangoGroup.ParsedResult);
+            Assert.IsTrue(mangoGroup.ParsedResult.Metadata.IsInitialized);
+            Assert.AreEqual(DataType.MangoGroup, mangoGroup.ParsedResult.Metadata.DataType);
+
+            // response to get multiple accounts to load root banks
+            string openOrdersResponse = File.ReadAllText("Resources/MangoClient/LoadRootBanksGetMultiple.json");
+            // queue responses to get multiple accounts which load the node banks for each root bank
+            EnqueueResponseFromFile("Resources/MangoClient/LoadRootBanksGetMultipleNodeBank1.json");
+            EnqueueResponseFromFile("Resources/MangoClient/LoadRootBanksGetMultipleNodeBank2.json");
+            EnqueueResponseFromFile("Resources/MangoClient/LoadRootBanksGetMultipleNodeBank3.json");
+            EnqueueResponseFromFile("Resources/MangoClient/LoadRootBanksGetMultipleNodeBank4.json");
+            EnqueueResponseFromFile("Resources/MangoClient/LoadRootBanksGetMultipleNodeBank5.json");
+            EnqueueResponseFromFile("Resources/MangoClient/LoadRootBanksGetMultipleNodeBank6.json");
+            EnqueueResponseFromFile("Resources/MangoClient/LoadRootBanksGetMultipleNodeBank7.json");
+            EnqueueResponseFromFile("Resources/MangoClient/LoadRootBanksGetMultipleNodeBank8.json");
+            EnqueueResponseFromFile("Resources/MangoClient/LoadRootBanksGetMultipleNodeBank9.json");
+
+            var filteredRootBanks = mangoGroup.ParsedResult.Tokens
+                .Where(x => !x.RootBank.Equals(SystemProgram.ProgramIdKey))
+                .Select(x => x.RootBank).ToList();
+
+            // setup call to get multiple accounts to load root banks
+            SetupGetMultipleAccounts(rpc, openOrdersResponse, filteredRootBanks);
+            // setup calls to get multiple accounts to the node banks for each root bank
+            SetupGetMultipleAccountsFromQueue(rpc, new List<PublicKey>() { new("6rkPNJTXF37X6Pf5ct5Y6E91PozpZpZNNU1AGATomKjD") });
+            SetupGetMultipleAccountsFromQueue(rpc, new List<PublicKey>() { new("4X3nP921qyh6BKJSAohKGNCykSXahFFwg1LxtC993Fai") });
+            SetupGetMultipleAccountsFromQueue(rpc, new List<PublicKey>() { new("3FPjawEtvrwvwtAetaURTbkkucu9BJofxWZUNPGHJtHg") });
+            SetupGetMultipleAccountsFromQueue(rpc, new List<PublicKey>() { new("7mYqCavd1K24fnL3oKTpX3YM66W5gfikmVHJWM3nrWKe") });
+            SetupGetMultipleAccountsFromQueue(rpc, new List<PublicKey>() { new("9wkpWmkSUSn9fitLhVh12cLbiDa5Bbhf6ZBGmPtcdMqN") });
+            SetupGetMultipleAccountsFromQueue(rpc, new List<PublicKey>() { new("JBHBTED3ttzk5u3U24txdjBFadm4Dnohb7g2pwcxU4rx") });
+            SetupGetMultipleAccountsFromQueue(rpc, new List<PublicKey>() { new("ERkKh9yUKzJ3kkHWhMNd3xGaync11TpzQiDFukEatHEQ") });
+            SetupGetMultipleAccountsFromQueue(rpc, new List<PublicKey>() { new("2k89sUjCE2ZSm4MPhXM9JV1zFEV2SjgEzvvJN6EsMFWa") });
+            SetupGetMultipleAccountsFromQueue(rpc, new List<PublicKey>() { new("J2Lmnc1e4frMnBEJARPoHtfpcohLfN67HdK1inXjTFSM") });
+
+            var res = mangoGroup.ParsedResult.LoadRootBanks(rpc.Object);
+
+            Assert.IsTrue(res.WasSuccessful);
+            Assert.AreEqual(16, mangoGroup.ParsedResult.RootBankAccounts.Count);
+            Assert.IsNotNull(mangoGroup.ParsedResult.RootBankAccounts[3]);
+        }
+
+        [TestMethod]
         public void GetMangoCache()
         {
             string response = File.ReadAllText("Resources/MangoClient/GetMangoCacheAccountInfo.json");
@@ -106,7 +228,10 @@ namespace Solnet.Mango.Test
 
             Assert.IsNotNull(mangoCache.ParsedResult);
             Assert.IsTrue(mangoCache.ParsedResult.Metadata.IsInitialized);
-            Assert.AreEqual(DataType.MangoCache, mangoCache.ParsedResult.Metadata.DataType); // finish test once merged due to incorrect decoding
+            Assert.AreEqual(DataType.MangoCache, mangoCache.ParsedResult.Metadata.DataType);
+            Assert.AreEqual(15, mangoCache.ParsedResult.PerpetualMarketCaches.Count);
+            Assert.AreEqual(15, mangoCache.ParsedResult.PriceCaches.Count);
+            Assert.AreEqual(16, mangoCache.ParsedResult.RootBankCaches.Count);
         }
 
         [TestMethod]
@@ -145,6 +270,31 @@ namespace Solnet.Mango.Test
         }
 
         [TestMethod]
+        public void GetMangoAccountAndLoadOpenOrders()
+        {
+            string response = File.ReadAllText("Resources/MangoClient/GetMangoAccountAccountInfo.json");
+            var rpc = SetupGetAccountInfo(response, "BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", "https://api.devnet.solana.com");
+
+            var mangoClient = ClientFactory.GetClient(rpc.Object);
+
+            var mangoAccount = mangoClient.GetMangoAccount("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s");
+
+            Assert.IsNotNull(mangoAccount.ParsedResult);
+            Assert.IsTrue(mangoAccount.ParsedResult.Metadata.IsInitialized);
+            Assert.AreEqual(DataType.MangoAccount, mangoAccount.ParsedResult.Metadata.DataType);
+
+            string openOrdersResponse = File.ReadAllText("Resources/MangoClient/LoadOpenOrdersGetMultiple.json");
+            var filteredOpenOrders = mangoAccount.ParsedResult.SpotOpenOrders.Where(x => !x.Equals(SystemProgram.ProgramIdKey)).ToList();
+            SetupGetMultipleAccounts(rpc, openOrdersResponse, filteredOpenOrders);
+
+            var res = mangoAccount.ParsedResult.LoadOpenOrdersAccounts(rpc.Object);
+
+            Assert.IsTrue(res.WasSuccessful);
+            Assert.AreEqual(15, mangoAccount.ParsedResult.OpenOrdersAccounts.Count);
+            Assert.IsNotNull(mangoAccount.ParsedResult.OpenOrdersAccounts[3]);
+        }
+
+        [TestMethod]
         public void GetAdvancedOrdersAccount()
         {
             string response = File.ReadAllText("Resources/MangoClient/GetAdvancedOrdersAccountAccountInfo.json");
@@ -158,6 +308,47 @@ namespace Solnet.Mango.Test
             Assert.IsTrue(advancedOrders.ParsedResult.Metadata.IsInitialized);
             Assert.AreEqual(DataType.AdvancedOrders, advancedOrders.ParsedResult.Metadata.DataType);
             Assert.AreEqual(0, advancedOrders.ParsedResult.AdvancedOrders.Count);
+        }
+
+        [TestMethod]
+        public void GetRootBank()
+        {
+            string response = File.ReadAllText("Resources/MangoClient/GetRootBankAccountInfo.json");
+            var rpc = SetupGetAccountInfo(response, "CY4nMV9huW5KCYFxWChrmoLwGCsZiXoiREeo2PMrBm5o", "https://api.devnet.solana.com");
+
+            var mangoClient = ClientFactory.GetClient(rpc.Object);
+
+            var rootBank = mangoClient.GetRootBank("CY4nMV9huW5KCYFxWChrmoLwGCsZiXoiREeo2PMrBm5o");
+
+            Assert.IsNotNull(rootBank.ParsedResult);
+            Assert.IsTrue(rootBank.ParsedResult.Metadata.IsInitialized);
+            Assert.AreEqual(DataType.RootBank, rootBank.ParsedResult.Metadata.DataType);
+            Assert.AreEqual(1017392.0746093992799856664533m, rootBank.ParsedResult.BorrowIndex.ToDecimal());
+            Assert.AreEqual(1013740.4744292109689389747018m, rootBank.ParsedResult.DepositIndex.ToDecimal());
+            Assert.AreEqual(0.0599999999999987210230756318m, rootBank.ParsedResult.OptimalRate.ToDecimal());
+            Assert.AreEqual(0.6999999999999992894572642399m, rootBank.ParsedResult.OptimalUtilization.ToDecimal());
+            Assert.AreEqual(1.5m, rootBank.ParsedResult.MaxRate.ToDecimal());
+            Assert.AreEqual(1UL, rootBank.ParsedResult.NumNodeBanks);
+            Assert.AreEqual(7, rootBank.ParsedResult.NodeBanks.Count);
+            Assert.AreEqual(0, rootBank.ParsedResult.NodeBankAccounts.Count);
+        }
+
+        [TestMethod]
+        public void GetNodeBank()
+        {
+            string response = File.ReadAllText("Resources/MangoClient/GetNodeBankAccountInfo.json");
+            var rpc = SetupGetAccountInfo(response, "6rkPNJTXF37X6Pf5ct5Y6E91PozpZpZNNU1AGATomKjD", "https://api.devnet.solana.com");
+
+            var mangoClient = ClientFactory.GetClient(rpc.Object);
+
+            var nodeBank = mangoClient.GetNodeBank("6rkPNJTXF37X6Pf5ct5Y6E91PozpZpZNNU1AGATomKjD");
+
+            Assert.IsNotNull(nodeBank.ParsedResult);
+            Assert.IsTrue(nodeBank.ParsedResult.Metadata.IsInitialized);
+            Assert.AreEqual(DataType.NodeBank, nodeBank.ParsedResult.Metadata.DataType);
+            Assert.AreEqual(254049.62161569644917236132642m, nodeBank.ParsedResult.Borrows.ToDecimal());
+            Assert.AreEqual(337344.10233830148964528916622m, nodeBank.ParsedResult.Deposits.ToDecimal());
+            Assert.AreEqual("79Rz9FwjTYSGMbpPBbQMT6kEmqhuGvhqpCPEoALJGmsb", nodeBank.ParsedResult.Vault);
         }
     }
 }

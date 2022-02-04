@@ -175,6 +175,8 @@ namespace Solnet.Mango.Models.Events
         /// <returns>The <see cref="FillEvent"/> structure.</returns>
         public static FillEvent Deserialize(ReadOnlySpan<byte> data)
         {
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
             return new FillEvent
             {
                 EventType = (EventType)Enum.Parse(typeof(EventType), data.GetU8(Layout.EventTypeOffset).ToString()),

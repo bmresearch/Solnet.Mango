@@ -1,4 +1,5 @@
-﻿using Solnet.Serum.Models;
+﻿using Solnet.Mango.Types;
+using Solnet.Serum.Models;
 
 namespace Solnet.Mango.Models
 {
@@ -10,22 +11,22 @@ namespace Solnet.Mango.Models
         /// <summary>
         /// The spot asset weight.
         /// </summary>
-        public double SpotAssetWeight;
+        public I80F48 SpotAssetWeight;
 
         /// <summary>
         /// The spot liability weight.
         /// </summary>
-        public double SpotLiabilityWeight;
+        public I80F48 SpotLiabilityWeight;
 
         /// <summary>
         /// The perpetual asset weight.
         /// </summary>
-        public double PerpAssetWeight;
+        public I80F48 PerpAssetWeight;
 
         /// <summary>
         /// The perpetual liability weight.
         /// </summary>
-        public double PerpLiabilityWeight;
+        public I80F48 PerpLiabilityWeight;
     }
 
     /// <summary>
@@ -36,27 +37,27 @@ namespace Solnet.Mango.Models
         /// <summary>
         /// Maximum leverage.
         /// </summary>
-        public double Maximum;
+        public I80F48 Maximum;
 
         /// <summary>
         /// The amount of deposits formatted.
         /// </summary>
-        public double UiDeposit;
+        public I80F48 UiDeposit;
 
         /// <summary>
         /// The amount of deposits.
         /// </summary>
-        public double Deposits;
+        public I80F48 Deposits;
 
         /// <summary>
         /// The amount of borrows formatted.
         /// </summary>
-        public double UiBorrow;
+        public I80F48 UiBorrow;
 
         /// <summary>
         /// The amount of borrows.
         /// </summary>
-        public double Borrows;
+        public I80F48 Borrows;
     }
 
     /// <summary>
@@ -67,21 +68,21 @@ namespace Solnet.Mango.Models
         /// <summary>
         /// The quote free.
         /// </summary>
-        public double QuoteFree;
+        public I80F48 QuoteFree;
 
         /// <summary>
         /// The quote locked.
         /// </summary>
-        public double QuoteLocked;
+        public I80F48 QuoteLocked;
 
         /// <summary>
         /// The base free.
         /// </summary>
-        public double BaseFree;
+        public I80F48 BaseFree;
 
         /// <summary>
         /// The base locked.
         /// </summary>
-        public double BaseLocked;
+        public I80F48 BaseLocked;
     }
 }

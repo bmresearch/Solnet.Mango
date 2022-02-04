@@ -38,34 +38,41 @@ namespace Solnet.Mango.Examples
                 Console.WriteLine(
                     $"Account: {mangoAccounts.OriginalRequest.Result[i].PublicKey} Owner: {mangoAccounts.ParsedResult[i].Owner}");
                 mangoAccounts.ParsedResult[i].LoadOpenOrdersAccounts(RpcClient);
-                for (int token = 0; token < mangoGroup.ParsedResult.Tokens.Count; token++)
-                {
-                    if (mangoGroup.ParsedResult.Tokens[token].RootBank.Key == SystemProgram.ProgramIdKey.Key) continue;
-                    Console.WriteLine(
-                        $"Token: {mangoGroup.ParsedResult.Tokens[token].Mint}\t" +
-                        $"Deposits: {mangoAccounts.ParsedResult[i].GetUiDeposit(mangoGroup.ParsedResult.RootBankAccounts[token], mangoGroup.ParsedResult, token):N6}\t" +
-                        $"Borrows: {mangoAccounts.ParsedResult[i].GetUiBorrow(mangoGroup.ParsedResult.RootBankAccounts[token], mangoGroup.ParsedResult, token):N6}\t" +
-                        $"MaxWithBorrow: {mangoAccounts.ParsedResult[i].GetMaxWithBorrowForToken(mangoGroup.ParsedResult, mangoCache, token):N6}\t" +
-                        $"Net: {mangoAccounts.ParsedResult[i].GetUiNet(mangoCache.RootBankCaches[token], mangoGroup.ParsedResult, token):N6}\t");
-                }
-
-                Console.WriteLine(
-                    $"Account Equity: {mangoAccounts.ParsedResult[i].GetEquity(mangoGroup.ParsedResult, mangoCache):N6}\n" +
-                    $"Account Maintenance Health Ratio: {mangoAccounts.ParsedResult[i].GetHealthRatio(mangoGroup.ParsedResult, mangoCache, HealthType.Maintenance):N6}\n" +
-                    $"Account Maintenance Health: {mangoAccounts.ParsedResult[i].GetHealth(mangoGroup.ParsedResult, mangoCache, HealthType.Maintenance):N6}\n" +
-                    $"Account Initialization Health: {mangoAccounts.ParsedResult[i].GetHealth(mangoGroup.ParsedResult, mangoCache, HealthType.Initialization):N6}\n" +
-                    $"Account Maintenance Health Ratio: {mangoAccounts.ParsedResult[i].GetHealthRatio(mangoGroup.ParsedResult, mangoCache, HealthType.Maintenance):N6}\n" +
-                    $"Account Initialization Health Ratio: {mangoAccounts.ParsedResult[i].GetHealthRatio(mangoGroup.ParsedResult, mangoCache, HealthType.Initialization):N6}\n" +
-                    $"Leverage: {mangoAccounts.ParsedResult[i].GetLeverage(mangoGroup.ParsedResult, mangoCache):N6}\n" +
-                    $"Assets Value: {mangoAccounts.ParsedResult[i].GetAssetsValue(mangoGroup.ParsedResult, mangoCache):N6}\n" +
-                    $"Liabilities Value: {mangoAccounts.ParsedResult[i].GetLiabilitiesValue(mangoGroup.ParsedResult, mangoCache):N6}\n" +
-                    $"Assets Maintenance Value: {mangoAccounts.ParsedResult[i].GetAssetsValue(mangoGroup.ParsedResult, mangoCache, HealthType.Maintenance):N6}\n" +
-                    $"Liabilities Maintenance Value: {mangoAccounts.ParsedResult[i].GetLiabilitiesValue(mangoGroup.ParsedResult, mangoCache, HealthType.Maintenance):N6}\n" +
-                    $"Assets Initialization Value: {mangoAccounts.ParsedResult[i].GetAssetsValue(mangoGroup.ParsedResult, mangoCache, HealthType.Initialization):N6}\n" +
-                    $"Liabilities Initialization Value: {mangoAccounts.ParsedResult[i].GetLiabilitiesValue(mangoGroup.ParsedResult, mangoCache, HealthType.Initialization):N6}\n");
+                LogAccountStatus(mangoGroup.ParsedResult, mangoCache, mangoAccounts.ParsedResult[i]);
             }
 
             Console.ReadLine();
+        }
+
+        private void LogAccountStatus(MangoGroup mangoGroup, MangoCache mangoCache, MangoAccount mangoAccount)
+        {
+            if (mangoGroup.RootBankAccounts.Count != 0)
+            {
+                for (int token = 0; token < mangoGroup.Tokens.Count; token++)
+                {
+                    if (mangoGroup.Tokens[token].RootBank.Key == SystemProgram.ProgramIdKey.Key) continue;
+                    Console.WriteLine(
+                        $"Token: {mangoGroup.Tokens[token].Mint}\t" +
+                        $"Deposits: {mangoAccount.GetUiDeposit(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal():N6}\t" +
+                        $"Borrows: {mangoAccount.GetUiBorrow(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal():N6}\t" +
+                        $"MaxWithBorrow: {mangoAccount.GetMaxWithBorrowForToken(mangoGroup, mangoCache, token).ToDecimal():N6}\t" +
+                        $"Net: {mangoAccount.GetUiNet(mangoCache.RootBankCaches[token], mangoGroup, token).ToDecimal():N6}\t");
+                }
+            }
+
+            Console.WriteLine(
+                $"Account Value: {mangoAccount.ComputeValue(mangoGroup, mangoCache).ToDecimal():N6}\n" +
+                $"Account Maintenance Health: {mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N6}\n" +
+                $"Account Initialization Health: {mangoAccount.GetHealth(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal():N6}\n" +
+                $"Account Maintenance Health Ratio: {mangoAccount.GetHealthRatio(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N6}\n" +
+                $"Account Initialization Health Ratio: {mangoAccount.GetHealthRatio(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal():N6}\n" +
+                $"Leverage: {mangoAccount.GetLeverage(mangoGroup, mangoCache).ToDecimal():N6}\n" +
+                $"Assets Value: {mangoAccount.GetAssetsValue(mangoGroup, mangoCache).ToDecimal():N6}\n" +
+                $"Liabilities Value: {mangoAccount.GetLiabilitiesValue(mangoGroup, mangoCache).ToDecimal():N6}\n" +
+                $"Assets Maintenance Value: {mangoAccount.GetAssetsValue(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N6}\n" +
+                $"Liabilities Maintenance Value: {mangoAccount.GetLiabilitiesValue(mangoGroup, mangoCache, HealthType.Maintenance).ToDecimal():N6}\n" +
+                $"Assets Initialization Value: {mangoAccount.GetAssetsValue(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal():N6}\n" +
+                $"Liabilities Initialization Value: {mangoAccount.GetLiabilitiesValue(mangoGroup, mangoCache, HealthType.Initialization).ToDecimal():N6}\n");
         }
     }
 }

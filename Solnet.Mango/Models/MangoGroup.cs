@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Logging;
+using Solnet.Mango.Models.Banks;
+using Solnet.Mango.Models.Caches;
 using Solnet.Mango.Models.Perpetuals;
+using Solnet.Mango.Types;
 using Solnet.Programs;
 using Solnet.Programs.Utilities;
 using Solnet.Rpc;
@@ -25,82 +28,87 @@ namespace Solnet.Mango.Models
         internal static class Layout
         {
             /// <summary>
-            /// 
+            /// The length of the structure.
+            /// </summary>
+            internal const int Length = 6032;
+
+            /// <summary>
+            /// The offset at which the metadata begins.
             /// </summary>
             internal const int MetadataOffset = 0;
 
             /// <summary>
-            /// 
+            /// The offset at which the number of oracles begins.
             /// </summary>
             internal const int NumOraclesOffset = 8;
 
             /// <summary>
-            /// 
+            /// The offset at which the tokens infos begins.
             /// </summary>
             internal const int TokensOffset = 16;
 
             /// <summary>
-            /// 
+            /// The offset at which the spot market infos begins.
             /// </summary>
             internal const int SpotMarketsOffset = 1168;
 
             /// <summary>
-            /// 
+            /// The offset at which the perp markets infos begins.
             /// </summary>
             internal const int PerpMarketsOffset = 2848;
 
             /// <summary>
-            /// 
+            /// The offset at which the oracles public keys begins.
             /// </summary>
             internal const int OraclesOffset = 5248;
 
             /// <summary>
-            /// 
+            /// The offset at which the signer nonce value begins.
             /// </summary>
             internal const int SignerNonceOffset = 5728;
 
             /// <summary>
-            /// 
+            /// The offset at which the signer key begins.
             /// </summary>
             internal const int SignerKeyOffset = 5736;
 
             /// <summary>
-            /// 
+            /// The offset at which the admin key begins.
             /// </summary>
             internal const int AdminKeyOffset = 5768;
 
             /// <summary>
-            /// 
+            /// The offset at which the dex program begins.
             /// </summary>
             internal const int DexProgramKeyOffset = 5800;
 
             /// <summary>
-            /// 
+            /// The offset at which the mango cache begins.
             /// </summary>
             internal const int MangoCacheKeyOffset = 5832;
 
             /// <summary>
-            /// 
+            /// The offset at which the valid interval value begins.
             /// </summary>
             internal const int ValidInternalOffset = 5864;
 
             /// <summary>
-            /// 
+            /// The offset at which the insurance vault begins.
             /// </summary>
             internal const int InsuranceVaultKeyOffset = 5872;
 
             /// <summary>
-            /// 
+            /// The offset at which the serum vault begins
             /// </summary>
             internal const int SerumVaultOffset = 5904;
 
             /// <summary>
-            /// 
+            /// The offset at which the megaserum vault begins.
             /// </summary>
             internal const int MegaSerumVaultOffset = 5936;
 
             /// <summary>
-            /// 
+            /// The offset at which the fee vault begins.
             /// </summary>
             internal const int FeesVaultOffset = 5968;
 
@@ -146,52 +154,52 @@ namespace Solnet.Mango.Models
         public List<PublicKey> Oracles;
 
         /// <summary>
-        /// 
+        /// The signer nonce.
         /// </summary>
         public ulong SignerNonce;
 
         /// <summary>
-        /// 
+        /// The signer key.
         /// </summary>
         public PublicKey SignerKey;
 
         /// <summary>
-        /// 
+        /// The admin of the mango group.
         /// </summary>
         public PublicKey Admin;
 
         /// <summary>
-        /// 
+        /// The dex program id.
         /// </summary>
         public PublicKey DexProgramId;
 
         /// <summary>
-        /// 
+        /// The mango cache.
         /// </summary>
         public PublicKey MangoCache;
 
         /// <summary>
-        /// 
+        /// The valid interval.
         /// </summary>
         public ulong ValidInterval;
 
         /// <summary>
-        /// 
+        /// The insurance vault.
         /// </summary>
         public PublicKey InsuranceVault;
 
         /// <summary>
-        /// 
+        /// The serum vault.
         /// </summary>
         public PublicKey SerumVault;
 
         /// <summary>
-        /// 
+        /// The mega serum vault.
         /// </summary>
         public PublicKey MegaSerumVault;
 
         /// <summary>
-        /// 
+        /// The fee vault.
         /// </summary>
         public PublicKey FeesVault;
 
@@ -229,11 +237,11 @@ namespace Solnet.Mango.Models
                 await rpcClient.GetMultipleAccountsAsync(filteredRootBanks.Select(x => x.Key).ToList());
             if (!rootBankAccounts.WasRequestSuccessfullyHandled)
             {
-                logger?.LogInformation($"Could not fetch root banks.");
+                logger?.LogInformation($"Could not fetch root bank accounts.");
                 return rootBankAccounts;
             }
             logger?.LogInformation(
-                $"Successfully fetched {rootBankAccounts.Result.Value.Count} root banks.");
+                $"Successfully fetched {rootBankAccounts.Result.Value.Count} root bank accounts.");
 
             Tokens.ForEach(key =>
             {
@@ -243,10 +251,8 @@ namespace Solnet.Mango.Models
                     RootBankAccounts.Add(null);
                     return;
                 }
-                RootBank rb =
-                    RootBank.Deserialize(
-                        Convert.FromBase64String(rootBankAccounts.Result.Value[keyIndex].Data[0]));
-                rb.LoadNodeBanksAsync(rpcClient, logger);
+                RootBank rb = RootBank.Deserialize(Convert.FromBase64String(rootBankAccounts.Result.Value[keyIndex].Data[0]));
+                rb.LoadNodeBanks(rpcClient, logger);
                 RootBankAccounts.Add(rb);
             });
 
@@ -341,7 +347,7 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The borrow rate.</returns>
-        public double GetBorrowRate(int tokenIndex)
+        public I80F48 GetBorrowRate(int tokenIndex)
         {
             RootBank rootBank = RootBankAccounts[tokenIndex];
             if (rootBank == null)
@@ -355,7 +361,7 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The deposit rate.</returns>
-        public double GetDepositRate(int tokenIndex)
+        public I80F48 GetDepositRate(int tokenIndex)
         {
             RootBank rootBank = RootBankAccounts[tokenIndex];
             if (rootBank == null)
@@ -370,10 +376,10 @@ namespace Solnet.Mango.Models
         /// <param name="price">The price.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The humanized value.</returns>
-        public double HumanizeCachePrice(double price, int tokenIndex)
+        public I80F48 HumanizeCachePrice(I80F48 price, int tokenIndex)
         {
-            double decimalAdj = Math.Pow(10, Tokens[tokenIndex].Decimals - Tokens[Constants.QuoteIndex].Decimals);
-            return price * decimalAdj;
+            var decimalAdj = (decimal) Math.Pow(10, Tokens[tokenIndex].Decimals - Tokens[Constants.QuoteIndex].Decimals);
+            return price * new I80F48(decimalAdj);
         }
 
         /// <summary>
@@ -382,12 +388,12 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The price.</returns>
-        public double GetPrice(MangoCache mangoCache, int tokenIndex)
+        public I80F48 GetPrice(MangoCache mangoCache, int tokenIndex)
         {
-            if (tokenIndex == Constants.QuoteIndex) return 1;
-            double decimalAdj = Math.Pow(10, Tokens[tokenIndex].Decimals - Tokens[Constants.QuoteIndex].Decimals);
+            if (tokenIndex == Constants.QuoteIndex) return new(1m);
+            var decimalAdj = (decimal) Math.Pow(10, Tokens[tokenIndex].Decimals - Tokens[Constants.QuoteIndex].Decimals);
 
-            return mangoCache.PriceCaches[tokenIndex].Price.Value * decimalAdj;
+            return mangoCache.PriceCaches[tokenIndex].Price * new I80F48(decimalAdj);
         }
 
         /// <summary>
@@ -396,10 +402,10 @@ namespace Solnet.Mango.Models
         /// <param name="mangoCache">The mango cache.</param>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The price.</returns>
-        public double GetPriceNative(MangoCache mangoCache, int tokenIndex)
+        public I80F48 GetPriceNative(MangoCache mangoCache, int tokenIndex)
         {
-            if (tokenIndex == Constants.QuoteIndex) return 1;
-            return mangoCache.PriceCaches[tokenIndex].Price.Value;
+            if (tokenIndex == Constants.QuoteIndex) return new(1m);
+            return mangoCache.PriceCaches[tokenIndex].Price;
         }
 
         /// <summary>
@@ -407,7 +413,7 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The deposit amount.</returns>
-        public double GetUiTotalDeposit(int tokenIndex)
+        public I80F48 GetUiTotalDeposit(int tokenIndex)
         {
             RootBank rootBank = RootBankAccounts[tokenIndex];
             if (rootBank == null)
@@ -421,7 +427,7 @@ namespace Solnet.Mango.Models
         /// </summary>
         /// <param name="tokenIndex">The token index.</param>
         /// <returns>The borrow amount.</returns>
-        public double GetUiTotalBorrow(int tokenIndex)
+        public I80F48 GetUiTotalBorrow(int tokenIndex)
         {
             RootBank rootBank = RootBankAccounts[tokenIndex];
             if (rootBank == null)
@@ -446,6 +452,9 @@ namespace Solnet.Mango.Models
         /// <returns>The <see cref="MangoGroup"/> structure.</returns>
         public static MangoGroup Deserialize(byte[] data)
         {
+            if(data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
+
             ReadOnlySpan<byte> span = data.AsSpan();
             List<TokenInfo> tokens = new(Constants.MaxTokens);
             ReadOnlySpan<byte> tokensBytes =

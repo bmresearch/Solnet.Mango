@@ -1,3 +1,4 @@
+using Solnet.Mango.Models.Caches;
 using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using System;
@@ -117,9 +118,9 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="perpMarketCache">The perpetual market's cache.</param>
         /// <param name="price">The current price.</param>
         /// <returns>The PNL value.</returns>
-        public double GetProfitAndLoss(PerpMarketInfo perpMarketInfo, PerpMarketCache perpMarketCache, double price)
+        public I80F48 GetProfitAndLoss(PerpMarketInfo perpMarketInfo, PerpMarketCache perpMarketCache, I80F48 price)
         {
-            return BasePosition * perpMarketInfo.BaseLotSize * price + GetQuotePosition(perpMarketCache);
+            return new I80F48((decimal)BasePosition * perpMarketInfo.BaseLotSize) * price + GetQuotePosition(perpMarketCache);
         }
 
         /// <summary>
@@ -127,13 +128,13 @@ namespace Solnet.Mango.Models.Perpetuals
         /// </summary>
         /// <param name="perpMarketCache">The perpetual market's cache.</param>
         /// <returns>The unsettled funding.</returns>
-        public double GetUnsettledFunding(PerpMarketCache perpMarketCache)
+        public I80F48 GetUnsettledFunding(PerpMarketCache perpMarketCache)
         {
             if (BasePosition < 0)
             {
-                return BasePosition * (perpMarketCache.ShortFunding.Value - ShortSettledFunding.Value);
+                return new I80F48((decimal) BasePosition) * (perpMarketCache.ShortFunding - ShortSettledFunding);
             }
-            return BasePosition * (perpMarketCache.LongFunding.Value - LongSettledFunding.Value);
+            return new I80F48((decimal) BasePosition) * (perpMarketCache.LongFunding - LongSettledFunding);
         }
 
         /// <summary>
@@ -141,16 +142,16 @@ namespace Solnet.Mango.Models.Perpetuals
         /// </summary>
         /// <param name="perpMarketCache">The perpetual market's cache.</param>
         /// <returns>The quote position.</returns>
-        public double GetQuotePosition(PerpMarketCache perpMarketCache)
+        public I80F48 GetQuotePosition(PerpMarketCache perpMarketCache)
         {
-            return QuotePosition.Value - GetUnsettledFunding(perpMarketCache);
+            return QuotePosition - GetUnsettledFunding(perpMarketCache);
         }
 
         /// <summary>
         /// Gets the base position value converted for ui display.
         /// </summary>
         /// <returns></returns>
-        public double GetUiBasePosition(PerpMarket market, byte decimals) =>
+        public decimal GetUiBasePosition(PerpMarket market, byte decimals) =>
             market.BaseLotsToNumber(BasePosition, decimals);
 
         /// <summary>
@@ -162,19 +163,19 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="liabilityWeight">The liability weight.</param>
         /// <param name="baseChange">The change on the base position.</param>
         /// <returns>The position health.</returns>
-        public double SimulatePositionHealth(PerpMarketInfo perpMarketInfo, double price,
-            double assetWeight, double liabilityWeight, double baseChange)
+        public I80F48 SimulatePositionHealth(PerpMarketInfo perpMarketInfo, I80F48 price,
+            I80F48 assetWeight, I80F48 liabilityWeight, long baseChange)
         {
-            double newBase = BasePosition + baseChange;
-            double health = QuotePosition.Value - ((baseChange * perpMarketInfo.BaseLotSize) * price);
+            long newBase = BasePosition + baseChange;
+            I80F48 health = QuotePosition - (new I80F48((decimal) (baseChange * perpMarketInfo.BaseLotSize)) * price);
 
             if (newBase > 0)
             {
-                health += newBase * perpMarketInfo.BaseLotSize * price * assetWeight;
+                health += new I80F48((decimal)newBase * perpMarketInfo.BaseLotSize) * price * assetWeight;
             }
             else if (newBase < 0)
             {
-                health += newBase * perpMarketInfo.BaseLotSize * price * liabilityWeight;
+                health += new I80F48((decimal)newBase * perpMarketInfo.BaseLotSize) * price * liabilityWeight;
             }
             return health;
         }
@@ -189,22 +190,22 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="shortFunding">The short funding.</param>
         /// <param name="longFunding">The long funding.</param>
         /// <returns>The health value.</returns>
-        public double GetHealth(PerpMarketInfo perpMarketInfo, double price, double assetWeight,
-            double liabilityWeight, double shortFunding, double longFunding)
+        public I80F48 GetHealth(PerpMarketInfo perpMarketInfo, I80F48 price, I80F48 assetWeight,
+            I80F48 liabilityWeight, I80F48 shortFunding, I80F48 longFunding)
         {
-            double bidsHealth = SimulatePositionHealth(perpMarketInfo, price, assetWeight, liabilityWeight, BidsQuantity);
-            double asksHealth = SimulatePositionHealth(perpMarketInfo, price, assetWeight, liabilityWeight, -AsksQuantity);
-            double health = bidsHealth < asksHealth ? bidsHealth : asksHealth;
+            I80F48 bidsHealth = SimulatePositionHealth(perpMarketInfo, price, assetWeight, liabilityWeight, BidsQuantity);
+            I80F48 asksHealth = SimulatePositionHealth(perpMarketInfo, price, assetWeight, liabilityWeight, AsksQuantity * -1);
+            I80F48 health = bidsHealth < asksHealth ? bidsHealth : asksHealth;
 
-            double x = 0;
+            I80F48 x = I80F48.Zero;
 
             if (BasePosition > 0)
             {
-                x = health - ((longFunding - LongSettledFunding.Value) * BasePosition);
+                x = health - ((longFunding - LongSettledFunding) * new I80F48((decimal)BasePosition));
             }
             else if (BasePosition < 0)
             {
-                x = health + ((shortFunding - ShortSettledFunding.Value) * BasePosition);
+                x = health + ((shortFunding - ShortSettledFunding) * new I80F48((decimal)BasePosition));
             }
 
             return x;
@@ -218,32 +219,32 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="shortFunding">The short funding.</param>
         /// <param name="longFunding">The long funding.</param>
         /// <returns>The liabilities value.</returns>
-        public double GetLiabilitiesValue(PerpMarketInfo perpMarketInfo, double price,
-            double shortFunding, double longFunding)
+        public I80F48 GetLiabilitiesValue(PerpMarketInfo perpMarketInfo, I80F48 price,
+            I80F48 shortFunding, I80F48 longFunding)
         {
-            double liabsValue = 0;
+            I80F48 liabsValue = I80F48.Zero;
 
             if (BasePosition < 0)
             {
-                liabsValue += ((BasePosition * perpMarketInfo.BaseLotSize) * price);
+                liabsValue += ((new I80F48((decimal)BasePosition * perpMarketInfo.BaseLotSize)) * price);
             }
 
-            double realQuotePosition = QuotePosition.Value;
+            I80F48 realQuotePosition = QuotePosition;
 
             if (BasePosition > 0)
             {
-                realQuotePosition = QuotePosition.Value - ((longFunding - LongSettledFunding.Value) * BasePosition);
+                realQuotePosition = QuotePosition - ((longFunding - LongSettledFunding) * new I80F48((decimal)BasePosition));
             }
             else if (BasePosition < 0)
             {
-                realQuotePosition = QuotePosition.Value - ((shortFunding - ShortSettledFunding.Value) * BasePosition);
+                realQuotePosition = QuotePosition - ((shortFunding - ShortSettledFunding) * new I80F48((decimal)BasePosition));
             }
 
-            if (realQuotePosition < 0)
+            if (realQuotePosition < I80F48.Zero)
             {
                 liabsValue += realQuotePosition;
             }
-            return liabsValue;
+            return liabsValue * I80F48.NegativeOne;
         }
 
         /// <summary>
@@ -254,27 +255,27 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="shortFunding">The short funding.</param>
         /// <param name="longFunding">The long funding.</param>
         /// <returns>The assets value.</returns>
-        public double GetAssetValue(PerpMarketInfo perpMarketInfo, double price, double shortFunding, double longFunding)
+        public I80F48 GetAssetValue(PerpMarketInfo perpMarketInfo, I80F48 price, I80F48 shortFunding, I80F48 longFunding)
         {
-            double assetsValue = 0;
+            I80F48 assetsValue = I80F48.Zero;
 
             if (BasePosition > 0)
             {
-                assetsValue += ((BasePosition * perpMarketInfo.BaseLotSize) * price);
+                assetsValue += ((new I80F48((decimal)BasePosition * perpMarketInfo.BaseLotSize)) * price);
             }
 
-            double realQuotePosition = QuotePosition.Value;
+            I80F48 realQuotePosition = QuotePosition;
 
             if (BasePosition > 0)
             {
-                realQuotePosition = QuotePosition.Value - ((longFunding - LongSettledFunding.Value) * BasePosition);
+                realQuotePosition = QuotePosition - ((longFunding - LongSettledFunding) * new I80F48((decimal)BasePosition));
             }
             else if (BasePosition < 0)
             {
-                realQuotePosition = QuotePosition.Value - ((shortFunding - ShortSettledFunding.Value) * BasePosition);
+                realQuotePosition = QuotePosition - ((shortFunding - ShortSettledFunding) * new I80F48((decimal)BasePosition));
             }
 
-            if (realQuotePosition > 0)
+            if (realQuotePosition > I80F48.Zero)
             {
                 assetsValue += realQuotePosition;
             }
@@ -288,7 +289,8 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <returns>The <see cref="PerpAccount"/> structure.</returns>
         public static PerpAccount Deserialize(ReadOnlySpan<byte> data)
         {
-
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
             return new PerpAccount
             {
                 BasePosition = data.GetS64(Layout.BasePositionOffset),

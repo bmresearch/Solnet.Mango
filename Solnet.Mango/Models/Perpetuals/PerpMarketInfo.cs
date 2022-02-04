@@ -67,7 +67,8 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <returns>The <see cref="PerpMarketInfo"/> structure.</returns>
         public static new PerpMarketInfo Deserialize(ReadOnlySpan<byte> data)
         {
-            if (data.Length != ExtraLayout.Length) throw new ArgumentException("data length is invalid");
+            if (data.Length != ExtraLayout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
 
             return new PerpMarketInfo
             {

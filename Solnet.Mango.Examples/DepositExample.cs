@@ -1,5 +1,6 @@
 using Solnet.KeyStore;
 using Solnet.Mango.Models;
+using Solnet.Mango.Models.Banks;
 using Solnet.Programs;
 using Solnet.Programs.Models;
 using Solnet.Programs.Utilities;

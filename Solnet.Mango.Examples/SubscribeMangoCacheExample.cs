@@ -1,5 +1,6 @@
 using Solnet.Mango.Models;
-using Solnet.Mango.Models.Perpetuals;
+using Solnet.Mango.Models.Banks;
+using Solnet.Mango.Models.Caches;
 using Solnet.Programs;
 using Solnet.Programs.Models;
 using Solnet.Rpc;
@@ -46,24 +47,24 @@ namespace Solnet.Mango.Examples
                     Console.Clear();
                     mangoCache = cache;
                     foreach (PriceCache priceCache in
-                        cache.PriceCaches.Where(priceCache => priceCache.Price.Value != 0))
+                        cache.PriceCaches.Where(priceCache => priceCache.Price.ToDecimal() != 0))
                     {
                         Console.WriteLine(
-                            $"{DateTime.UnixEpoch.AddSeconds((long)priceCache.LastUpdated)} - Price: {priceCache.Price.Value:C2}");
+                            $"{DateTime.UnixEpoch.AddSeconds((long)priceCache.LastUpdated)} - Price: {priceCache.Price.ToDecimal():C2}");
                     }
 
                     foreach (PerpMarketCache perpCache in cache.PerpetualMarketCaches.Where(perpCache =>
-                        perpCache.LongFunding.Value != 0))
+                        perpCache.LongFunding.ToDecimal() != 0))
                     {
                         Console.WriteLine(
-                            $"{DateTime.UnixEpoch.AddSeconds((long)perpCache.LastUpdated)} - Long Funding:\t{perpCache.LongFunding.Value}\tShort Funding:\t{perpCache.LongFunding.Value}");
+                            $"{DateTime.UnixEpoch.AddSeconds((long)perpCache.LastUpdated)} - Long Funding:\t{perpCache.LongFunding.ToDecimal()}\tShort Funding:\t{perpCache.LongFunding.ToDecimal()}");
                     }
 
                     foreach (RootBankCache rootBankCache in cache.RootBankCaches.Where(rootBankCache =>
-                        rootBankCache.BorrowIndex.Value != 0))
+                        rootBankCache.BorrowIndex.ToDecimal() != 0))
                     {
                         Console.WriteLine(
-                            $"{DateTime.UnixEpoch.AddSeconds((long)rootBankCache.LastUpdated)} - Borrow Index:\t{rootBankCache.BorrowIndex.Value}\tDeposit Index:\t{rootBankCache.DepositIndex.Value}");
+                            $"{DateTime.UnixEpoch.AddSeconds((long)rootBankCache.LastUpdated)} - Borrow Index:\t{rootBankCache.BorrowIndex.ToDecimal()}\tDeposit Index:\t{rootBankCache.DepositIndex.ToDecimal()}");
                     }
                 }, Constants.MangoCache,
                 Commitment.Confirmed);

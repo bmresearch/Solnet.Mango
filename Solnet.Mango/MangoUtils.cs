@@ -24,9 +24,9 @@ namespace Solnet.Mango
         /// <param name="value">The value.</param>
         /// <param name="decimals">The number of decimals for the asset.</param>
         /// <returns>The humanized value.</returns>
-        public static double HumanizeNative(double value, byte decimals)
+        public static I80F48 HumanizeNative(I80F48 value, byte decimals)
         {
-            return value / Math.Pow(10, decimals);
+            return value / new I80F48((decimal) Math.Pow(10, decimals));
         }
 
         /// <summary>
@@ -69,11 +69,11 @@ namespace Solnet.Mango
         /// <returns>The open orders stats.</returns>
         public static OpenOrdersStats SplitOpenOrders(OpenOrdersAccount openOrdersAccount)
         {
-            double quoteFree = openOrdersAccount.QuoteTokenFree + openOrdersAccount.ReferrerRebatesAccrued;
-            double quoteLocked = openOrdersAccount.QuoteTokenTotal - openOrdersAccount.QuoteTokenFree;
+            I80F48 quoteFree = new((decimal)openOrdersAccount.QuoteTokenFree + openOrdersAccount.ReferrerRebatesAccrued);
+            I80F48 quoteLocked = new((decimal)openOrdersAccount.QuoteTokenTotal - openOrdersAccount.QuoteTokenFree);
 
-            double baseFree = openOrdersAccount.BaseTokenFree;
-            double baseLocked = openOrdersAccount.BaseTokenTotal - openOrdersAccount.BaseTokenFree;
+            I80F48 baseFree = new((decimal)openOrdersAccount.BaseTokenFree);
+            I80F48 baseLocked = new((decimal)openOrdersAccount.BaseTokenTotal - openOrdersAccount.BaseTokenFree);
 
             return new OpenOrdersStats
             {
@@ -97,24 +97,24 @@ namespace Solnet.Mango
             {
                 HealthType.Maintenance => new Weights
                 {
-                    SpotAssetWeight = mangoGroup.SpotMarkets[tokenIndex].MaintenanceAssetWeight.Value,
-                    SpotLiabilityWeight = mangoGroup.SpotMarkets[tokenIndex].MaintenanceLiabilityWeight.Value,
-                    PerpAssetWeight = mangoGroup.PerpetualMarkets[tokenIndex].MaintenanceAssetWeight.Value,
-                    PerpLiabilityWeight = mangoGroup.PerpetualMarkets[tokenIndex].MaintenanceLiabilityWeight.Value,
+                    SpotAssetWeight = mangoGroup.SpotMarkets[tokenIndex].MaintenanceAssetWeight,
+                    SpotLiabilityWeight = mangoGroup.SpotMarkets[tokenIndex].MaintenanceLiabilityWeight,
+                    PerpAssetWeight = mangoGroup.PerpetualMarkets[tokenIndex].MaintenanceAssetWeight,
+                    PerpLiabilityWeight = mangoGroup.PerpetualMarkets[tokenIndex].MaintenanceLiabilityWeight,
                 },
                 HealthType.Initialization => new Weights
                 {
-                    SpotAssetWeight = mangoGroup.SpotMarkets[tokenIndex].InitializationAssetWeight.Value,
-                    SpotLiabilityWeight = mangoGroup.SpotMarkets[tokenIndex].InitializationLiabilityWeight.Value,
-                    PerpAssetWeight = mangoGroup.PerpetualMarkets[tokenIndex].InitializationAssetWeight.Value,
-                    PerpLiabilityWeight = mangoGroup.PerpetualMarkets[tokenIndex].InitializationLiabilityWeight.Value,
+                    SpotAssetWeight = mangoGroup.SpotMarkets[tokenIndex].InitializationAssetWeight,
+                    SpotLiabilityWeight = mangoGroup.SpotMarkets[tokenIndex].InitializationLiabilityWeight,
+                    PerpAssetWeight = mangoGroup.PerpetualMarkets[tokenIndex].InitializationAssetWeight,
+                    PerpLiabilityWeight = mangoGroup.PerpetualMarkets[tokenIndex].InitializationLiabilityWeight,
                 },
                 _ => new Weights
                 {
-                    SpotAssetWeight = 1,
-                    SpotLiabilityWeight = 1,
-                    PerpAssetWeight = 1,
-                    PerpLiabilityWeight = 1,
+                    SpotAssetWeight = new(1m),
+                    SpotLiabilityWeight = new(1m),
+                    PerpAssetWeight = new(1m),
+                    PerpLiabilityWeight = new(1m),
                 }
             };
         }

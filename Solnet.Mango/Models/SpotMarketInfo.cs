@@ -11,7 +11,7 @@ namespace Solnet.Mango.Models
     public class SpotMarketInfo
     {
         /// <summary>
-        /// The layout of the <see cref="SpotMarketInfo"/>.
+        /// The layout of the <see cref="SpotMarketInfo"/> structure.
         /// </summary>
         internal static class Layout
         {
@@ -88,7 +88,8 @@ namespace Solnet.Mango.Models
         /// <returns>The <see cref="SpotMarketInfo"/> structure.</returns>
         public static SpotMarketInfo Deserialize(ReadOnlySpan<byte> data)
         {
-            if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
 
             return new SpotMarketInfo
             {

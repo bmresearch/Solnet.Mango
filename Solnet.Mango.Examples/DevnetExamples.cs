@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging.Console;
 using Solnet.KeyStore;
 using Solnet.Mango.Models;
+using Solnet.Mango.Models.Banks;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs;
 using Solnet.Programs.Models;
@@ -77,14 +78,15 @@ namespace Solnet.Mango.Examples
             
 
             var mangoGroup = _mangoClient.GetMangoGroup(Constants.DevNetMangoGroup);
-            //mangoGroup.ParsedResult.LoadRootBanks(_rpcClient, _logger);
-
+            mangoGroup.ParsedResult.LoadRootBanks(_rpcClient, _logger);
             var mangoCache = _mangoClient.GetMangoCache(mangoGroup.ParsedResult.MangoCache);
+
+            Console.ReadLine();
 
             var mangoAccountAddress = _mango.DeriveMangoAccountAddress(_wallet.Account, 1);
 
             var mangoAccount = _mangoClient.GetMangoAccount(mangoAccountAddress);
-            //mangoAccount.ParsedResult.LoadOpenOrdersAccounts(_rpcClient, _logger);
+            mangoAccount.ParsedResult.LoadOpenOrdersAccounts(_rpcClient, _logger);
 
             var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
            
@@ -93,7 +95,6 @@ namespace Solnet.Mango.Examples
 
             ExampleHelpers.DecodeAndLogMessage(msg);
 
-            Console.ReadLine();
             var txBytes = SignAndAssembleTx(msg);
 
             var sig = ExampleHelpers.SubmitTxSendAndLog(_rpcClient, txBytes);

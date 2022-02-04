@@ -21,77 +21,77 @@ namespace Solnet.Mango.Models.Perpetuals
             internal const int Length = 320;
 
             /// <summary>
-            /// 
+            /// The offset at whiuch the metadata begins.
             /// </summary>
             internal const int MetadataOffset = 0;
 
             /// <summary>
-            /// 
+            /// The offset at which the mango group begins.
             /// </summary>
             internal const int MangoGroupOffset = 8;
 
             /// <summary>
-            /// 
+            /// The offest at which the bids begin.
             /// </summary>
             internal const int BidsOffset = 40;
 
             /// <summary>
-            /// 
+            /// The offset at which th assks begin.
             /// </summary>
             internal const int AsksOffset = 72;
 
             /// <summary>
-            /// 
+            /// The offset at which the event queue begins.
             /// </summary>
             internal const int EventQueueOffset = 104;
 
             /// <summary>
-            /// 
+            /// The offset at which the quote lot size value begins.
             /// </summary>
             internal const int QuoteLotSizeOffset = 136;
 
             /// <summary>
-            /// 
+            /// The offset at which the base lot size value begins.
             /// </summary>
             internal const int BaseLotSizeOffset = 144;
 
             /// <summary>
-            /// 
+            /// The offset at which the long funding begins.
             /// </summary>
             internal const int LongFundingOffset = 152;
 
             /// <summary>
-            /// 
+            /// The offset at which the shoprt funding begins.
             /// </summary>
             internal const int ShortFundingOffset = 168;
 
             /// <summary>
-            /// 
+            /// The offset at which the open interest begins.
             /// </summary>
             internal const int OpenInterestOffset = 184;
 
             /// <summary>
-            /// 
+            /// The offset at which the last update begins.
             /// </summary>
             internal const int LastUpdatedOffset = 192;
 
             /// <summary>
-            /// 
+            /// The offset at which the sequence number begins.
             /// </summary>
             internal const int SequenceNumberOffset = 200;
 
             /// <summary>
-            /// 
+            /// The offset at which the fees accrued begins.
             /// </summary>
             internal const int FeesAccruedOffset = 208;
 
             /// <summary>
-            /// 
+            /// The offset at which the liquidity mining info begins.
             /// </summary>
             internal const int LiquidityMiningInfoOffset = 224;
 
             /// <summary>
-            /// 
+            /// The offset at which the mango vault begins.
             /// </summary>
             internal const int MangoVaultOffset = 288;
         }
@@ -102,72 +102,72 @@ namespace Solnet.Mango.Models.Perpetuals
         public MetaData Metadata;
 
         /// <summary>
-        /// 
+        /// The mango group.
         /// </summary>
         public PublicKey MangoGroup;
 
         /// <summary>
-        /// 
+        /// The bids.
         /// </summary>
         public PublicKey Bids;
 
         /// <summary>
-        /// 
+        /// The asks.
         /// </summary>
         public PublicKey Asks;
 
         /// <summary>
-        /// 
+        /// The event queue.
         /// </summary>
         public PublicKey EventQueue;
 
         /// <summary>
-        /// 
+        /// The base lot size.
         /// </summary>
         public long BaseLotSize;
 
         /// <summary>
-        /// 
+        /// The quote lot size.
         /// </summary>
         public long QuoteLotSize;
 
         /// <summary>
-        /// 
+        /// The long funding.
         /// </summary>
         public I80F48 LongFunding;
 
         /// <summary>
-        /// 
+        /// The short funding.
         /// </summary>
         public I80F48 ShortFunding;
 
         /// <summary>
-        /// 
+        /// The open interest.
         /// </summary>
         public long OpenInterest;
 
         /// <summary>
-        /// 
+        /// The last update timestamp.
         /// </summary>
         public ulong LastUpdated;
 
         /// <summary>
-        /// 
+        /// The sequence number.
         /// </summary>
         public ulong SequenceNumber;
 
         /// <summary>
-        /// 
+        /// The fees accrued.
         /// </summary>
         public I80F48 FeesAccrued;
 
         /// <summary>
-        /// 
+        /// The liquidity mining info.
         /// </summary>
         public LiquidityMiningInfo LiquidityMiningInfo;
 
         /// <summary>
-        /// 
+        /// The mango vault.
         /// </summary>
         public PublicKey MangoVault;
 
@@ -192,11 +192,11 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quoteDecimals">The quote decimals.</param>
         /// <returns>Convert price lots to humanized number.</returns>
-        public double PriceLotsToNumber(double price, byte baseDecimals, byte quoteDecimals)
+        public decimal PriceLotsToNumber(I80F48 price, byte baseDecimals, byte quoteDecimals)
         {
-            double nativeToUi = Math.Pow(10, baseDecimals - quoteDecimals);
-            double lotsToNative = (double) QuoteLotSize / BaseLotSize;
-            return price * lotsToNative * nativeToUi;
+            decimal nativeToUi = (decimal) Math.Pow(10, baseDecimals - quoteDecimals);
+            decimal lotsToNative = (decimal) QuoteLotSize / BaseLotSize;
+            return price.ToDecimal() * lotsToNative * nativeToUi;
         }
 
         /// <summary>
@@ -205,15 +205,15 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quantity">The quantity.</param>
         /// <returns>Converted base lots to humanized number.</returns>
-        public double BaseLotsToNumber(double quantity, byte baseDecimals)
-            => (quantity * BaseLotSize) / Math.Pow(10, baseDecimals);
+        public decimal BaseLotsToNumber(decimal quantity, byte baseDecimals)
+            => (quantity * BaseLotSize) / (decimal) Math.Pow(10, baseDecimals);
 
         /// <summary>
         /// Get the minimum order size.
         /// </summary>
         /// <param name="baseDecimals">The base decimals.</param>
         /// <returns>The minimum order size.</returns>
-        public double MinOrderSize(byte baseDecimals) => BaseLotsToNumber(1, baseDecimals);
+        public decimal MinOrderSize(byte baseDecimals) => BaseLotsToNumber(1, baseDecimals);
 
         /// <summary>
         /// The tick size.
@@ -221,7 +221,7 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quoteDecimals">The quote decimals.</param>
         /// <returns>The tick size.</returns>
-        public double TickSize(byte baseDecimals, byte quoteDecimals) => PriceLotsToNumber(1, baseDecimals, quoteDecimals);
+        public decimal TickSize(byte baseDecimals, byte quoteDecimals) => PriceLotsToNumber(I80F48.One, baseDecimals, quoteDecimals);
 
         /// <summary>
         /// Conversion for order values.
@@ -249,7 +249,8 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <returns>The <see cref="PerpMarket"/> structure.</returns>
         public static PerpMarket Deserialize(byte[] data)
         {
-            if (data.Length != Layout.Length) throw new ArgumentException("data length is invalid");
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
             ReadOnlySpan<byte> span = data.AsSpan();
 
             return new PerpMarket

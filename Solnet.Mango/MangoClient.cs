@@ -1,5 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Solnet.Mango.Models;
+using Solnet.Mango.Models.Banks;
+using Solnet.Mango.Models.Events;
+using Solnet.Mango.Models.Matching;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs.Abstract;
 using Solnet.Programs.Models;
@@ -12,9 +15,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using EventQueue = Solnet.Mango.Models.EventQueue;
-using OrderBook = Solnet.Mango.Models.OrderBook;
-using OrderBookSide = Solnet.Mango.Models.OrderBookSide;
 
 namespace Solnet.Mango
 {

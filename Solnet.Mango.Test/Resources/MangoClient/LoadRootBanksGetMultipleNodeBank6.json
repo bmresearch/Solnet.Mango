@@ -1,0 +1,12 @@
+{
+  "context": { "slot": 112422439 },
+  "value": [
+    {
+      "data": [ "AwABAAAAAABMvCYdNZAHpwEAAAAAAAAABK0E86eSMgAAAAAAAAAAAErsMDDZUwYo61YPMX44ChrGsSvnkSoTHf11jQnq34Kc", "base64" ],
+      "executable": false,
+      "lamports": 1392000,
+      "owner": "4skJ85cdxQAFVKbcGgfun8iZPL7BadVYXG3kGEGkufqA",
+      "rentEpoch": 260
+    }
+  ]
+}

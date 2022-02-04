@@ -63,6 +63,8 @@ namespace Solnet.Mango.Models.Events
         /// <returns>The <see cref="OutEvent"/> structure.</returns>
         public static OutEvent Deserialize(ReadOnlySpan<byte> data)
         {
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
             return new OutEvent
             {
                 EventType = (EventType)Enum.Parse(typeof(EventType), data.GetU8(Layout.EventTypeOffset).ToString()),
