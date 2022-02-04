@@ -26,7 +26,6 @@ namespace Solnet.Mango
             { Values.PlacePerpOrder, "Place Perp Order" },
             { Values.CancelPerpOrderByClientId, "Cancel Perp Order By Client Id" },
             { Values.CancelPerpOrder, "Cancel Perp Order" },
-            { Values.ConsumeEvents, "Consume Events" },
             { Values.SettleFunds, "Settle Funds" },
             { Values.CancelSpotOrder, "Cancel Spot Order" },
             { Values.SettleProfitAndLoss, "Settle Profit & Loss" },
@@ -34,8 +33,6 @@ namespace Solnet.Mango
             { Values.InitSpotOpenOrders, "Initialize Spot Open Orders Account" },
             { Values.RedeemMango, "Redeem Mango" },
             { Values.AddMangoAccountInfo, "Add Mango Account Info" },
-            { Values.DepositMegaSerum, "Deposit MegaSerum" },
-            { Values.WithdrawMegaSerum, "Withdraw MegaSerum" },
             { Values.CancelAllPerpOrders, "Cancel All Perp Orders" },
             { Values.InitAdvancedOrders, "Initialize Advanced Orders Account" },
             { Values.AddPerpTriggerOrder, "Add Perp Trigger Order"},
@@ -91,11 +88,6 @@ namespace Solnet.Mango
             CancelPerpOrder = 14,
 
             /// <summary>
-            /// Consumes events on the Mango Perpetual <see cref="Models.Events.EventQueue"/>.
-            /// </summary>
-            ConsumeEvents = 15,
-
-            /// <summary>
             /// Settles all funds from Serum DEX open orders into <see cref="MangoAccount"/> positions.
             /// </summary>
             SettleFunds = 19,
@@ -129,20 +121,6 @@ namespace Solnet.Mango
             /// Adds info to a <see cref="MangoAccount"/>.
             /// </summary>
             AddMangoAccountInfo = 34,
-
-            /// <summary>
-            /// Deposits MSRM into the MSRM vault for <see cref="MangoGroup"/>.
-            /// These MSRM are not at risk and are not counted towards collateral or any margin calculations.
-            /// Depositing MSRM is a strictly altruistic act with no upside and no downside.
-            /// </summary>
-            DepositMegaSerum = 35,
-
-            /// <summary>
-            /// Withdraws MSRM from the MSRM vault for <see cref="MangoGroup"/>.
-            /// These MSRM are not at risk and are not counted towards collateral or any margin calculations.
-            /// Depositing MSRM is a strictly altruistic act with no upside and no downside.
-            /// </summary>
-            WithdrawMegaSerum = 36,
 
             /// <summary>
             /// Cancels all open perp orders.

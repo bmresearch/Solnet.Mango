@@ -24,6 +24,7 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
     - `MangoGroup`
     - `MangoCache`
     - `MangoAccount`
+    - `AdvancedOrdersAccount`
     - `PerpMarket`
     - `RootBank`
     - `NodeBank`
@@ -34,16 +35,29 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
   - Deposit
   - Withdraw
   - PlaceSpotOrder
+  - PlaceSpotOrder2
   - PlacePerpOrder
   - CancelPerpOrderByClientId
   - CancelPerpOrder
   - SettleFunds
   - CancelSpotOrder
   - SettleProfitAndLoss
+  - SettleFees
   - InitSpotOpenOrders
   - RedeemMango
   - AddMangoAccountInfo
   - CancelAllPerpOrders
+  - InitAdvancedOrders
+  - AddPerpTriggerOrder
+  - RemoveAdvancedOrder
+  - ExecutePerpTriggerOrder
+  - CloseMangoAccount
+  - CloseSpotOpenOrders
+  - CloseAdvancedOrders
+  - CreateMangoAccount
+  - UpgradeMangoAccountV0V1
+  - CancelPerpOrdersSide
+  - SetDelegate
 - `MangoClient` class which allows to:
     - Get these structures and decode them only by having their address
     - Subscribing to these accounts in real time, getting notifications with their decoded structures
@@ -52,16 +66,17 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
 - net 5.0
 
 ## Dependencies
-- Solnet.Serum v1.0.5
-- Solnet.Wallet v0.4.11
-- Solnet.Rpc v0.4.11
+- Solnet.Serum v1.2.0
+- Solnet.Wallet v0.5.0
+- Solnet.Rpc v0.5.0
 
 ## Examples
 
 The [Solnet.Mango.Examples](https://github.com/bmresearch/Solnet.Mango/tree/master/Solnet.Mango.Examples) project features some examples on how to use the [IMangoClient](https://github.com/bmresearch/Solnet.Mango/tree/master/Solnet.Mango/IMangoClient.cs), these examples include:
 - Getting all mango accounts owned by a specific address
 - Streaming market data and various structures
-- Submitting orders
+- Submitting orders (spot, perps)
+- Cancelling orders (spot, perps)
 - Creating new mango accounts
 
 ## Contribution
