@@ -145,6 +145,45 @@
       <None Update="Resources\MangoClient\GetMangoGroupAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Resources\MangoClient\GetNodeBankAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetRootBankAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadOpenOrdersGetMultiple.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultiple.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultipleNodeBank1.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultipleNodeBank2.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultipleNodeBank3.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultipleNodeBank4.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultipleNodeBank5.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultipleNodeBank6.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultipleNodeBank7.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultipleNodeBank8.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadRootBanksGetMultipleNodeBank9.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Resources\OneDeposit\MangoAccount.txt">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
