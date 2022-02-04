@@ -71,8 +71,8 @@ namespace Solnet.Mango.Types
         private BigInteger _storage;
 
         /// <summary>
-        /// Constructs a I80F48 number from a <see cref="byte[]"/> used as storage. 
-        /// The given <see cref="byte[]"/> needs to have been previously converted to the I80F48 format.
+        /// Constructs a I80F48 number from a byte array used as storage. 
+        /// The given byte array needs to have been previously converted to the I80F48 format.
         /// </summary>
         /// <param name="data">The number.</param>
         public I80F48(byte[] data)

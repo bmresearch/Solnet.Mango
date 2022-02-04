@@ -22,7 +22,7 @@ namespace Solnet.Mango.Examples
                 if (string.IsNullOrWhiteSpace(txHash)) break;
 
                 Console.WriteLine($"Handling transaction: {txHash}");
-                var tx = RpcClient.GetConfirmedTransaction(txHash);
+                var tx = RpcClient.GetTransaction(txHash);
 
                 if (!tx.WasRequestSuccessfullyHandled)
                 {

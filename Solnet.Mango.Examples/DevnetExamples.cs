@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging.Console;
 using Solnet.KeyStore;
 using Solnet.Mango.Models;
+using Solnet.Mango.Models.Banks;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs;
 using Solnet.Programs.Models;

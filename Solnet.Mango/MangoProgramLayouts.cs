@@ -109,22 +109,6 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// Represents the layout of the <see cref="MangoProgramInstructions.Values.SettleBorrow"/> method encoded data structure.
-        /// </summary>
-        internal static class SettleBorrow
-        {
-            /// <summary>
-            /// The offset at which to write the token index value.
-            /// </summary>
-            internal const int TokenIndexOffset = 4;
-
-            /// <summary>
-            /// The offset at which to write the quantity value.
-            /// </summary>
-            internal const int QuantityOffset = 12;
-        }
-
-        /// <summary>
         /// Represents the layout of the <see cref="MangoProgramInstructions.Values.PlaceSpotOrder"/> method encoded data structure.
         /// </summary>
         internal static class PlaceSpotOrder
