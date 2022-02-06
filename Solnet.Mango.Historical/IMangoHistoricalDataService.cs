@@ -16,13 +16,13 @@ namespace Solnet.Mango.Historical
         /// 
         /// </summary>
         /// <returns></returns>
-        Task<IList<SpotStats>> GetSpotStatsAsync();
+        Task<IList<MarginLendingStats>> GetSpotStatsAsync();
 
         /// <summary>
         /// 
         /// </summary>
         /// <returns></returns>
-        IList<SpotStats> GetSpotStats();
+        IList<MarginLendingStats> GetSpotStats();
 
         /// <summary>
         /// 

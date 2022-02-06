@@ -78,7 +78,9 @@ namespace Solnet.Mango.Historical
 
             var url = _config.MangoStatsBaseUrl != null ?
                 _config.MangoStatsBaseUrl :
-                MangoStatsBaseUrl + $"/perp/funding_rate?mangoGroup={_config.MangoGroup}&market={marketAddress}";
+                MangoStatsBaseUrl + 
+                $"/perp/funding_rate?mangoGroup={_config.MangoGroup}" +
+                $"&market={marketAddress}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -148,7 +150,8 @@ namespace Solnet.Mango.Historical
         {
             var url = _config.MangoStatsBaseUrl != null ? 
                 _config.MangoStatsBaseUrl : 
-                MangoStatsBaseUrl + $"/perp?mangoGroup={_config.MangoGroup}";
+                MangoStatsBaseUrl + 
+                $"/perp?mangoGroup={_config.MangoGroup}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -167,7 +170,8 @@ namespace Solnet.Mango.Historical
         {
             var url = _config.EventHistoryCandlesBaseUrl != null ?
                 _config.EventHistoryCandlesBaseUrl :
-                EventHistoryApiCandlesBaseUrl + $"/tv/config";
+                EventHistoryApiCandlesBaseUrl + 
+                $"/tv/config";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -187,7 +191,8 @@ namespace Solnet.Mango.Historical
         {
             var url = _config.EventHistoryCandlesBaseUrl != null ?
                 _config.EventHistoryCandlesBaseUrl :
-                EventHistoryApiCandlesBaseUrl + $"/trades/address/{marketAddress}";
+                EventHistoryApiCandlesBaseUrl + 
+                $"/trades/address/{marketAddress}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -199,14 +204,15 @@ namespace Solnet.Mango.Historical
         }
 
         /// <inheritdoc cref="IMangoHistoricalDataService.GetSpotStats"/>
-        public IList<SpotStats> GetSpotStats() => GetSpotStatsAsync().Result;
+        public IList<MarginLendingStats> GetSpotStats() => GetSpotStatsAsync().Result;
 
         /// <inheritdoc cref="IMangoHistoricalDataService.GetSpotStatsAsync"/>
-        public async Task<IList<SpotStats>> GetSpotStatsAsync()
+        public async Task<IList<MarginLendingStats>> GetSpotStatsAsync()
         {
             var url = _config.MangoStatsBaseUrl != null ?
                 _config.MangoStatsBaseUrl :
-                MangoStatsBaseUrl + $"/spot?mangoGroup={_config.MangoGroup}";
+                MangoStatsBaseUrl + 
+                $"/spot?mangoGroup={_config.MangoGroup}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -214,7 +220,7 @@ namespace Solnet.Mango.Historical
                 return null;
             }
 
-            return await HandleResponse<List<SpotStats>>(res);
+            return await HandleResponse<List<MarginLendingStats>>(res);
         }
 
         /// <inheritdoc cref="IMangoHistoricalDataService.GetSymbol"/>
@@ -225,7 +231,8 @@ namespace Solnet.Mango.Historical
         {
             var url = _config.EventHistoryCandlesBaseUrl != null ?
                 _config.EventHistoryCandlesBaseUrl :
-                EventHistoryApiCandlesBaseUrl + $"/tv/symbols?symbol={symbol}";
+                EventHistoryApiCandlesBaseUrl + 
+                $"/tv/symbols?symbol={symbol}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -244,7 +251,8 @@ namespace Solnet.Mango.Historical
         {
             var url = _config.EventHistoryBaseUrl != null ?
                 _config.EventHistoryBaseUrl :
-                EventHistoryBaseUrl + $"/stats/perps/{marketAddress}";
+                EventHistoryBaseUrl + 
+                $"/stats/perps/{marketAddress}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)

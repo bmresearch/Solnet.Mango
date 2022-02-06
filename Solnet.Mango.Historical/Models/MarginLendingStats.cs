@@ -3,7 +3,7 @@
     /// <summary>
     /// 
     /// </summary>
-    public class SpotStats : Stats
+    public class MarginLendingStats : Stats
     {
         /// <summary>
         /// 
