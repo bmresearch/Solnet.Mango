@@ -76,7 +76,9 @@ namespace Solnet.Mango.Historical
             if (string.IsNullOrEmpty(marketAddress))
                 throw new ArgumentNullException(nameof(marketAddress));
 
-            var url = MangoStatsBaseUrl + $"/perp/funding_rate?mangoGroup={_config.MangoGroup}&market={marketAddress}";
+            var url = _config.MangoStatsBaseUrl != null ?
+                _config.MangoStatsBaseUrl :
+                MangoStatsBaseUrl + $"/perp/funding_rate?mangoGroup={_config.MangoGroup}&market={marketAddress}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -94,8 +96,13 @@ namespace Solnet.Mango.Historical
         /// <inheritdoc cref="IMangoHistoricalDataService.GetHistoryForSymbolAsync(DateTime, DateTime, string, string)"/>
         public async Task<TvHistory> GetHistoryForSymbolAsync(DateTime from, DateTime to, string symbol, string resolution)
         {
-            var url = EventHistoryApiCandlesBaseUrl + 
-                $"/tv/history?symbol={symbol}&resolution={resolution}&from={(from - DateTime.UnixEpoch).TotalSeconds}&to={(to - DateTime.UnixEpoch).TotalSeconds}";
+            var url = _config.EventHistoryCandlesBaseUrl != null ?
+                _config.EventHistoryCandlesBaseUrl :
+                EventHistoryApiCandlesBaseUrl +
+                $"/tv/history?symbol={symbol}" +
+                $"&resolution={resolution}" +
+                $"&from={(from - DateTime.UnixEpoch).TotalSeconds}" +
+                $"&to={(to - DateTime.UnixEpoch).TotalSeconds}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -139,7 +146,9 @@ namespace Solnet.Mango.Historical
         /// <inheritdoc cref="IMangoHistoricalDataService.GetPerpStatsAsync"/>
         public async Task<IList<PerpStats>> GetPerpStatsAsync()
         {
-            var url = MangoStatsBaseUrl + $"/perp?mangoGroup={_config.MangoGroup}";
+            var url = _config.MangoStatsBaseUrl != null ? 
+                _config.MangoStatsBaseUrl : 
+                MangoStatsBaseUrl + $"/perp?mangoGroup={_config.MangoGroup}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -156,7 +165,9 @@ namespace Solnet.Mango.Historical
         /// <inheritdoc cref="IMangoHistoricalDataService.GetProviderConfigAsync"/>
         public async Task<TvProviderConfig> GetProviderConfigAsync()
         {
-            var url = EventHistoryApiCandlesBaseUrl + $"/tv/config";
+            var url = _config.EventHistoryCandlesBaseUrl != null ?
+                _config.EventHistoryCandlesBaseUrl :
+                EventHistoryApiCandlesBaseUrl + $"/tv/config";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -174,7 +185,9 @@ namespace Solnet.Mango.Historical
         /// <inheritdoc cref="IMangoHistoricalDataService.GetRecentTradesAsync(string)"/>
         public async Task<Response<IList<TradeInfo>>> GetRecentTradesAsync(string marketAddress)
         {
-            var url = EventHistoryApiCandlesBaseUrl + $"/trades/address/{marketAddress}";
+            var url = _config.EventHistoryCandlesBaseUrl != null ?
+                _config.EventHistoryCandlesBaseUrl :
+                EventHistoryApiCandlesBaseUrl + $"/trades/address/{marketAddress}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -191,7 +204,9 @@ namespace Solnet.Mango.Historical
         /// <inheritdoc cref="IMangoHistoricalDataService.GetSpotStatsAsync"/>
         public async Task<IList<SpotStats>> GetSpotStatsAsync()
         {
-            var url = MangoStatsBaseUrl + $"/spot?mangoGroup={_config.MangoGroup}";
+            var url = _config.MangoStatsBaseUrl != null ?
+                _config.MangoStatsBaseUrl :
+                MangoStatsBaseUrl + $"/spot?mangoGroup={_config.MangoGroup}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -208,7 +223,9 @@ namespace Solnet.Mango.Historical
         /// <inheritdoc cref="IMangoHistoricalDataService.GetSymbolAsync"/>
         public async Task<TvSymbol> GetSymbolAsync(string symbol)
         {
-            var url = EventHistoryApiCandlesBaseUrl + $"/tv/symbols?symbol={symbol}";
+            var url = _config.EventHistoryCandlesBaseUrl != null ?
+                _config.EventHistoryCandlesBaseUrl :
+                EventHistoryApiCandlesBaseUrl + $"/tv/symbols?symbol={symbol}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -225,7 +242,9 @@ namespace Solnet.Mango.Historical
         /// <inheritdoc cref="IMangoHistoricalDataService.GetVolumeAsync(string)"/>
         public async Task<Response<VolumeInfo>> GetVolumeAsync(string marketAddress)
         {
-            var url = EventHistoryBaseUrl + $"/stats/perps/{marketAddress}";
+            var url = _config.EventHistoryBaseUrl != null ?
+                _config.EventHistoryBaseUrl :
+                EventHistoryBaseUrl + $"/stats/perps/{marketAddress}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)

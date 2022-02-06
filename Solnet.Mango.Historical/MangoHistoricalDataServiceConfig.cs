@@ -24,22 +24,22 @@ namespace Solnet.Mango.Historical
         /// <summary>
         /// 
         /// </summary>
-        public Uri BaseUri { get; set; }
+        public string BaseUrl { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public Uri MangoStatsBaseUri { get; set; }
+        public string MangoStatsBaseUrl { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public Uri EventHistoryBaseUri { get; set; }
+        public string EventHistoryBaseUrl { get; set; }
 
         /// <summary>
         /// 
         /// </summary>
-        public Uri SerumHistoryBaseUri { get; set; }
+        public string EventHistoryCandlesBaseUrl { get; set; }
 
         /// <summary>
         /// 
