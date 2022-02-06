@@ -14,17 +14,7 @@ namespace Solnet.Mango.Historical
         /// <summary>
         /// 
         /// </summary>
-        public bool UseSingleBaseUri { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public bool ParseOhlcv { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string BaseUrl { get; set; }
 
         /// <summary>
         /// 
