@@ -9,7 +9,7 @@ namespace Solnet.Mango.Historical.Models
     /// <summary>
     /// 
     /// </summary>
-    public class CandlestickSymbol
+    public class TvSymbol
     {
         /// <summary>
         /// 

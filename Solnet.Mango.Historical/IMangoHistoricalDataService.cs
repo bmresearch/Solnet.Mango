@@ -78,6 +78,49 @@ namespace Solnet.Mango.Historical
         /// <returns></returns>
         IList<FundingRateStats> GetHistoricalFundingRates(string marketAddress);
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task<TvProviderConfig> GetProviderConfigAsync();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        TvProviderConfig GetProviderConfig();
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        Task<TvSymbol> GetSymbolAsync(string symbol);
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        TvSymbol GetSymbol(string symbol);
+
+        /// <summary>
+        /// Get historical data for specified time range. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="symbol"></param>
+        /// <param name="resolution"></param>
+        /// <returns></returns>
+        Task<TvHistory> GetHistoryForSymbolAsync(DateTime from, DateTime to, string symbol, string resolution);
+
+        /// <summary>
+        /// Get historical data for specified time range.
+        /// </summary>
+        /// <param name="from"></param>
+        /// <param name="to"></param>
+        /// <param name="symbol"></param>
+        /// <param name="resolution"></param>
+        /// <returns></returns>
+        TvHistory GetHistoryForSymbol(DateTime from, DateTime to, string symbol, string resolution);
 
     }
 }

@@ -61,6 +61,12 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
 - `MangoClient` class which allows to:
     - Get these structures and decode them only by having their address
     - Subscribing to these accounts in real time, getting notifications with their decoded structures
+- `MangoHistoricalDataService` class which allows to:
+  - Get historical deposits and borrows
+  - Get historical funding rates on Mango's perpetual markets
+  - Get volume of Mango's perpetual markets
+  - Get candlesticks of both Mango's spot and perpetual markets
+  - Get recent trades of both Mango's spot and perpetual markets
 
 ## Requirements
 - net 5.0

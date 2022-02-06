@@ -10,7 +10,7 @@ namespace Solnet.Mango.Historical.Models
     /// <summary>
     /// 
     /// </summary>
-    public class CandlestickProviderConfig
+    public class TvProviderConfig
     {
         /// <summary>
         /// 

@@ -31,11 +31,13 @@ namespace Solnet.Mango.Examples
             _mangoHistoricalDataService = new MangoHistoricalDataService( new MangoHistoricalDataServiceConfig 
             {
                 MangoGroup = "mainnet.1",
+                ParseOhlcv = true,
             }, _logger);
         }
 
         public void Run()
         {
+            var spotStats = _mangoHistoricalDataService.GetSpotStats();
             var perpStats = _mangoHistoricalDataService.GetPerpStats();
 
             var fundingRate = _mangoHistoricalDataService.GetHistoricalFundingRates("SOL-PERP");
@@ -44,7 +46,15 @@ namespace Solnet.Mango.Examples
 
             var recentTrades = _mangoHistoricalDataService.GetRecentTrades("2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi");
 
-            //var candles = _mangoHistoricalDataService.GetCandlesticks("SOL-PERP", )
+            var providerConfig = _mangoHistoricalDataService.GetProviderConfig();
+
+            var symbol = _mangoHistoricalDataService.GetSymbol("SOL/USDC");
+
+            // hourly perp candles
+            var perpCandles = _mangoHistoricalDataService.GetHistoryForSymbol(new DateTime(2022, 02, 01), DateTime.UtcNow, "BTC-PERP", "60");
+
+            // hourly spot candles
+            var spotCandles = _mangoHistoricalDataService.GetHistoryForSymbol(new DateTime(2022, 02, 01), DateTime.UtcNow, "SOL/USDC", "60");
 
             Console.ReadLine();
         }

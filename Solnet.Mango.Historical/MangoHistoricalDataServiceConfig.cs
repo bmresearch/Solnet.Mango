@@ -19,6 +19,11 @@ namespace Solnet.Mango.Historical
         /// <summary>
         /// 
         /// </summary>
+        public bool ParseOhlcv { get; set; }
+
+        /// <summary>
+        /// 
+        /// </summary>
         public Uri BaseUri { get; set; }
 
         /// <summary>
