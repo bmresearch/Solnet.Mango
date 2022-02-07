@@ -17,17 +17,17 @@ namespace Solnet.Mango.Historical
         /// <summary>
         /// 
         /// </summary>
-        private static readonly string MangoStatsBaseUrl = "https://mango-stats-v3.herokuapp.com";
+        private static readonly string MangoStatsBaseUrl = "https://mango-stats-v3.herokuapp.com/";
 
         /// <summary>
         /// 
         /// </summary>
-        private static readonly string EventHistoryBaseUrl = "https://event-history-api.herokuapp.com";
+        private static readonly string EventHistoryBaseUrl = "https://event-history-api.herokuapp.com/";
 
         /// <summary>
         /// 
         /// </summary>
-        private static readonly string EventHistoryApiCandlesBaseUrl = "https://event-history-api-candles.herokuapp.com";
+        private static readonly string EventHistoryApiCandlesBaseUrl = "https://event-history-api-candles.herokuapp.com/";
 
         /// <summary>
         /// 
@@ -79,7 +79,7 @@ namespace Solnet.Mango.Historical
             var url = _config.MangoStatsBaseUrl != null ?
                 _config.MangoStatsBaseUrl :
                 MangoStatsBaseUrl + 
-                $"/perp/funding_rate?mangoGroup={_config.MangoGroup}" +
+                $"perp/funding_rate?mangoGroup={_config.MangoGroup}" +
                 $"&market={marketAddress}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
@@ -91,57 +91,6 @@ namespace Solnet.Mango.Historical
             return await HandleResponse<List<FundingRateStats>>(res);
         }
 
-        /// <inheritdoc cref="IMangoHistoricalDataService.GetHistoryForSymbol(DateTime, DateTime, string, string)"/>
-        public TvHistory GetHistoryForSymbol(DateTime from, DateTime to, string symbol, string resolution)
-            => GetHistoryForSymbolAsync(from, to, symbol, resolution).Result;
-
-        /// <inheritdoc cref="IMangoHistoricalDataService.GetHistoryForSymbolAsync(DateTime, DateTime, string, string)"/>
-        public async Task<TvHistory> GetHistoryForSymbolAsync(DateTime from, DateTime to, string symbol, string resolution)
-        {
-            var url = _config.EventHistoryCandlesBaseUrl != null ?
-                _config.EventHistoryCandlesBaseUrl :
-                EventHistoryApiCandlesBaseUrl +
-                $"/tv/history?symbol={symbol}" +
-                $"&resolution={resolution}" +
-                $"&from={(from - DateTime.UnixEpoch).TotalSeconds}" +
-                $"&to={(to - DateTime.UnixEpoch).TotalSeconds}";
-            HttpResponseMessage res = await _httpClient.GetAsync(url);
-
-            if (!res.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            var tvHistory = await HandleResponse<TvHistory>(res);
-
-            if (_config.ParseOhlcv)
-            {
-                if (tvHistory != null && tvHistory.ErrorMessage == null
-                                   && tvHistory.High.Length == tvHistory.Low.Length
-                                   && tvHistory.High.Length == tvHistory.Close.Length
-                                   && tvHistory.High.Length == tvHistory.Open.Length
-                                   && tvHistory.High.Length == tvHistory.Volume.Length)
-                {
-                    var resultOhlcvs = new OHLCV[tvHistory.High.Length];
-                    for (int i = 0; i < tvHistory.High.Length; i++)
-                    {
-                        resultOhlcvs[i] = new OHLCV()
-                        {
-                            High = tvHistory.High[i],
-                            Close = tvHistory.Close[i],
-                            Open = tvHistory.Open[i],
-                            Low = tvHistory.Low[i],
-                            Volume = tvHistory.Volume[i],
-                            Timestamp = DateTime.UnixEpoch.AddSeconds(tvHistory.Timestamp[i])
-                        };
-                    }
-                    tvHistory.ParsedOHLCVs = resultOhlcvs;
-                }
-            }
-
-            return tvHistory;
-        }
-
         /// <inheritdoc cref="IMangoHistoricalDataService.GetPerpStats"/>
         public IList<PerpStats> GetPerpStats() => GetPerpStatsAsync().Result;
 
@@ -151,7 +100,7 @@ namespace Solnet.Mango.Historical
             var url = _config.MangoStatsBaseUrl != null ? 
                 _config.MangoStatsBaseUrl : 
                 MangoStatsBaseUrl + 
-                $"/perp?mangoGroup={_config.MangoGroup}";
+                $"perp?mangoGroup={_config.MangoGroup}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -160,26 +109,6 @@ namespace Solnet.Mango.Historical
             }
 
             return await HandleResponse<List<PerpStats>>(res);
-        }
-
-        /// <inheritdoc cref="IMangoHistoricalDataService.GetProviderConfig"/>
-        public TvProviderConfig GetProviderConfig() => GetProviderConfigAsync().Result;
-
-        /// <inheritdoc cref="IMangoHistoricalDataService.GetProviderConfigAsync"/>
-        public async Task<TvProviderConfig> GetProviderConfigAsync()
-        {
-            var url = _config.EventHistoryCandlesBaseUrl != null ?
-                _config.EventHistoryCandlesBaseUrl :
-                EventHistoryApiCandlesBaseUrl + 
-                $"/tv/config";
-            HttpResponseMessage res = await _httpClient.GetAsync(url);
-
-            if (!res.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            return await HandleResponse<TvProviderConfig>(res);
         }
 
         /// <inheritdoc cref="IMangoHistoricalDataService.GetRecentTrades(string)"/>
@@ -192,7 +121,7 @@ namespace Solnet.Mango.Historical
             var url = _config.EventHistoryCandlesBaseUrl != null ?
                 _config.EventHistoryCandlesBaseUrl :
                 EventHistoryApiCandlesBaseUrl + 
-                $"/trades/address/{marketAddress}";
+                $"trades/address/{marketAddress}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -212,7 +141,7 @@ namespace Solnet.Mango.Historical
             var url = _config.MangoStatsBaseUrl != null ?
                 _config.MangoStatsBaseUrl :
                 MangoStatsBaseUrl + 
-                $"/spot?mangoGroup={_config.MangoGroup}";
+                $"spot?mangoGroup={_config.MangoGroup}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)
@@ -221,26 +150,6 @@ namespace Solnet.Mango.Historical
             }
 
             return await HandleResponse<List<MarginLendingStats>>(res);
-        }
-
-        /// <inheritdoc cref="IMangoHistoricalDataService.GetSymbol"/>
-        public TvSymbol GetSymbol(string symbol) => GetSymbolAsync(symbol).Result;
-
-        /// <inheritdoc cref="IMangoHistoricalDataService.GetSymbolAsync"/>
-        public async Task<TvSymbol> GetSymbolAsync(string symbol)
-        {
-            var url = _config.EventHistoryCandlesBaseUrl != null ?
-                _config.EventHistoryCandlesBaseUrl :
-                EventHistoryApiCandlesBaseUrl + 
-                $"/tv/symbols?symbol={symbol}";
-            HttpResponseMessage res = await _httpClient.GetAsync(url);
-
-            if (!res.IsSuccessStatusCode)
-            {
-                return null;
-            }
-
-            return await HandleResponse<TvSymbol> (res);
         }
 
         /// <inheritdoc cref="IMangoHistoricalDataService.GetVolume(string)"/>
@@ -252,7 +161,7 @@ namespace Solnet.Mango.Historical
             var url = _config.EventHistoryBaseUrl != null ?
                 _config.EventHistoryBaseUrl :
                 EventHistoryBaseUrl + 
-                $"/stats/perps/{marketAddress}";
+                $"stats/perps/{marketAddress}";
             HttpResponseMessage res = await _httpClient.GetAsync(url);
 
             if (!res.IsSuccessStatusCode)

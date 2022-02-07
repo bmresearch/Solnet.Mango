@@ -14,11 +14,6 @@ namespace Solnet.Mango.Historical
         /// <summary>
         /// 
         /// </summary>
-        public bool ParseOhlcv { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
         public string MangoStatsBaseUrl { get; set; }
 
         /// <summary>
