@@ -44,6 +44,8 @@ namespace Solnet.Mango.Test
 
         private const string SettleFeesMessage = "AQAGDApz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4PXZlUykmGWoPjtNacJy3FdWu697umtHGPMe68DE4x2WYAxig2FEvystJRkjr1kfkvxGi/EKTL1QaZFDVZrfaJPzunXKJbtS8YLYgY2f11zGxHDuQhmnN4m8nFrEbWL7mjOkRwE+LS7mOqKst0t9XVKIjQLKnorTLqzoWt16QJOc8TQ4J2EPl9BDMF+zkq/DCJmIcxEjojfFW/ZpOiHHc6sohIC1MXuUx1BqubENkb/BfDUR2wytGaIy8quZuGSIhc1enabCRStasrnNU4+aP4LPFLTp9LFYZTQ1yFH/LwMX0sZDYUlptIBg9RW0ZzsuHXwOMLhTPIhTUezqL5RfJO6cwEDDqWqCTX/YYsLoZIm4/AOjtdu54FMVywS+aYKOBBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKk5kw4m3RTlrY1U1TDoqPHph4SQpWHgwU5NDOx8pbUuMXbH15BXMTE9b0EDMhCHjJirqhVm0ZQt0Uw8u3N+OQVWAQsKBgcBAggDBAUJCgQdAAAA";
 
+        private const string SetDelegateMessage = "AQADBQpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4mAMYoNhRL8rLSUZI69ZH5L8RovxCky9UGmRQ1Wa32iTKISAtTF7lMdQarmxDZG/wXw1EdsMrRmiMvKrmbhkiIUdpq5cgS6g/sMruF/eGjx4HTlIVgaDYnZQ3napltxeyOZMOJt0U5a2NVNUw6Kjx6YeEkKVh4MFOTQzsfKW1LjFCOnISNMoN1q1oaY51oyod00EnC8RaGBYrGcg8VhA8LwEEBAIBAAMEOgAAAA==";
+
         [ClassInitialize]
         public static void Setup(TestContext tc)
         {
@@ -537,6 +539,24 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("54PcMYTAZd8uRaYyb3Cwgctcfc1LchGMaqVrmxgr3yVs", ix[0].Values.GetValueOrDefault("Fees Vault").ToString());
             Assert.AreEqual("CFdbPXrnPLmo5Qrze7rw9ZNiD82R1VeNdoQosooSP1Ax", ix[0].Values.GetValueOrDefault("Signer").ToString());
             Assert.AreEqual("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", ix[0].Values.GetValueOrDefault("Token Program").ToString());
+        }
+
+        [TestMethod]
+        public void SetDelegate()
+        {
+
+            Message msg = Message.Deserialize(Convert.FromBase64String(SetDelegateMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(1, ix.Count);
+            Assert.AreEqual("Set Delegate", ix[0].InstructionName);
+            Assert.AreEqual("Mango Program V3", ix[0].ProgramName);
+            Assert.AreEqual(0, ix[0].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[0].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", ix[0].Values.GetValueOrDefault("Mango Account").ToString());
+            Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[0].Values.GetValueOrDefault("Owner").ToString());
+            Assert.AreEqual("5omQJtDUHA3gMFdHEQg1zZSvcBUVzey5WaKWYRmqF1Vj", ix[0].Values.GetValueOrDefault("Delegate").ToString());
         }
     }
 }

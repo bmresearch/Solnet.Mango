@@ -27,7 +27,7 @@ namespace Solnet.Mango.Examples
                 {
                     if (mangoGroup.Tokens[token].RootBank.Key == SystemProgram.ProgramIdKey.Key) continue;
                     Console.WriteLine(
-                        //$"Token: {mangoGroup.Tokens[token].Mint,-50}" +
+                        $"Token: {mangoGroup.Tokens[token].Mint,-50}" +
                         $"Deposits: {mangoAccount.GetUiDeposit(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal(),-25:N4}" +
                         $"Borrows: {mangoAccount.GetUiBorrow(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal(),-25:N4}" +
                         $"MaxWithBorrow: {mangoAccount.GetMaxWithBorrowForToken(mangoGroup, mangoCache, token).ToDecimal(),-25:N4}" +

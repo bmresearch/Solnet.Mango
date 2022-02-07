@@ -82,18 +82,30 @@ namespace Solnet.Mango.Examples
             mangoGroup.ParsedResult.LoadRootBanks(_rpcClient, _logger);
             var mangoCache = _mangoClient.GetMangoCache(mangoGroup.ParsedResult.MangoCache);
 
-            var mangoAccount = _mangoClient.GetMangoAccount("DRUZRfLQtki4ZYvRXhi5yGmyqCf6iMfTzxtBpxo6rbHu");
+            var mangoAccount = _mangoClient.GetMangoAccount(mangoAccountAddress);
             mangoAccount.ParsedResult.LoadOpenOrdersAccounts(_rpcClient, _logger);
             
-            //var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
+            var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
 
             ExampleHelpers.LogAccountStatus(_mangoClient, mangoGroup.ParsedResult, mangoCache.ParsedResult, mangoAccount.ParsedResult);
 
-            var msg = MarketBuySOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
+            // close LONG on SOL-PERP
+            // var msg = ClosePositionSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
 
-            Console.ReadLine();
+            // settle perp fees
+            // var msg = SettleFeesSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
+
+            // var msg = AddAdvancedOrderIx(mangoGroup.ParsedResult, mangoAccount.ParsedResult, perp);
+
+            // deposit to an account
+            // var msg = Deposit(mangoGroup.ParsedResult, mangoAccountAddress, MarketUtils.WrappedSolMint, 58);
+
+            // withdraw from an account
+            var msg = Withdraw(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress, new("8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN"), 9331.94);
+
             ExampleHelpers.DecodeAndLogMessage(msg);
 
+            Console.ReadLine();
             var txBytes = SignAndAssembleTx(msg);
 
             var sig = ExampleHelpers.SubmitTxSendAndLog(_rpcClient, txBytes);
@@ -122,8 +134,11 @@ namespace Solnet.Mango.Examples
                 mangoGroup.Tokens.FirstOrDefault(x => x.Mint.Key == MarketUtils.WrappedSolMint);
             if (wrappedSolTokenInfo == null) return null;
 
-
             int tokenIndex = mangoGroup.GetTokenIndex(wrappedSolTokenInfo.Mint);
+
+            var market = _mangoClient.GetPerpMarket(mangoGroup.PerpetualMarkets[tokenIndex].Market);
+
+            Console.WriteLine($"Fees Accrued: {MangoUtils.HumanizeNative(market.ParsedResult.FeesAccrued, mangoGroup.GetQuoteTokenInfo().Decimals)}");
 
             return SettleFeesIx(mangoGroup, mangoGroup.PerpetualMarkets[tokenIndex].Market, mangoAccountAddress);
         }
@@ -143,6 +158,23 @@ namespace Solnet.Mango.Examples
             return PlacePerpOrder(mangoGroup, mangoAccount, mangoAccountAddress, wrappedSolTokenInfo, quoteTokenInfo,
                 market.ParsedResult, mangoGroup.PerpetualMarkets[tokenIndex].Market, Side.Sell, PerpOrderType.IOC,
                 (float) mangoAccount.PerpetualAccounts[tokenIndex].GetUiBasePosition(market.ParsedResult, wrappedSolTokenInfo.Decimals), 105, true);
+        }
+
+        private byte[] SetStopLossSOLPERP(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress)
+        {
+            TokenInfo wrappedSolTokenInfo =
+                mangoGroup.Tokens.FirstOrDefault(x => x.Mint.Key == MarketUtils.WrappedSolMint);
+            if (wrappedSolTokenInfo == null) return null;
+            int tokenIndex = mangoGroup.GetTokenIndex(wrappedSolTokenInfo.Mint);
+
+            TokenInfo quoteTokenInfo =
+                mangoGroup.GetQuoteTokenInfo();
+
+            var market = _mangoClient.GetPerpMarket(mangoGroup.PerpetualMarkets[tokenIndex].Market);
+
+            var advancedOrdersAddress = _mango.DeriveAdvancedOrdersAccountAddress(mangoAccountAddress);
+
+            return AddAdvancedOrderIx(mangoGroup, mangoAccount, mangoGroup.PerpetualMarkets[tokenIndex].Market, mangoAccountAddress, advancedOrdersAddress);
         }
 
         private byte[] MarketBuySOLPERP(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress)
@@ -172,10 +204,10 @@ namespace Solnet.Mango.Examples
 
             var order = new OrderBuilder()
                 .SetSide(Side.Sell)
-                .SetOrderType(OrderType.Limit)
+                .SetOrderType(OrderType.ImmediateOrCancel)
                 .SetSelfTradeBehavior(SelfTradeBehavior.AbortTransaction)
                 .SetClientOrderId(1_000_000UL)
-                .SetPrice(250)
+                .SetPrice(110)
                 .SetQuantity(10)
                 .Build();
 
@@ -207,34 +239,47 @@ namespace Solnet.Mango.Examples
             return CreateSpotOpenOrdersIx(mangoGroup, mangoAccountAddress, mangoGroup.SpotMarkets[tokenIndex].Market);
         }
 
-        private byte[] WithdrawSolana(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress)
+        private byte[] Withdraw(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress, PublicKey tokenMint, double withdrawAmount)
         {
-            TokenInfo wrappedSolTokenInfo =
-                mangoGroup.Tokens.FirstOrDefault(x => x.Mint.Key == MarketUtils.WrappedSolMint);
-            if (wrappedSolTokenInfo == null) return null;
-            AccountResultWrapper<RootBank> wrappedSolRootBank = _mangoClient.GetRootBank(wrappedSolTokenInfo.RootBank);
-            Console.WriteLine($"RootBankKey: {wrappedSolTokenInfo.RootBank}");
-            Console.WriteLine($"Type: {wrappedSolRootBank.ParsedResult.Metadata.DataType}");
+            TokenInfo tokenInfo =
+                mangoGroup.Tokens.FirstOrDefault(x => x.Mint.Key == tokenMint);
+            if (tokenInfo == null) return null;
+            var tokenIndex = mangoGroup.GetTokenIndex(tokenInfo.Mint);
+
+            AccountResultWrapper<RootBank> tokenRootBank = _mangoClient.GetRootBank(tokenInfo.RootBank);
+            Console.WriteLine($"RootBankKey: {tokenInfo.RootBank}");
+            Console.WriteLine($"Type: {tokenRootBank.ParsedResult.Metadata.DataType}");
 
             Task.Delay(200).Wait();
 
             PublicKey nodeBankKey =
-                wrappedSolRootBank.ParsedResult.NodeBanks.FirstOrDefault(x => x.Key != SystemProgram.ProgramIdKey.Key);
+                tokenRootBank.ParsedResult.NodeBanks.FirstOrDefault(x => x.Key != SystemProgram.ProgramIdKey.Key);
             if (nodeBankKey == null) return null;
             AccountResultWrapper<NodeBank> nodeBank = _mangoClient.GetNodeBank(nodeBankKey);
             Console.WriteLine($"NodeBankKey: {nodeBankKey}");
             Console.WriteLine($"Type: {nodeBank.ParsedResult.Metadata.DataType}");
 
-            return WithdrawIx(mangoGroup, mangoAccountAddress, wrappedSolTokenInfo.RootBank, nodeBankKey, nodeBank.ParsedResult.Vault, mangoAccount.SpotOpenOrders);
+            var balance = mangoAccount.GetUiDeposit(mangoGroup.RootBankAccounts[tokenIndex], mangoGroup, tokenIndex).ToDecimal();
+            var amount = (ulong)withdrawAmount * (ulong)Math.Pow(10, tokenInfo.Decimals);
+
+            Console.WriteLine($"Balance: {balance}\t\tWithdraw Amount: {amount}");
+
+            var tokenAccounts = _rpcClient.GetTokenAccountsByOwner(_wallet.Account.PublicKey, tokenMint);
+
+            var tokenAccount = tokenAccounts.Result.Value != null ? tokenAccounts.Result.Value.Select(x => x.PublicKey).FirstOrDefault() : null ;
+
+            return WithdrawIx(mangoGroup, mangoAccountAddress, tokenInfo.RootBank, nodeBankKey, nodeBank.ParsedResult.Vault, mangoAccount.SpotOpenOrders, amount, 
+                tokenAccount != null ? new(tokenAccount) : null);
         }
 
-        private byte[] DepositSolana(MangoGroup mangoGroup, PublicKey mangoAccount)
+        private byte[] Deposit(MangoGroup mangoGroup, PublicKey mangoAccount, PublicKey tokenMint, double depositAmount)
         {
-            TokenInfo wrappedSolTokenInfo =
-                mangoGroup.Tokens.First(x => x.Mint.Key == MarketUtils.WrappedSolMint);
-            if (wrappedSolTokenInfo == null) return null;
-            AccountResultWrapper<RootBank> wrappedSolRootBank = _mangoClient.GetRootBank(wrappedSolTokenInfo.RootBank);
-            Console.WriteLine($"RootBankKey: {wrappedSolTokenInfo.RootBank}");
+            TokenInfo tokenInfo =
+                mangoGroup.Tokens.First(x => x.Mint.Key == tokenMint);
+            if (tokenInfo == null) return null;
+            var tokenIndex = mangoGroup.GetTokenIndex(tokenInfo.Mint);
+            AccountResultWrapper<RootBank> wrappedSolRootBank = _mangoClient.GetRootBank(tokenInfo.RootBank);
+            Console.WriteLine($"RootBankKey: {tokenInfo.RootBank}");
             Console.WriteLine($"Type: {wrappedSolRootBank.ParsedResult.Metadata.DataType}");
 
             Task.Delay(200).Wait();
@@ -246,7 +291,57 @@ namespace Solnet.Mango.Examples
             Console.WriteLine($"NodeBankKey: {nodeBankKey}");
             Console.WriteLine($"Type: {nodeBank.ParsedResult.Metadata.DataType}");
 
-            return DepositIx(mangoGroup, mangoAccount, wrappedSolTokenInfo.RootBank, nodeBankKey, nodeBank.ParsedResult.Vault);
+            ulong amount = (ulong) depositAmount * (ulong) Math.Pow(10, tokenInfo.Decimals);
+
+            Console.WriteLine($"Deposit Amount: {amount}");
+
+            return DepositIx(mangoGroup, mangoAccount, tokenInfo.RootBank, nodeBankKey, nodeBank.ParsedResult.Vault, amount);
+        }
+
+        private byte[] SetDelegateIx(PublicKey mangoAccountAddress)
+        {
+            var blockhash = _rpcClient.GetRecentBlockHash();
+
+            TransactionBuilder txBuilder = new TransactionBuilder()
+                .SetFeePayer(_wallet.Account)
+                .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
+                .AddInstruction(_mango.SetDelegate(
+                    Constants.DevNetMangoGroup,
+                    mangoAccountAddress,
+                    _wallet.Account,
+                    new("5omQJtDUHA3gMFdHEQg1zZSvcBUVzey5WaKWYRmqF1Vj")
+                    ));
+
+            return txBuilder.CompileMessage();
+        }
+
+        private byte[] AddAdvancedOrderIx(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey perpMarket,
+            PublicKey mangoAccountAddress, PublicKey advancedOrdersAddress)
+        {
+            var blockhash = _rpcClient.GetRecentBlockHash();
+
+            TransactionBuilder txBuilder = new TransactionBuilder()
+                .SetFeePayer(_wallet.Account)
+                .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
+                .AddInstruction(_mango.AddPerpTriggerOrder(
+                    Constants.DevNetMangoGroup,
+                    mangoAccountAddress, 
+                    _wallet.Account,
+                    advancedOrdersAddress, 
+                    mangoGroup.MangoCache,
+                    perpMarket,
+                    mangoAccount.SpotOpenOrders,
+                    PerpOrderType.IOC, 
+                    Side.Buy,
+                    100_000,
+                    100_000,
+                    TriggerCondition.Below,
+                    100_000,
+                    1_000_000,
+                    true
+                    ));
+
+            return txBuilder.CompileMessage();
         }
 
         private byte[] SettleFeesIx(MangoGroup mangoGroup, PublicKey perpMarket, PublicKey mangoAccountAddress)
@@ -359,6 +454,8 @@ namespace Solnet.Mango.Examples
 
             var (nativePrice, nativeQuantity) = market.UiToNativePriceQuantity(price, size, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
 
+            var marketIndex = mangoGroup.GetPerpMarketIndex(perpMarket);
+
             TransactionBuilder txBuilder = new TransactionBuilder()
                 .SetFeePayer(_wallet.Account)
                 .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
@@ -372,8 +469,8 @@ namespace Solnet.Mango.Examples
                     market.Asks,
                     market.EventQueue,
                     mangoAccount.SpotOpenOrders,
-                    side, 
-                    perpOrderType, 
+                    side,
+                    perpOrderType,
                     nativePrice,
                     nativeQuantity,
                     1_000_000,
@@ -536,25 +633,42 @@ namespace Solnet.Mango.Examples
         /// <param name="vault"></param>
         /// <param name="openOrders"></param>
         /// <returns></returns>
-        private byte[] WithdrawIx(MangoGroup mangoGroup, PublicKey mangoAccount, PublicKey rootBank, PublicKey nodeBank, PublicKey vault, List<PublicKey> openOrders)
+        private byte[] WithdrawIx(MangoGroup mangoGroup, PublicKey mangoAccount, PublicKey rootBank, PublicKey nodeBank, PublicKey vault,
+            List<PublicKey> openOrders, ulong balance, PublicKey tokenAccount = null)
         {
             var blockhash = _rpcClient.GetRecentBlockHash();
 
-            var minBalance = _rpcClient.GetMinimumBalanceForRentExemption(TokenProgram.TokenAccountDataSize);
-
+            /// in case we need to create wSOL account
             Account acc = new Account();
-            _signers.Add(acc);
 
+            var destAcc = acc.PublicKey;
             TransactionBuilder txBuilder = new TransactionBuilder()
                 .SetFeePayer(_wallet.Account)
-                .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
-                .AddInstruction(SystemProgram.CreateAccount(
+                .SetRecentBlockHash(blockhash.Result.Value.Blockhash);
+
+            /// need to create wSOL token account
+            if (rootBank == mangoGroup.Tokens[mangoGroup.GetTokenIndex(MarketUtils.WrappedSolMint)].RootBank)
+            {
+                var minBalance = _rpcClient.GetMinimumBalanceForRentExemption(TokenProgram.TokenAccountDataSize);
+                _signers.Add(acc);
+                txBuilder.AddInstruction(SystemProgram.CreateAccount(
                     _wallet.Account,
-                    acc,
+                    destAcc,
                     minBalance.Result,
                     TokenProgram.TokenAccountDataSize,
                     TokenProgram.ProgramIdKey))
-                .AddInstruction(TokenProgram.InitializeAccount(acc, MarketUtils.WrappedSolMint, _wallet.Account))
+                .AddInstruction(TokenProgram.InitializeAccount(destAcc, MarketUtils.WrappedSolMint, _wallet.Account));
+            }
+
+            if(tokenAccount == null && rootBank != mangoGroup.Tokens[mangoGroup.GetTokenIndex(MarketUtils.WrappedSolMint)].RootBank)
+            {
+                var tokenInfo = mangoGroup.Tokens.First(x => x.RootBank == rootBank);
+                var tokenAccountAddress = AssociatedTokenAccountProgram.DeriveAssociatedTokenAccount(_wallet.Account, tokenInfo.Mint);
+                destAcc = tokenAccountAddress;
+                txBuilder.AddInstruction(AssociatedTokenAccountProgram.CreateAssociatedTokenAccount(_wallet.Account, _wallet.Account, tokenInfo.Mint));
+            }
+
+            txBuilder
                 .AddInstruction(_mango.Withdraw(
                     Constants.DevNetMangoGroup,
                     mangoAccount,
@@ -563,13 +677,16 @@ namespace Solnet.Mango.Examples
                     rootBank,
                     nodeBank,
                     vault,
-                    acc,
+                    destAcc,
                     mangoGroup.SignerKey,
                     openOrders,
-                    1 * SolHelper.LAMPORTS_PER_SOL,
+                    balance,
                     false
-                ))
-                .AddInstruction(TokenProgram.CloseAccount(acc, _wallet.Account, _wallet.Account, TokenProgram.ProgramIdKey));
+                ));
+
+            /// need to close wSOL token account
+            if (rootBank == mangoGroup.Tokens[mangoGroup.GetTokenIndex(MarketUtils.WrappedSolMint)].RootBank)
+                txBuilder.AddInstruction(TokenProgram.CloseAccount(destAcc, _wallet.Account, _wallet.Account, TokenProgram.ProgramIdKey));
 
             return txBuilder.CompileMessage();
         }
@@ -586,39 +703,49 @@ namespace Solnet.Mango.Examples
         /// <param name="nodeBank"></param>
         /// <param name="vault"></param>
         /// <returns></returns>
-        private byte[] DepositIx(MangoGroup mangoGroup, PublicKey mangoAccount, PublicKey rootBank, PublicKey nodeBank, PublicKey vault)
+        private byte[] DepositIx(MangoGroup mangoGroup, PublicKey mangoAccount, PublicKey rootBank, PublicKey nodeBank, PublicKey vault, ulong amount)
         {
 
             var blockhash = _rpcClient.GetRecentBlockHash();
 
             var minBalance = _rpcClient.GetMinimumBalanceForRentExemption(TokenProgram.TokenAccountDataSize);
 
+            /// in case we need to create wSOL account
             Account acc = new Account();
             _signers.Add(acc);
 
             TransactionBuilder txBuilder = new TransactionBuilder()
                 .SetFeePayer(_wallet.Account)
-                .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
-                .AddInstruction(SystemProgram.CreateAccount(
+                .SetRecentBlockHash(blockhash.Result.Value.Blockhash);
+
+            /// need to create wSOL token account
+            if (rootBank == mangoGroup.Tokens[mangoGroup.GetTokenIndex(MarketUtils.WrappedSolMint)].RootBank)
+            {
+                txBuilder.AddInstruction(SystemProgram.CreateAccount(
                     _wallet.Account,
                     acc,
                     minBalance.Result +
-                    100 * SolHelper.LAMPORTS_PER_SOL,
+                    amount,
                     TokenProgram.TokenAccountDataSize,
                     TokenProgram.ProgramIdKey))
-                .AddInstruction(TokenProgram.InitializeAccount(acc, MarketUtils.WrappedSolMint, _wallet.Account))
-                .AddInstruction(_mango.Deposit(
-                    Constants.DevNetMangoGroup,
-                    mangoAccount,
-                    _wallet.Account,
-                    mangoGroup.MangoCache,
-                    rootBank,
-                    nodeBank,
-                    vault,
-                    acc,
-                    100 * SolHelper.LAMPORTS_PER_SOL
-                ))
-                .AddInstruction(TokenProgram.CloseAccount(acc, _wallet.Account, _wallet.Account, TokenProgram.ProgramIdKey));
+                .AddInstruction(TokenProgram.InitializeAccount(acc, MarketUtils.WrappedSolMint, _wallet.Account));
+            }
+
+            txBuilder.AddInstruction(_mango.Deposit(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                _wallet.Account,
+                mangoGroup.MangoCache,
+                rootBank,
+                nodeBank,
+                vault,
+                acc,
+                amount
+            ));
+
+            /// need to close wSOL token account
+            if (rootBank == mangoGroup.Tokens[mangoGroup.GetTokenIndex(MarketUtils.WrappedSolMint)].RootBank)
+                txBuilder.AddInstruction(TokenProgram.CloseAccount(acc, _wallet.Account, _wallet.Account, TokenProgram.ProgramIdKey));
 
             return txBuilder.CompileMessage();
         }
