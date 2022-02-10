@@ -4,6 +4,7 @@ using Solnet.Mango.Models.Caches;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Mango.Types;
 using Solnet.Programs;
+using Solnet.Programs.Models;
 using Solnet.Programs.Utilities;
 using Solnet.Rpc;
 using Solnet.Rpc.Core.Http;
@@ -224,24 +225,66 @@ namespace Solnet.Mango.Models
         public uint NumMangoAccounts;
 
         /// <summary>
+        /// Loads the perp markets for this mango group. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="mangoClient">A mango client instance.</param>
+        /// <param name="logger">A logger instance.</param>
+        public async Task<MultipleAccountsResultWrapper<List<PerpMarket>>> LoadPerpMarketsAsync(IMangoClient mangoClient, ILogger logger = null)
+        {
+            List<PublicKey> filteredPerpMarkets = PerpetualMarkets
+                .Where(x => !x.Market.Equals(SystemProgram.ProgramIdKey))
+                .Select(x => x.Market).ToList();
+            MultipleAccountsResultWrapper<List<PerpMarket>> perpMarketAccounts =
+                await mangoClient.GetPerpMarketsAsync(filteredPerpMarkets);
+            if (!perpMarketAccounts.OriginalRequest.WasSuccessful)
+            {
+                logger?.LogInformation($"Could not fetch perp market accounts.");
+                return perpMarketAccounts;
+            }
+            logger?.LogInformation(
+                $"Successfully fetched {perpMarketAccounts.ParsedResult.Count} perp market accounts.");
+
+            PerpetualMarkets.ForEach(key =>
+            {
+                int keyIndex = filteredPerpMarkets.IndexOf(key.Market);
+                if (keyIndex == -1)
+                {
+                    PerpMarketAccounts.Add(null);
+                    return;
+                }
+                PerpMarketAccounts.Add(perpMarketAccounts.ParsedResult[keyIndex]);
+            });
+
+            return perpMarketAccounts;
+        }
+
+        /// <summary>
+        /// Loads the perp markets for this mango group.
+        /// </summary>
+        /// <param name="mangoClient">A mango client instance.</param>
+        /// <param name="logger">A logger instance.</param>
+        public MultipleAccountsResultWrapper<List<PerpMarket>> LoadPerpMarkets(IMangoClient mangoClient, ILogger logger = null) =>
+            LoadPerpMarketsAsync(mangoClient, logger).Result;
+
+        /// <summary>
         /// Loads the root banks for this root bank. This is an asynchronous operation.
         /// </summary>
-        /// <param name="rpcClient">A rpc client instance.</param>
+        /// <param name="mangoClient">A mango client instance.</param>
         /// <param name="logger">A logger instance.</param>
-        public async Task<RequestResult<ResponseValue<List<AccountInfo>>>> LoadRootBanksAsync(IRpcClient rpcClient, ILogger logger = null)
+        public async Task<MultipleAccountsResultWrapper<List<RootBank>>> LoadRootBanksAsync(IMangoClient mangoClient, ILogger logger = null)
         {
-            IList<PublicKey> filteredRootBanks = Tokens
+            List<PublicKey> filteredRootBanks = Tokens
                 .Where(x => !x.RootBank.Equals(SystemProgram.ProgramIdKey))
                 .Select(x => x.RootBank).ToList();
-            RequestResult<ResponseValue<List<AccountInfo>>> rootBankAccounts =
-                await rpcClient.GetMultipleAccountsAsync(filteredRootBanks.Select(x => x.Key).ToList());
-            if (!rootBankAccounts.WasRequestSuccessfullyHandled)
+            MultipleAccountsResultWrapper<List<RootBank>> rootBankAccounts =
+                await mangoClient.GetRootBanksAsync(filteredRootBanks);
+            if (!rootBankAccounts.WasSuccessful)
             {
                 logger?.LogInformation($"Could not fetch root bank accounts.");
                 return rootBankAccounts;
             }
             logger?.LogInformation(
-                $"Successfully fetched {rootBankAccounts.Result.Value.Count} root bank accounts.");
+                $"Successfully fetched {rootBankAccounts.ParsedResult.Count} root bank accounts.");
 
             Tokens.ForEach(key =>
             {
@@ -251,9 +294,8 @@ namespace Solnet.Mango.Models
                     RootBankAccounts.Add(null);
                     return;
                 }
-                RootBank rb = RootBank.Deserialize(Convert.FromBase64String(rootBankAccounts.Result.Value[keyIndex].Data[0]));
-                rb.LoadNodeBanks(rpcClient, logger);
-                RootBankAccounts.Add(rb);
+                rootBankAccounts.ParsedResult[keyIndex].LoadNodeBanks(mangoClient, logger);
+                RootBankAccounts.Add(rootBankAccounts.ParsedResult[keyIndex]);
             });
 
             return rootBankAccounts;
@@ -262,10 +304,10 @@ namespace Solnet.Mango.Models
         /// <summary>
         /// Loads the root banks for this root bank.
         /// </summary>
-        /// <param name="rpcClient">A rpc client instance.</param>
+        /// <param name="mangoClient">A mango client instance.</param>
         /// <param name="logger">A logger instance.</param>
-        public RequestResult<ResponseValue<List<AccountInfo>>> LoadRootBanks(IRpcClient rpcClient, ILogger logger = null) =>
-            LoadRootBanksAsync(rpcClient, logger).Result;
+        public MultipleAccountsResultWrapper<List<RootBank>> LoadRootBanks(IMangoClient mangoClient, ILogger logger = null) =>
+            LoadRootBanksAsync(mangoClient, logger).Result;
 
         /// <summary>
         /// Gets the index for the given oracle <see cref="PublicKey"/>.
@@ -498,7 +540,6 @@ namespace Solnet.Mango.Models
             for (int i = 0; i < Constants.MaxPairs; i++)
             {
                 PublicKey oracle = oraclesBytes.GetPubKey(i * PublicKey.PublicKeyLength);
-                if (oracle.Equals(SystemProgram.ProgramIdKey)) continue;
                 oracles.Add(oracle);
             }
 

@@ -4,10 +4,23 @@
 <p align="center">
     <a href="https://github.com/bmresearch/Solnet.Mango/actions/workflows/dotnet.yml">
         <img src="https://github.com/bmresearch/Solnet.Mango/actions/workflows/dotnet.yml/badge.svg"
-            alt="Build Status (master)" ></a>
+            alt="Build" ></a>
+    <a href="https://github.com/bmresearch/Solnet.Mango/actions/workflows/publish.yml">
+       <img src="https://github.com/bmresearch/Solnet.Mango/actions/workflows/publish.yml/badge.svg" 
+            alt="Release"></a>
     <a href="https://coveralls.io/github/bmresearch/Solnet.Mango?branch=master">
         <img src="https://coveralls.io/repos/github/bmresearch/Solnet.Mango/badge.svg?branch=master" 
             alt="Coverage Status" ></a>
+<br/>
+    <a href="">
+        <img src="https://img.shields.io/github/license/bmresearch/Solnet.Mango?style=flat-square"
+            alt="Code License"></a>
+    <a href="https://twitter.com/intent/follow?screen_name=blockmountainio">
+        <img src="https://img.shields.io/twitter/follow/blockmountainio?style=flat-square&logo=twitter"
+            alt="Follow on Twitter"></a>
+    <a href="https://discord.gg/YHMbpuS3Tx">
+       <img alt="Discord" src="https://img.shields.io/discord/849407317761064961?style=flat-square"
+            alt="Join the discussion!"></a>
 </p>
 
 # What is Solnet.Mango?

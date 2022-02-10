@@ -1,8 +1,12 @@
 using Solnet.Mango.Models;
 using Solnet.Mango.Models.Banks;
 using Solnet.Mango.Models.Caches;
+using Solnet.Mango.Models.Perpetuals;
+using Solnet.Mango.Types;
 using Solnet.Programs;
 using Solnet.Programs.Models;
+using Solnet.Pyth;
+using Solnet.Pyth.Models;
 using Solnet.Rpc;
 using Solnet.Rpc.Types;
 using Solnet.Serum;
@@ -23,91 +27,126 @@ namespace Solnet.Mango.Examples
             Solnet.Rpc.ClientFactory.GetStreamingClient(Cluster.MainNet);
 
         private readonly IMangoClient _mangoClient;
+        private readonly IPythClient _pythClient;
 
         public SubscribeMangoCacheExample()
         {
             StreamingRpcClient.ConnectAsync().Wait();
             _mangoClient = ClientFactory.GetClient(RpcClient, StreamingRpcClient);
+            _pythClient = Pyth.ClientFactory.GetClient(RpcClient, StreamingRpcClient);
         }
 
         public void Run()
         {
-            AccountResultWrapper<MangoGroup> mangoGroup = _mangoClient.GetMangoGroup(Constants.MangoGroup);
-            MangoCache mangoCache = _mangoClient.GetMangoCache(Constants.MangoCache).ParsedResult;
-            mangoGroup.ParsedResult.LoadRootBanks(RpcClient);
+            var tokenNames = new List<string>();
+            AccountResultWrapper<MappingAccount> mappingAccount =
+                   _pythClient.GetMappingAccount(Pyth.Constants.MappingAccount);
 
-            foreach (RootBank rootBank in mangoGroup.ParsedResult.RootBankAccounts.Where(rootBank => rootBank != null))
+            MultipleAccountsResultWrapper<List<ProductAccount>> productAccounts =
+                _pythClient.GetProductAccounts(mappingAccount.ParsedResult);
+
+            MangoGroup mangoGroup = _mangoClient.GetMangoGroup(Models.Constants.MangoGroup).ParsedResult;
+            MangoCache mangoCache = _mangoClient.GetMangoCache(Models.Constants.MangoCache).ParsedResult;
+            mangoGroup.LoadRootBanks(_mangoClient);
+            mangoGroup.LoadPerpMarkets(_mangoClient);
+
+            foreach (var perpMarket in mangoGroup.PerpetualMarkets)
             {
-                rootBank.LoadNodeBanks(RpcClient);
-                Task.Delay(100).Wait();
+                var marketIndex = mangoGroup.GetPerpMarketIndex(perpMarket.Market);
+                if (perpMarket.Market.Equals(SystemProgram.ProgramIdKey))
+                {
+                    tokenNames.Add("UNKNOWN"); // probably switchboard ones 
+                    continue;
+                }
+                var productAccount = productAccounts.ParsedResult.FirstOrDefault(x =>
+                    x.PriceAccount.Equals(mangoGroup.Oracles[marketIndex]));
+                if (productAccount == null)
+                {
+                    tokenNames.Add("UNKNOWN");
+                    continue;
+                }
+
+                tokenNames.Add(productAccount.Product.Description.Split("/")[0]);
             }
+
+            tokenNames.Add("USDC");
 
             _mangoClient.SubscribeMangoCache((_, cache, _) =>
                 {
                     Console.Clear();
                     mangoCache = cache;
-                    foreach (PriceCache priceCache in
-                        cache.PriceCaches.Where(priceCache => priceCache.Price.ToDecimal() != 0))
-                    {
-                        Console.WriteLine(
-                            $"{DateTime.UnixEpoch.AddSeconds((long)priceCache.LastUpdated)} - Price: {priceCache.Price.ToDecimal():C2}");
-                    }
 
-                    foreach (PerpMarketCache perpCache in cache.PerpetualMarketCaches.Where(perpCache =>
-                        perpCache.LongFunding.ToDecimal() != 0))
-                    {
-                        Console.WriteLine(
-                            $"{DateTime.UnixEpoch.AddSeconds((long)perpCache.LastUpdated)} - Long Funding:\t{perpCache.LongFunding.ToDecimal()}\tShort Funding:\t{perpCache.LongFunding.ToDecimal()}");
-                    }
-
-                    foreach (RootBankCache rootBankCache in cache.RootBankCaches.Where(rootBankCache =>
-                        rootBankCache.BorrowIndex.ToDecimal() != 0))
-                    {
-                        Console.WriteLine(
-                            $"{DateTime.UnixEpoch.AddSeconds((long)rootBankCache.LastUpdated)} - Borrow Index:\t{rootBankCache.BorrowIndex.ToDecimal()}\tDeposit Index:\t{rootBankCache.DepositIndex.ToDecimal()}");
-                    }
-                }, Constants.MangoCache,
-                Commitment.Confirmed);
-
-            ProgramAccountsResultWrapper<List<MangoAccount>> mangoAccounts = _mangoClient.GetMangoAccounts(Owner);
-            for (int i = 0; i < mangoAccounts.ParsedResult.Count; i++)
-            {
-                Console.WriteLine(
-                    $"Account: {mangoAccounts.OriginalRequest.Result[i].PublicKey} Owner: {mangoAccounts.ParsedResult[i].Owner}");
-                mangoAccounts.ParsedResult[i].LoadOpenOrdersAccounts(RpcClient);
-                for (int token = 0; token < mangoGroup.ParsedResult.Tokens.Count; token++)
-                {
-                    if (mangoGroup.ParsedResult.Tokens[token].RootBank.Key == SystemProgram.ProgramIdKey.Key) continue;
+                    var tBorrows = new I80F48(0);
+                    var tDeposits = new I80F48(0);
+                    Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
                     Console.WriteLine(
-                        $"Token: {mangoGroup.ParsedResult.Tokens[token].Mint} " +
-                        $"Deposits: {mangoAccounts.ParsedResult[i].GetUiDeposit(mangoGroup.ParsedResult.RootBankAccounts[token], mangoGroup.ParsedResult, token):N4} " +
-                        $"Borrows: {mangoAccounts.ParsedResult[i].GetUiBorrow(mangoGroup.ParsedResult.RootBankAccounts[token], mangoGroup.ParsedResult, token):N4} " +
-                        $"MaxWithBorrow: {mangoAccounts.ParsedResult[i].GetMaxWithBorrowForToken(mangoGroup.ParsedResult, mangoCache, token)}");
-                }
-
-                Console.WriteLine(
-                    $"Account Maint Health: {mangoAccounts.ParsedResult[i].GetHealthRatio(mangoGroup.ParsedResult, mangoCache, HealthType.Maintenance)}\n" +
-                    $"Account Init Health: {mangoAccounts.ParsedResult[i].GetHealthRatio(mangoGroup.ParsedResult, mangoCache, HealthType.Initialization)}\n" +
-                    $"Leverage: {mangoAccounts.ParsedResult[i].GetLeverage(mangoGroup.ParsedResult, mangoCache)}\n" +
-                    $"Assets Value Maint: {mangoAccounts.ParsedResult[i].GetAssetsValue(mangoGroup.ParsedResult, mangoCache, HealthType.Maintenance)}\n" +
-                    $"Liabilities Value Maint: {mangoAccounts.ParsedResult[i].GetLiabilitiesValue(mangoGroup.ParsedResult, mangoCache, HealthType.Maintenance)}\n" +
-                    $"Assets Value Init: {mangoAccounts.ParsedResult[i].GetAssetsValue(mangoGroup.ParsedResult, mangoCache, HealthType.Initialization)}\n" +
-                    $"Liabilities Value Init: {mangoAccounts.ParsedResult[i].GetLiabilitiesValue(mangoGroup.ParsedResult, mangoCache, HealthType.Initialization)}\n");
-                _mangoClient.SubscribeMangoAccount((subscription, account, arg3) =>
-                {
-                    for (int token = 0; token < mangoGroup.ParsedResult.Tokens.Count; token++)
+                        $"| {"Token",-10} | {"Mint",-10} | {"Price",-15} | {"Borrow Rate",-15} | {"Deposit Rate",-15} |" +
+                        $" {"Token Deposits",-20} | {"Deposits Value",-25} | {"Token Borrows",-20} | {"Borrows Value",-25} |"); 
+                    Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+                    for (int i = 0; i < Models.Constants.MaxTokens; i++)
                     {
-                        if (mangoGroup.ParsedResult.Tokens[token].RootBank.Key == SystemProgram.ProgramIdKey.Key)
-                            continue;
-                        Console.WriteLine(
-                            $"Token: {mangoGroup.ParsedResult.Tokens[token].Mint} " +
-                            $"Deposits: {account.GetUiDeposit(mangoGroup.ParsedResult.RootBankAccounts[token], mangoGroup.ParsedResult, token):N4} " +
-                            $"Borrows: {account.GetUiBorrow(mangoGroup.ParsedResult.RootBankAccounts[token], mangoGroup.ParsedResult, token):N4} ");
-                        Console.WriteLine(
-                            $"Account Health: {mangoAccounts.ParsedResult[i].GetHealthRatio(mangoGroup.ParsedResult, mangoCache, HealthType.Maintenance)}");
+                        var price = i == Models.Constants.MaxPairs ? I80F48.One : cache.PriceCaches[i].Price;
+                        var lastUpdated = i == Models.Constants.MaxPairs ? DateTime.UtcNow : DateTime.UnixEpoch.AddSeconds(cache.PriceCaches[i].LastUpdated);
+                        string log = "";
+                        if (mangoGroup.Tokens[i].Mint != SystemProgram.ProgramIdKey)
+                        {
+                            log += $"| {tokenNames[i],-10} | {mangoGroup.Tokens[i].Mint.Key[..10]} | ${price.ToDecimal(),-14:N3} |";
+                            var tokenDeposits = mangoGroup.RootBankAccounts[i].GetUiTotalDeposit(mangoGroup.Tokens[i].Decimals);
+                            var tokenBorrows = mangoGroup.RootBankAccounts[i].GetUiTotalBorrow(mangoGroup.Tokens[i].Decimals);
+                            var uiDeposits = mangoGroup.RootBankAccounts[i].GetUiTotalDeposit(mangoGroup.GetQuoteTokenInfo().Decimals);
+                            var uiBorrows = mangoGroup.RootBankAccounts[i].GetUiTotalBorrow(mangoGroup.GetQuoteTokenInfo().Decimals);
+                            var borrowsVal = uiBorrows * price;
+                            var depositsVal = uiDeposits * price;
+                            tBorrows += borrowsVal;
+                            tDeposits += depositsVal;
+                            log +=
+                                $" {mangoGroup.RootBankAccounts[i].GetBorrowRate(mangoGroup.Tokens[i].Decimals).ToDecimal(),-15:P4} |" +
+                                $" {mangoGroup.RootBankAccounts[i].GetDepositRate(mangoGroup.Tokens[i].Decimals).ToDecimal(),-15:P4} |";
+                            log +=
+                                $" {tokenDeposits.ToDecimal(),-20:N4} |" +
+                                $" ${depositsVal.ToDecimal(),-24:N4} |" +
+                                $" {tokenBorrows.ToDecimal(),-20:N4} |" +
+                                $" ${borrowsVal.ToDecimal(),-24:N4} |";
+                        }
+                        else
+                        {
+                            log += $"| {"NaNi?!",-10} | {"NaNi?!",-10} | {"NaNi?!",-15} | {"NaNi?!",-15} | {"NaNi?!",-15} | {"NaNi?!",-20} | {"NaNi?!",-25} | {"NaNi?!",-20} | {"NaNi?!",-25} | ";
+                        }
+                        Console.WriteLine(log);
                     }
-                }, mangoAccounts.OriginalRequest.Result[i].PublicKey);
-            }
+                    Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+                    Console.WriteLine($"Total Deposits: ${tDeposits.ToDecimal(),-15:N4}\nTotal Borrows: ${tBorrows.ToDecimal(),-15:N4}\t\n");
+                    Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+                    Console.WriteLine(
+                        $"| {"Market",-15} | {"Key",-10} | {"Long Funding",-15} | {"Short Funding",-15} | {"Open Interest",-15} |");
+                    Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+                    for (int i = 0; i < Models.Constants.MaxPairs; i++)
+                    {
+                        string log = "";
+                        if (mangoGroup.PerpetualMarkets[i].Market != SystemProgram.ProgramIdKey)
+                        {
+                            // TODO: this is inaccurate, change this and write a method which receives the perpStats to properly calculate funding
+                            var funding = (cache.PerpetualMarketCaches[i].LongFunding + cache.PerpetualMarketCaches[i].ShortFunding);
+                            var fundingInQuoteDecimals = funding / new I80F48(Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals));
+                            var basePriceInBaseLots = cache.PriceCaches[i].Price * new I80F48(mangoGroup.PerpMarketAccounts[i].BaseLotsToNumber(1m, mangoGroup.Tokens[i].Decimals));
+
+                            log += 
+                                $"| {tokenNames[i] + "-PERP",-15} |" +
+                                $" {mangoGroup.PerpetualMarkets[i].Market.Key[..10],-10} |" +
+                                $" {cache.PerpetualMarketCaches[i].LongFunding.ToDecimal(),-15:N4} |" +
+                                $" {cache.PerpetualMarketCaches[i].ShortFunding.ToDecimal(),-15:N4} |" +
+                                $" {mangoGroup.PerpMarketAccounts[i].BaseLotsToNumber(mangoGroup.PerpMarketAccounts[i].OpenInterest, mangoGroup.Tokens[i].Decimals) / 2,-15:N4} |";
+                        }
+                        else
+                        {
+                            log += $"| {"NaNi?!",-15} | {"NaNi?!",-10} | {"NaNi?!",-15} | {"NaNi?!",-15} | {"NaNi?!",-15} |";
+                        }
+                        Console.WriteLine(log);
+                    }
+                    Console.WriteLine("---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+                    
+                }, Models.Constants.MangoCache,
+                Commitment.Confirmed);
 
             Console.ReadLine();
         }

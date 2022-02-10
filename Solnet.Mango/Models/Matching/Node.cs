@@ -73,7 +73,6 @@ namespace Solnet.Mango.Models.Matching
 
             return tag switch
             {
-                (byte)NodeType.FreeNode => FreeNode.Deserialize(blob),
                 (byte)NodeType.InnerNode => InnerNode.Deserialize(blob),
                 (byte)NodeType.LeafNode => LeafNode.Deserialize(blob),
                 _ => null

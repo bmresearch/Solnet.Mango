@@ -30,7 +30,7 @@ namespace Solnet.Mango.Examples
         {
             AccountResultWrapper<MangoGroup> mangoGroup = _mangoClient.GetMangoGroup(Constants.DevNetMangoGroup);
             MangoCache mangoCache = _mangoClient.GetMangoCache(mangoGroup.ParsedResult.MangoCache).ParsedResult;
-            mangoGroup.ParsedResult.LoadRootBanks(RpcClient);
+            mangoGroup.ParsedResult.LoadRootBanks(_mangoClient);
 
             ProgramAccountsResultWrapper<List<MangoAccount>> mangoAccounts = _mangoClient.GetMangoAccounts(Owner);
             for (int i = 0; i < mangoAccounts.ParsedResult.Count; i++)

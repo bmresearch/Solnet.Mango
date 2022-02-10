@@ -14,6 +14,7 @@ using Solnet.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace Solnet.Mango
@@ -72,8 +73,37 @@ namespace Solnet.Mango
             _programId = programId != null ? programId : MangoProgram.MainNetProgramIdKeyV3;
         }
 
+        /// <inheritdoc cref="IMangoClient.NodeAddress"/>
+        public Uri NodeAddress => RpcClient.NodeAddress;
+
+        /// <inheritdoc cref="IMangoClient.ConnectionStatistics"/>
+        public IConnectionStatistics ConnectionStatistics => StreamingRpcClient.Statistics;
+
+        /// <inheritdoc cref="IMangoClient.State"/>
+        public WebSocketState State => StreamingRpcClient.State;
+
         /// <inheritdoc cref="IMangoClient.ProgramId"/>
         public PublicKey ProgramId { get => _programId; }
+
+        /// <inheritdoc cref="IMangoClient.ConnectAsync"/>
+        public Task ConnectAsync() 
+        { 
+            if(State != WebSocketState.Open)
+                return StreamingRpcClient.ConnectAsync();
+            return null;
+        }
+
+        /// <inheritdoc cref="IMangoClient.DisconnectAsync"/>
+        public Task DisconnectAsync()
+        {
+            if (State != WebSocketState.Open)
+                return null;
+            _eventQueueSubscriptions.Clear();
+            _mangoAccountSubscriptions.Clear();
+            _mangoCacheSubscriptions.Clear();
+            _orderBookSideSubscriptions.Clear();
+            return StreamingRpcClient.DisconnectAsync();
+        }
 
         /// <inheritdoc cref="IMangoClient.GetMangoGroupAsync(string, Commitment)"/>
         public async Task<AccountResultWrapper<MangoGroup>> GetMangoGroupAsync(string account,
@@ -102,14 +132,14 @@ namespace Solnet.Mango
         public AccountResultWrapper<RootBank> GetRootBank(string account,
             Commitment commitment = Commitment.Finalized) => GetRootBankAsync(account, commitment).Result;
 
-        /// <inheritdoc cref="IMangoClient.GetRootBanksAsync(MangoGroup, Commitment)"/>
-        public async Task<MultipleAccountsResultWrapper<List<RootBank>>> GetRootBanksAsync(MangoGroup mangoGroup, Commitment commitment = Commitment.Finalized)
-            => await GetMultipleAccounts<RootBank>(mangoGroup.Tokens.Select(x => x.RootBank.Key).ToList(), commitment);
+        /// <inheritdoc cref="IMangoClient.GetRootBanksAsync(List{PublicKey}, Commitment)"/>
+        public async Task<MultipleAccountsResultWrapper<List<RootBank>>> GetRootBanksAsync(List<PublicKey> rootBanks, Commitment commitment = Commitment.Finalized)
+            => await GetMultipleAccounts<RootBank>(rootBanks.Select(x => x.Key).ToList(), commitment);
 
-        /// <inheritdoc cref="IMangoClient.GetRootBanks(MangoGroup, Commitment)"/>
-        public MultipleAccountsResultWrapper<List<RootBank>> GetRootBanks(MangoGroup mangoGroup,
+        /// <inheritdoc cref="IMangoClient.GetRootBanks(List{PublicKey}, Commitment)"/>
+        public MultipleAccountsResultWrapper<List<RootBank>> GetRootBanks(List<PublicKey> rootBanks,
             Commitment commitment = Commitment.Finalized)
-            => GetRootBanksAsync(mangoGroup, commitment).Result;
+            => GetRootBanksAsync(rootBanks, commitment).Result;
 
         /// <inheritdoc cref="IMangoClient.GetNodeBankAsync(string, Commitment)"/>
         public async Task<AccountResultWrapper<NodeBank>> GetNodeBankAsync(string account,
@@ -120,14 +150,14 @@ namespace Solnet.Mango
         public AccountResultWrapper<NodeBank> GetNodeBank(string account,
             Commitment commitment = Commitment.Finalized) => GetNodeBankAsync(account, commitment).Result;
 
-        /// <inheritdoc cref="IMangoClient.GetNodeBanksAsync(RootBank, Commitment)"/>
-        public async Task<MultipleAccountsResultWrapper<List<NodeBank>>> GetNodeBanksAsync(RootBank rootBank, Commitment commitment = Commitment.Finalized)
-            => await GetMultipleAccounts<NodeBank>(rootBank.NodeBanks.Select(x => x.Key).ToList(), commitment);
+        /// <inheritdoc cref="IMangoClient.GetNodeBanksAsync(List{PublicKey}, Commitment)"/>
+        public async Task<MultipleAccountsResultWrapper<List<NodeBank>>> GetNodeBanksAsync(List<PublicKey> nodeBanks, Commitment commitment = Commitment.Finalized)
+            => await GetMultipleAccounts<NodeBank>(nodeBanks.Select(x => x.Key).ToList(), commitment);
 
-        /// <inheritdoc cref="IMangoClient.GetNodeBanks(RootBank, Commitment)"/>
-        public MultipleAccountsResultWrapper<List<NodeBank>> GetNodeBanks(RootBank rootBank,
+        /// <inheritdoc cref="IMangoClient.GetNodeBanks(List{PublicKey}, Commitment)"/>
+        public MultipleAccountsResultWrapper<List<NodeBank>> GetNodeBanks(List<PublicKey> nodeBanks,
             Commitment commitment = Commitment.Finalized)
-            => GetNodeBanksAsync(rootBank, commitment).Result;
+            => GetNodeBanksAsync(nodeBanks, commitment).Result;
 
         /// <inheritdoc cref="IMangoClient.GetPerpMarketAsync(string, Commitment)"/>
         public async Task<AccountResultWrapper<PerpMarket>> GetPerpMarketAsync(string account,
@@ -137,6 +167,15 @@ namespace Solnet.Mango
         /// <inheritdoc cref="IMangoClient.GetPerpMarket(string, Commitment)"/>
         public AccountResultWrapper<PerpMarket> GetPerpMarket(string account,
             Commitment commitment = Commitment.Finalized) => GetPerpMarketAsync(account, commitment).Result;
+
+        /// <inheritdoc cref="IMangoClient.GetPerpMarketsAsync(List{PublicKey}, Commitment)"/>
+        public async Task<MultipleAccountsResultWrapper<List<PerpMarket>>> GetPerpMarketsAsync(List<PublicKey> perpMarkets,
+            Commitment commitment = Commitment.Finalized)
+            => await GetMultipleAccounts<PerpMarket>(perpMarkets.Select(x => x.Key).ToList(), commitment);
+
+        /// <inheritdoc cref="IMangoClient.GetPerpMarkets(List{PublicKey}, Commitment)"/>
+        public MultipleAccountsResultWrapper<List<PerpMarket>> GetPerpMarkets(List<PublicKey> perpMarkets,
+            Commitment commitment = Commitment.Finalized) => GetPerpMarketsAsync(perpMarkets, commitment).Result;
 
         /// <inheritdoc cref="IMangoClient.GetOrderBookSideAsync(string, Commitment)"/>
         public async Task<AccountResultWrapper<OrderBookSide>> GetOrderBookSideAsync(string account,
@@ -206,22 +245,6 @@ namespace Solnet.Mango
         /// <inheritdoc cref="IMangoClient.GetMangoAccounts(string, Commitment)"/>
         public ProgramAccountsResultWrapper<List<MangoAccount>> GetMangoAccounts(string ownerAccount,
             Commitment commitment = Commitment.Finalized) => GetMangoAccountsAsync(ownerAccount, commitment).Result;
-
-        /// <inheritdoc cref="IMangoClient.GetPerpMarketsAsync(string, Commitment)"/>
-        public async Task<ProgramAccountsResultWrapper<List<PerpMarket>>> GetPerpMarketsAsync(string mangoGroup,
-            Commitment commitment = Commitment.Finalized)
-        {
-            List<MemCmp> filters = new()
-            {
-                new MemCmp { Offset = PerpMarket.Layout.MangoGroupOffset, Bytes = mangoGroup }
-            };
-
-            return await GetProgramAccounts<PerpMarket>(_programId, filters, PerpMarket.Layout.Length, commitment);
-        }
-
-        /// <inheritdoc cref="IMangoClient.GetPerpMarkets(string, Commitment)"/>
-        public ProgramAccountsResultWrapper<List<PerpMarket>> GetPerpMarkets(string mangoGroup,
-            Commitment commitment = Commitment.Finalized) => GetPerpMarketsAsync(mangoGroup, commitment).Result;
 
         /// <inheritdoc cref="IMangoClient.SubscribeEventQueueAsync(Action{Subscription, EventQueue, ulong}, string, Commitment)"/>
         public async Task<Subscription> SubscribeEventQueueAsync(
@@ -332,7 +355,7 @@ namespace Solnet.Mango
 
         /// <inheritdoc cref="IMangoClient.UnsubscribeOrderBookSide(string)"/>
         public void UnsubscribeOrderBookSide(string orderBookAccountAddress) =>
-            UnsubscribeOrderBookSideAsync(orderBookAccountAddress).Wait();
+            UnsubscribeOrderBookSideAsync(orderBookAccountAddress);
 
         /// <inheritdoc cref="IMangoClient.SubscribeMangoAccountAsync(Action{Subscription, MangoAccount, ulong}, string, Commitment)"/>
         public async Task<Subscription> SubscribeMangoAccountAsync(Action<Subscription, MangoAccount, ulong> action, string mangoAccountAddress,
@@ -382,18 +405,18 @@ namespace Solnet.Mango
 
         /// <inheritdoc cref="IMangoClient.UnsubscribeMangoAccount(string)"/>
         public void UnsubscribeMangoAccount(string mangoAccountAddress) =>
-            UnsubscribeMangoAccountAsync(mangoAccountAddress).Wait();
+            UnsubscribeMangoAccountAsync(mangoAccountAddress);
 
         /// <inheritdoc cref="IMangoClient.SubscribeMangoCacheAsync(Action{Subscription, MangoCache, ulong}, string, Commitment)"/>
-        public async Task<Subscription> SubscribeMangoCacheAsync(Action<Subscription, MangoCache, ulong> action, string mangoAccountAddress,
+        public async Task<Subscription> SubscribeMangoCacheAsync(Action<Subscription, MangoCache, ulong> action, string mangoCacheAddress,
             Commitment commitment = Commitment.Finalized)
         {
-            SubscriptionState sub = await SubscribeAccount<MangoCache>(mangoAccountAddress,
+            SubscriptionState sub = await SubscribeAccount<MangoCache>(mangoCacheAddress,
                 (state, accountInfo, mangoAccount) =>
                 {
                     SubscriptionWrapper<MangoCache> mangoCacheSub =
                         _mangoCacheSubscriptions.FirstOrDefault(
-                            s => s.Address.Key == mangoAccountAddress);
+                            s => s.Address.Key == mangoCacheAddress);
                     if (mangoCacheSub == null) return;
                     mangoCacheSub.SubscriptionState = state;
                     action(mangoCacheSub, mangoAccount, accountInfo.Context.Slot);
@@ -402,7 +425,7 @@ namespace Solnet.Mango
             SubscriptionWrapper<MangoCache> subMangoCache = new()
             {
                 SubscriptionState = sub,
-                Address = new PublicKey(mangoAccountAddress)
+                Address = new PublicKey(mangoCacheAddress)
             };
             _mangoCacheSubscriptions.Add(subMangoCache);
             return subMangoCache;
@@ -432,6 +455,6 @@ namespace Solnet.Mango
 
         /// <inheritdoc cref="IMangoClient.UnsubscribeMangoCache(string)"/>
         public void UnsubscribeMangoCache(string mangoCacheAddress) =>
-            UnsubscribeMangoAccountAsync(mangoCacheAddress).Wait();
+            UnsubscribeMangoCacheAsync(mangoCacheAddress);
     }
 }

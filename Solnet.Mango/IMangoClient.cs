@@ -9,6 +9,7 @@ using Solnet.Rpc.Types;
 using Solnet.Wallet;
 using System;
 using System.Collections.Generic;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace Solnet.Mango
@@ -18,6 +19,11 @@ namespace Solnet.Mango
     /// </summary>
     public interface IMangoClient
     {
+        /// <summary>
+        /// The websocket connection state.
+        /// </summary>
+        WebSocketState State { get; }
+
         /// <summary>
         /// The <see cref="IRpcClient"/> instance.
         /// </summary>
@@ -32,6 +38,28 @@ namespace Solnet.Mango
         /// The program id.
         /// </summary>
         PublicKey ProgramId { get; }
+
+        /// <summary>
+        /// The statistics of the current websocket connection.
+        /// </summary>
+        IConnectionStatistics ConnectionStatistics { get; }
+
+        /// <summary>
+        /// The cluster the client is connected to.
+        /// </summary>
+        Uri NodeAddress { get; }
+
+        /// <summary>
+        /// Connect to the <see cref="StreamingRpcClient"/> for data streaming. This is an asynchronous operation.
+        /// </summary>
+        /// <returns>A task which may connect to the Rpc.</returns>
+        Task ConnectAsync();
+
+        /// <summary>
+        /// Disconnects from the <see cref="StreamingRpcClient"/> for data streaming. This is an asynchronous operation.
+        /// </summary>
+        /// <returns>A task which may connect to the Rpc.</returns>
+        Task DisconnectAsync();
 
         /// <summary>
         /// Gets the given <see cref="MangoGroup"/>. This is an asynchronous operation.
@@ -85,21 +113,21 @@ namespace Solnet.Mango
         AccountResultWrapper<RootBank> GetRootBank(string account, Commitment commitment = Commitment.Finalized);
 
         /// <summary>
-        /// Gets the <see cref="RootBank"/>s for the given <see cref="MangoGroup"/>. This is an asynchronous operation.
+        /// Gets the <see cref="RootBank"/>s with the given keys. This is an asynchronous operation.
         /// </summary>
-        /// <param name="mangoGroup">The <see cref="MangoGroup"/>.</param>
+        /// <param name="rootBanks">The root bank public keys.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="RootBank"/>s or null in case an error occurred.</returns>
-        Task<MultipleAccountsResultWrapper<List<RootBank>>> GetRootBanksAsync(MangoGroup mangoGroup,
+        Task<MultipleAccountsResultWrapper<List<RootBank>>> GetRootBanksAsync(List<PublicKey> rootBanks,
             Commitment commitment = Commitment.Finalized);
 
         /// <summary>
-        /// Gets the <see cref="RootBank"/>s for the given <see cref="MangoGroup"/>.
+        /// Gets the <see cref="RootBank"/>s with the given keys.
         /// </summary>
-        /// <param name="mangoGroup">The <see cref="MangoGroup"/>.</param>
+        /// <param name="rootBanks">The root bank public keys.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="RootBank"/>s.</returns>
-        MultipleAccountsResultWrapper<List<RootBank>> GetRootBanks(MangoGroup mangoGroup, Commitment commitment = Commitment.Finalized);
+        MultipleAccountsResultWrapper<List<RootBank>> GetRootBanks(List<PublicKey> rootBanks, Commitment commitment = Commitment.Finalized);
 
         /// <summary>
         /// Gets the given <see cref="NodeBank"/>. This is an asynchronous operation.
@@ -111,21 +139,21 @@ namespace Solnet.Mango
             Commitment commitment = Commitment.Finalized);
 
         /// <summary>
-        /// Gets the <see cref="NodeBank"/>s for the given <see cref="RootBank"/>. This is an asynchronous operation.
+        /// Gets the <see cref="NodeBank"/>s with the given keys. This is an asynchronous operation.
         /// </summary>
-        /// <param name="rootBank">The <see cref="RootBank"/>.</param>
+        /// <param name="nodeBanks">The node bank public keys.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="NodeBank"/>s or null in case an error occurred.</returns>
-        Task<MultipleAccountsResultWrapper<List<NodeBank>>> GetNodeBanksAsync(RootBank rootBank,
+        Task<MultipleAccountsResultWrapper<List<NodeBank>>> GetNodeBanksAsync(List<PublicKey> nodeBanks,
             Commitment commitment = Commitment.Finalized);
 
         /// <summary>
-        /// Gets the <see cref="NodeBank"/>s for the given <see cref="RootBank"/>.
+        /// Gets the <see cref="NodeBank"/>s with the given keys.
         /// </summary>
-        /// <param name="rootBank">The <see cref="RootBank"/>.</param>
+        /// <param name="nodeBanks">The node bank public keys.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="NodeBank"/>s.</returns>
-        MultipleAccountsResultWrapper<List<NodeBank>> GetNodeBanks(RootBank rootBank, Commitment commitment = Commitment.Finalized);
+        MultipleAccountsResultWrapper<List<NodeBank>> GetNodeBanks(List<PublicKey> nodeBanks, Commitment commitment = Commitment.Finalized);
 
         /// <summary>
         /// Gets the given <see cref="NodeBank"/>.
@@ -260,19 +288,19 @@ namespace Solnet.Mango
         /// <summary>
         /// Gets the perpetual markets for the given Mango group. This is an asynchronous operation.
         /// </summary>
-        /// <param name="mangoGroup">The mango group public key.</param>
+        /// <param name="perpMarkets">The perp markets.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="PerpMarket"/>s or null in case an error occurred.</returns>
-        Task<ProgramAccountsResultWrapper<List<PerpMarket>>> GetPerpMarketsAsync(string mangoGroup,
+        Task<MultipleAccountsResultWrapper<List<PerpMarket>>> GetPerpMarketsAsync(List<PublicKey> perpMarkets,
             Commitment commitment = Commitment.Finalized);
 
         /// <summary>
         /// Gets the perpetual markets for the given Mango group.
         /// </summary>
-        /// <param name="mangoGroup">The mango group public key.</param>
+        /// <param name="perpMarkets">The perp markets.</param>
         /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
         /// <returns>The list of <see cref="PerpMarket"/>s or null in case an error occurred.</returns>
-        ProgramAccountsResultWrapper<List<PerpMarket>> GetPerpMarkets(string mangoGroup,
+        MultipleAccountsResultWrapper<List<PerpMarket>> GetPerpMarkets(List<PublicKey> perpMarkets,
             Commitment commitment = Commitment.Finalized);
 
         /// <summary>
@@ -363,9 +391,9 @@ namespace Solnet.Mango
         /// Subscribe to a live feed of a <see cref="MangoCache"/>. This is an asynchronous operation.
         /// </summary>
         /// <param name="action">An action which receives the <see cref="Subscription"/>, an <see cref="MangoCache"/> and the corresponding slot.</param>
-        /// <param name="mangoAccountAddress">The public key of the <see cref="MangoCache"/> account.</param>
+        /// <param name="mangoCacheAddress">The public key of the <see cref="MangoCache"/> account.</param>
         /// <param name="commitment">The commitment parameter for the Rpc Client.</param>
-        Task<Subscription> SubscribeMangoCacheAsync(Action<Subscription, MangoCache, ulong> action, string mangoAccountAddress, Commitment commitment = Commitment.Finalized);
+        Task<Subscription> SubscribeMangoCacheAsync(Action<Subscription, MangoCache, ulong> action, string mangoCacheAddress, Commitment commitment = Commitment.Finalized);
 
         /// <summary>
         /// Subscribe to a live feed of a <see cref="MangoCache"/>.

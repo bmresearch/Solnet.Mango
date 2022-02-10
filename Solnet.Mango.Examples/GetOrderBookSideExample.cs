@@ -52,6 +52,11 @@ namespace Solnet.Mango.Examples
 
                 MultipleAccountsResultWrapper<OrderBook> book = _mangoClient.GetOrderBook(perpMarket.ParsedResult);
 
+                var bestBid = book.ParsedResult.Bids.GetBest();
+                var bestAsk = book.ParsedResult.Asks.GetBest();
+
+                Console.WriteLine($"Best Ask: P {bestAsk.RawPrice} S {bestAsk.RawQuantity}\nBest Bid: P {bestBid.RawPrice} S {bestBid.RawQuantity}");
+
                 Console.ReadKey();
             }
         }

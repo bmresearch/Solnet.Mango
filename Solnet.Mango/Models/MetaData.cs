@@ -32,6 +32,16 @@ namespace Solnet.Mango.Models
             /// The offset at which the boolean which defines if the account is initialized value begins.
             /// </summary>
             internal const int IsInitializedOffset = 2;
+
+            /// <summary>
+            /// The offset at which the metadata extra info begins.
+            /// </summary>
+            internal const int ExtraInfoOffset = 3;
+
+            /// <summary>
+            /// The length of the extra info.
+            /// </summary>
+            internal const int ExtraInfoLength = 5;
         }
 
         /// <summary>
@@ -50,6 +60,11 @@ namespace Solnet.Mango.Models
         public bool IsInitialized;
 
         /// <summary>
+        /// Extra info.
+        /// </summary>
+        public byte[] ExtraInfo;
+
+        /// <summary>
         /// Deserialize a span of bytes into a <see cref="MetaData"/> instance.
         /// </summary>
         /// <param name="data">The data to deserialize into the structure.</param>
@@ -65,7 +80,8 @@ namespace Solnet.Mango.Models
             {
                 DataType = dataType,
                 Version = data.GetU8(Layout.VersionOffset),
-                IsInitialized = data.GetU8(Layout.IsInitializedOffset) == 1
+                IsInitialized = data.GetU8(Layout.IsInitializedOffset) == 1,
+                ExtraInfo = data.GetBytes(Layout.ExtraInfoOffset, Layout.ExtraInfoLength)
             };
         }
     }

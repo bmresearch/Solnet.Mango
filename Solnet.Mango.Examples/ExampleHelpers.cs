@@ -113,7 +113,7 @@ namespace Solnet.Mango.Examples
             string logs = PrettyPrintTransactionSimulationLogs(txSim.Result.Value.Logs);
             Console.WriteLine($"Transaction Simulation:\n\tError: {txSim.Result.Value.Error}\n\tLogs: \n" + logs);
 
-            RequestResult<string> txReq = rpcClient.SendTransaction(tx, true, commitment: Commitment.Confirmed);
+            RequestResult<string> txReq = rpcClient.SendTransaction(tx, commitment: Commitment.Confirmed);
             Console.WriteLine($"Tx Signature: {txReq.Result}");
 
             return txReq.Result;

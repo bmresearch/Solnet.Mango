@@ -226,11 +226,11 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <summary>
         /// Conversion for order values.
         /// </summary>
-        /// <param name="price"></param>
-        /// <param name="quantity"></param>
-        /// <param name="baseDecimals"></param>
-        /// <param name="quoteDecimals"></param>
-        /// <returns></returns>
+        /// <param name="price">The price.</param>
+        /// <param name="quantity">The quantity.</param>
+        /// <param name="baseDecimals">The base decimals.</param>
+        /// <param name="quoteDecimals">The quote decimals.</param>
+        /// <returns>The price and quantity.</returns>
         public (long Price, long Quantity) UiToNativePriceQuantity(double price, double quantity, byte baseDecimals, byte quoteDecimals)
         {
             var baseUnit = Math.Pow(10, baseDecimals);
@@ -240,6 +240,27 @@ namespace Solnet.Mango.Models.Perpetuals
             var nativeQuantity = (long)(quantity * baseUnit / BaseLotSize);
 
             return (nativePrice, nativeQuantity);
+        }
+
+        /// <summary>
+        /// Conversion for order values.
+        /// </summary>
+        /// <param name="price">The price.</param>
+        /// <param name="quantity">The quantity.</param>
+        /// <param name="baseDecimals">The base decimals.</param>
+        /// <param name="quoteDecimals">The quote decimals.</param>
+        /// <returns>The price and quantity.</returns>
+        public (decimal Price, decimal Quantity) NativeToUiPriceQuantity(long price, long quantity, byte baseDecimals, byte quoteDecimals)
+        {
+            var baseUnit = Math.Pow(10, baseDecimals);
+            var quoteUnit = Math.Pow(10, quoteDecimals);
+
+            var iq = quantity * BaseLotSize / baseUnit;
+
+            var uiPrice = PriceLotsToNumber(new(price), baseDecimals, quoteDecimals);
+            var uiQuantity = BaseLotsToNumber(quantity, baseDecimals);
+
+            return (uiPrice, uiQuantity);
         }
 
         /// <summary>

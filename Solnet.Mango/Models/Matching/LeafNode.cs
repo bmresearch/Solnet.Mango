@@ -28,6 +28,22 @@ namespace Solnet.Mango.Models.Matching
             internal const int OwnerSlotOffset = 0;
 
             /// <summary>
+            /// The offset at which the order type value begins.
+            /// <remarks>
+            /// This value is only valid after reading the Tag property of the <see cref="Node"/>.
+            /// </remarks>
+            /// </summary>
+            internal const int OrderTypeOffset = 1;
+
+            /// <summary>
+            /// The offset at which the version begins.
+            /// <remarks>
+            /// This value is only valid after reading the Tag property of the <see cref="Node"/>.
+            /// </remarks>
+            /// </summary>
+            internal const int VersionOffset = 2;
+
+            /// <summary>
             /// The offset at which the order id value begins.
             /// <remarks>
             /// This value is only valid after reading the Tag property of the <see cref="Node"/>.
@@ -85,9 +101,19 @@ namespace Solnet.Mango.Models.Matching
         }
 
         /// <summary>
-        /// The next node.
+        /// The slot of the order in the owner's account..
         /// </summary>
         public byte OwnerSlot;
+
+        /// <summary>
+        /// The order type.
+        /// </summary>
+        public PerpOrderType OrderType;
+
+        /// <summary>
+        /// The version.
+        /// </summary>
+        public byte Version;
 
         /// <summary>
         /// The order id.
@@ -138,7 +164,9 @@ namespace Solnet.Mango.Models.Matching
             {
                 Tag = NodeType.LeafNode,
                 OwnerSlot = data.GetU8(ExtraLayout.OwnerSlotOffset),
-                OrderId = data.GetBigInt(ExtraLayout.OrderIdOffset, 16, true),
+                OrderType = (PerpOrderType) Enum.Parse(typeof(PerpOrderType), data.GetU8(ExtraLayout.OrderTypeOffset).ToString()),
+                Version = data.GetU8(ExtraLayout.VersionOffset),
+                OrderId = data.GetBigInt(ExtraLayout.OrderIdOffset, Layout.KeyLength),
                 Owner = data.GetPubKey(ExtraLayout.OwnerOffset),
                 Quantity = data.GetS64(ExtraLayout.QuantityOffset),
                 ClientOrderId = data.GetU64(ExtraLayout.ClientOrderIdOffset),

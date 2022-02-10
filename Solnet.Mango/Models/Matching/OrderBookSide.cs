@@ -1,4 +1,5 @@
 using Solnet.Mango.Models.Matching;
+using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using System;
 using System.Collections.Generic;
@@ -113,6 +114,44 @@ namespace Solnet.Mango.Models.Matching
                         OrderId = new BigInteger(leafNode.Key)
                     }).ToList();
         }
+
+        /// <summary>
+        /// Gets the price reached for a given quantity up the book.
+        /// </summary>
+        /// <param name="quantity">The quantity.</param>
+        /// <returns>The price or zero if desired amount is not on the book.</returns>
+        public long GetImpactPrice(long quantity)
+        {
+            long s = 0;
+            var orders = GetOrders();
+            foreach (var order in orders)
+            {
+                s += order.RawQuantity;
+                if (s > quantity)
+                    return order.RawPrice;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Gets the best order on the book.
+        /// </summary>
+        /// <returns>The order.</returns>
+        public OpenOrder GetBest()
+        {
+            bool isBids = Metadata.DataType == DataType.Bids;
+            var orders = GetOrders();
+
+            if (!isBids)
+            {
+                orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order.RawPrice.CompareTo(order1.RawPrice)));
+            } else
+            {
+                orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order1.RawPrice.CompareTo(order.RawPrice)));
+            }
+            return orders.FirstOrDefault();
+        }
+
 
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="OrderBookSide"/> instance.

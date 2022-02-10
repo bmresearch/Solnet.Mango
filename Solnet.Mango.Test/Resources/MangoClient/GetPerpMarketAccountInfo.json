@@ -1,0 +1,10 @@
+{
+  "context": { "slot": 113553756 },
+  "value": {
+    "data": [ "BAEBAg8AAADKISAtTF7lMdQarmxDZG/wXw1EdsMrRmiMvKrmbhkiIUPXOoXyuWXewzh7yshCVnTUo3fNk5slN9HwnKzI+n4QNM/FJTcX9uS0V2MQMjGIy/SrHK9eCTrkFCPbUZzg0t8NeAuluDYnAXorrEnP9GCBQ40xJzJiaII/jC2LzswIl2QAAAAAAAAAQEIPAAAAAACGIkcxIuP92fj/////////hiJHMSLj/dn4/////////y6wAAAAAAAAEB8EYgAAAACnbi8AAAAAAIwzfMLeupXPSwAAAAAAAAAvAAAAAAAAAAAAAAAAAAAAAAAAAAAA4JMEAAAAAAAAACQrhGEAAAAAEA4AAAAAAAAFAzUbAAAAAABlzR0AAAAAthj2zImGUC9IP85KhzhfS4s/CJ4ejYmV6ibeRvselpA=", "base64" ],
+    "executable": false,
+    "lamports": 3118080,
+    "owner": "4skJ85cdxQAFVKbcGgfun8iZPL7BadVYXG3kGEGkufqA",
+    "rentEpoch": 262
+  }
+}
