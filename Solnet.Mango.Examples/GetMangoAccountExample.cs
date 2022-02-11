@@ -38,7 +38,7 @@ namespace Solnet.Mango.Examples
                 Console.WriteLine(
                     $"Account: {mangoAccounts.OriginalRequest.Result[i].PublicKey} Owner: {mangoAccounts.ParsedResult[i].Owner}");
                 mangoAccounts.ParsedResult[i].LoadOpenOrdersAccounts(RpcClient);
-                ExampleHelpers.LogAccountStatus(_mangoClient, mangoGroup.ParsedResult, mangoCache, mangoAccounts.ParsedResult[i]);
+                ExampleHelpers.LogAccountStatus(mangoGroup.ParsedResult, mangoCache, mangoAccounts.ParsedResult[i]);
             }
 
             Console.ReadLine();

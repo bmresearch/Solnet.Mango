@@ -428,6 +428,22 @@ namespace Solnet.Mango.Test
         }
 
         [TestMethod]
+        public void GetAdvancedOrdersAccountWithOrders()
+        {
+            string response = File.ReadAllText("Resources/MangoClient/GetAdvancedOrdersAccountInfoWithOrders.json");
+            var rpc = SetupGetAccountInfo(response, "AZofyy49f3sY6bt3F1vgMse92eZdFuCM8jkV1USofneA", "https://api.devnet.solana.com");
+
+            var mangoClient = ClientFactory.GetClient(rpc.Object);
+
+            var advancedOrders = mangoClient.GetAdvancedOrdersAccount("AZofyy49f3sY6bt3F1vgMse92eZdFuCM8jkV1USofneA");
+
+            Assert.IsNotNull(advancedOrders.ParsedResult);
+            Assert.IsTrue(advancedOrders.ParsedResult.Metadata.IsInitialized);
+            Assert.AreEqual(DataType.AdvancedOrders, advancedOrders.ParsedResult.Metadata.DataType);
+            Assert.AreEqual(1, advancedOrders.ParsedResult.AdvancedOrders.Count);
+        }
+
+        [TestMethod]
         public void GetRootBank()
         {
             string response = File.ReadAllText("Resources/MangoClient/GetRootBankAccountInfo.json");

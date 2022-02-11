@@ -176,14 +176,14 @@ namespace Solnet.Mango.Models.Perpetuals
         /// </summary>
         /// <param name="price">The price</param>
         /// <returns>Convert price lots to the native value.</returns>
-        public long PriceLotsToNative(double price) => (long)(QuoteLotSize * price) / BaseLotSize;
+        public long PriceLotsToNative(decimal price) => (long)(QuoteLotSize * price) / BaseLotSize;
 
         /// <summary>
         /// Converts the base lots quantity to a the native value.
         /// </summary>
         /// <param name="quantity">The quantity.</param>
         /// <returns>Convert price lots to the native value.</returns>
-        public long BaseLotsToNative(double quantity) => (long)(BaseLotSize * quantity);
+        public long BaseLotsToNative(decimal quantity) => (long)(BaseLotSize * quantity);
 
         /// <summary>
         /// Converts the price lots quantity to a humanized number.
@@ -240,27 +240,6 @@ namespace Solnet.Mango.Models.Perpetuals
             var nativeQuantity = (long)(quantity * baseUnit / BaseLotSize);
 
             return (nativePrice, nativeQuantity);
-        }
-
-        /// <summary>
-        /// Conversion for order values.
-        /// </summary>
-        /// <param name="price">The price.</param>
-        /// <param name="quantity">The quantity.</param>
-        /// <param name="baseDecimals">The base decimals.</param>
-        /// <param name="quoteDecimals">The quote decimals.</param>
-        /// <returns>The price and quantity.</returns>
-        public (decimal Price, decimal Quantity) NativeToUiPriceQuantity(long price, long quantity, byte baseDecimals, byte quoteDecimals)
-        {
-            var baseUnit = Math.Pow(10, baseDecimals);
-            var quoteUnit = Math.Pow(10, quoteDecimals);
-
-            var iq = quantity * BaseLotSize / baseUnit;
-
-            var uiPrice = PriceLotsToNumber(new(price), baseDecimals, quoteDecimals);
-            var uiQuantity = BaseLotsToNumber(quantity, baseDecimals);
-
-            return (uiPrice, uiQuantity);
         }
 
         /// <summary>

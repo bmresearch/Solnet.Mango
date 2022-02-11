@@ -136,6 +136,9 @@
       <None Update="Resources\MangoClient\GetAdvancedOrdersAccountAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Resources\MangoClient\GetAdvancedOrdersAccountInfoWithOrders.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Resources\MangoClient\GetEventQueueAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
@@ -166,7 +169,13 @@
       <None Update="Resources\MangoClient\GetRootBankAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Resources\MangoClient\LoadBidsOrderBookSide.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Resources\MangoClient\LoadOpenOrdersGetMultiple.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadAsksOrderBookSide.txt">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Resources\MangoClient\LoadPerpMarketsGetMultiple.json">

@@ -49,6 +49,11 @@ namespace Solnet.Mango.Test
             return OpenOrdersAccount.Deserialize(await LoadData(path));
         }
 
+        protected async Task<Models.Matching.OrderBookSide> LoadOrderBookSide(string path)
+        {
+            return Models.Matching.OrderBookSide.Deserialize(await LoadData(path));
+        }
+
         protected void LogAccountStatus(MangoGroup mangoGroup, MangoCache mangoCache, MangoAccount mangoAccount)
         {
             if (mangoGroup.RootBankAccounts.Count != 0)

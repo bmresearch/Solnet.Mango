@@ -20,7 +20,7 @@ namespace Solnet.Mango.Models
         /// <summary>
         /// An immediate or cancel order.
         /// </summary>
-        IOC,
+        ImmediateOrCancel,
 
         /// <summary>
         /// A post only order.

@@ -63,7 +63,8 @@ namespace Solnet.Mango.Models.Matching
         /// <returns>The <see cref="Node"/> structure.</returns>
         public static Node Deserialize(ReadOnlySpan<byte> data)
         {
-            if (data.Length != Layout.Length) throw new Exception("data length is invalid");
+            if (data.Length != Layout.Length)
+                throw new ArgumentException($"data length is invalid, expected {Layout.Length} but got {data.Length}");
 
             uint tag = data.GetU32(Layout.TagOffset);
             if (tag is (byte)NodeType.Uninitialized or (byte)NodeType.LastFreeNode or (byte)NodeType.FreeNode)

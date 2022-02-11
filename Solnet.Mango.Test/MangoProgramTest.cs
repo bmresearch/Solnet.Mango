@@ -59,7 +59,7 @@ namespace Solnet.Mango.Test
 
             var address = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
 
-            Assert.AreEqual("A1rSmySABCrzaxkdxeu4jEPWrxTyVmuPjL8WV6Jhfodd", address);
+            Assert.AreEqual("BaJtBZwcC4ATkJCH3gKdE46L17VQreg5HpPeYK3DHrXL", address);
         }
 
         [TestMethod]
@@ -70,7 +70,7 @@ namespace Solnet.Mango.Test
 
             var address = mango.DeriveAdvancedOrdersAccountAddress(mangoAccount);
 
-            Assert.AreEqual("8RLk5De9hFKCF8xFCvJQnTJ7KHfrLaBD7uarPrBh5R5F", address);
+            Assert.AreEqual("EZVEU44PyMP71ktbwJgQyKwfUdpbr53uT3ykYkAcP5xT", address);
         }
 
         [TestMethod]
@@ -449,6 +449,58 @@ namespace Solnet.Mango.Test
         }
 
         [TestMethod]
+        public void CancelSpotOrder()
+        {
+            var serum = SerumProgram.CreateDevNet();
+
+            Assert.AreEqual(SerumProgram.DevNetProgramIdKeyV3, serum.ProgramIdKey);
+            Assert.AreEqual("Serum Program", serum.ProgramName);
+
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+
+            var openOrders = new List<PublicKey>();
+            for (int i = 0; i < Constants.MaxPairs; i++)
+            {
+                if (i == 3)
+                {
+                    openOrders.Add(new("8Z5esfhcw6zb9kBRSUH4SWfERoEDUH3cpMXFMnN2F1wC"));
+                }
+                else
+                {
+                    openOrders.Add(SystemProgram.ProgramIdKey);
+                }
+            }
+
+            var ix = mango.CancelSpotOrder(
+                Constants.DevNetMangoGroup,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"),
+                mangoAccount,
+                new("5xWpt56U1NCuHoAEtpLeUrQcxDkEpNfScjfLFaRzLPgR"),
+                new("8ezpneRznTJNZWFSLeQvtPCagpsUVWA7djLSzqp3Hx4p"),
+                new("8gJhxSwbLJkDQbqgzbJ6mDvJYnEVWB6NHWEN9oZZkwz7"),
+                new("8Z5esfhcw6zb9kBRSUH4SWfERoEDUH3cpMXFMnN2F1wC"),
+                new("CFdbPXrnPLmo5Qrze7rw9ZNiD82R1VeNdoQosooSP1Ax"),
+                new("48be6VKEq86awgUjfvbKDmEzXr4WNR7hzDxfF6ZPptmd"),
+                new(4611686018427387908904197m),
+                Side.Sell);
+
+            var expectedData =
+                new byte[] {
+                    20, 0, 0, 0, 1, 0, 0, 0,
+                    5, 213, 74, 0, 0, 0, 0, 0,
+                    144, 208, 3, 0, 0, 0, 0, 0,
+                };
+            Assert.AreEqual(10, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
         public void SettleFunds()
         {
             var serum = SerumProgram.CreateDevNet();
@@ -514,7 +566,7 @@ namespace Solnet.Mango.Test
         }
 
         [TestMethod]
-        public void PlacePerpOrder()
+        public void PlacePerpOrderReduceOnly()
         {
             var mango = MangoProgram.CreateDevNet();
 
@@ -562,6 +614,183 @@ namespace Solnet.Mango.Test
             };
 
             Assert.AreEqual(23, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void PlacePerpOrder()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+
+            var openOrders = new List<PublicKey>();
+            for (int i = 0; i < Constants.MaxPairs; i++)
+            {
+                if (i == 3)
+                {
+                    openOrders.Add(new("8Z5esfhcw6zb9kBRSUH4SWfERoEDUH3cpMXFMnN2F1wC"));
+                }
+                else
+                {
+                    openOrders.Add(SystemProgram.ProgramIdKey);
+                }
+            }
+
+            var ix = mango.PlacePerpOrder(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"),
+                new("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z"),
+                new("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ"),
+                new("7HRgm8iXEDx2TmSETo3Lq9SXkF954HMVKNiq8t5sKvQS"),
+                new("4oNxXQv1Rx3h7aNWjhTs3PWBoXdoPZjCaikSThV4yGb8"),
+                new("CZ5MCRvkN38d5pnZDDEEyMiED3drgDUVpEUjkuJq31Kf"),
+                openOrders,
+                Side.Buy,
+                PerpOrderType.Limit,
+                10500,
+                25000,
+                1000000,
+                false
+                );
+
+            var expectedData = new byte[] 
+            { 
+                12, 0, 0, 0, 4, 41, 0, 0, 0, 0, 0, 0,
+                168, 97, 0, 0, 0, 0, 0, 0, 64, 66, 15,
+                0, 0, 0, 0, 0, 0, 0, 0
+            };
+
+            Assert.AreEqual(23, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void CancelPerpOrderByClientId()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+
+            var ix = mango.CancelPerpOrderByClientId(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"),
+                new("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ"),
+                new("7HRgm8iXEDx2TmSETo3Lq9SXkF954HMVKNiq8t5sKvQS"),
+                new("4oNxXQv1Rx3h7aNWjhTs3PWBoXdoPZjCaikSThV4yGb8"),
+                1_000_000,
+                false);
+
+            var expectedData = new byte[]
+            {
+                13, 0, 0, 0, 64, 66, 15, 0, 0, 0, 0, 0,
+                0,
+            };
+
+            Assert.AreEqual(6, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void CancelPerpOrderByClientIdInvalidOk()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+
+            var ix = mango.CancelPerpOrderByClientId(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"),
+                new("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ"),
+                new("7HRgm8iXEDx2TmSETo3Lq9SXkF954HMVKNiq8t5sKvQS"),
+                new("4oNxXQv1Rx3h7aNWjhTs3PWBoXdoPZjCaikSThV4yGb8"),
+                1_000_000,
+                true);
+
+            var expectedData = new byte[]
+            {
+                13, 0, 0, 0, 64, 66, 15, 0, 0, 0, 0, 0,
+                1,
+            };
+
+            Assert.AreEqual(6, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void CancelPerpOrder()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+
+            var ix = mango.CancelPerpOrder(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"),
+                new("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ"),
+                new("7HRgm8iXEDx2TmSETo3Lq9SXkF954HMVKNiq8t5sKvQS"),
+                new("4oNxXQv1Rx3h7aNWjhTs3PWBoXdoPZjCaikSThV4yGb8"),
+                1_000_000,
+                false);
+
+            var expectedData = new byte[]
+            {
+                14, 0, 0, 0, 64, 66, 15, 0, 0, 0, 0, 0,
+                0, 0, 0, 0,0, 0, 0, 0, 0,
+            };
+
+            Assert.AreEqual(6, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void CancelPerpOrderInvalidOk()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+
+            var ix = mango.CancelPerpOrder(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"),
+                new("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ"),
+                new("7HRgm8iXEDx2TmSETo3Lq9SXkF954HMVKNiq8t5sKvQS"),
+                new("4oNxXQv1Rx3h7aNWjhTs3PWBoXdoPZjCaikSThV4yGb8"),
+                1_000_000,
+                true);
+
+            var expectedData = new byte[]
+            {
+                14, 0, 0, 0, 64, 66, 15, 0, 0, 0, 0, 0,
+                0, 0, 0, 0,0, 0, 0, 0, 1,
+            };
+
+            Assert.AreEqual(6, ix.Keys.Count);
             CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
             CollectionAssert.AreEqual(expectedData, ix.Data);
         }
@@ -632,6 +861,157 @@ namespace Solnet.Mango.Test
             Assert.AreEqual(4, ix.Keys.Count);
             CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
             CollectionAssert.AreEqual(new byte[]{ 52, 0, 0, 0 }, ix.Data);
+        }
+
+        [TestMethod]
+        public void AddPerpTriggerOrderReduceOnly()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+            var advancedOrders = mango.DeriveAdvancedOrdersAccountAddress(mangoAccount);
+
+            var openOrders = new List<PublicKey>();
+            for (int i = 0; i < Constants.MaxPairs; i++)
+            {
+                openOrders.Add(SystemProgram.ProgramIdKey);
+            }
+
+            var ix = mango.AddPerpTriggerOrder(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 
+                advancedOrders,
+                new("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z"),
+                new("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ"),
+                openOrders, 
+                PerpOrderType.ImmediateOrCancel,
+                Side.Buy,
+                1_000,
+                1_000,
+                TriggerCondition.Below,
+                new(100),
+                1_000_000,
+                true
+                );
+            var expectedData = new byte[] 
+            { 
+                43, 0, 0, 0, 1, 0, 1, 1, 
+                64, 66, 15, 0, 0, 0, 0, 0, // client order id
+                232, 3, 0, 0, 0, 0, 0, 0, // price
+                232, 3, 0, 0, 0, 0, 0, 0, // quantity
+                0, 0, 0, 0, 0, 0, 100, 0, // trigger price
+                0, 0, 0, 0, 0, 0, 0, 0, // trigger price
+            };
+            Assert.AreEqual(22, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void AddPerpTriggerOrder()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+            var advancedOrders = mango.DeriveAdvancedOrdersAccountAddress(mangoAccount);
+
+            var openOrders = new List<PublicKey>();
+            for (int i = 0; i < Constants.MaxPairs; i++)
+            {
+                openOrders.Add(SystemProgram.ProgramIdKey);
+            }
+
+            var ix = mango.AddPerpTriggerOrder(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 
+                advancedOrders,
+                new("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z"),
+                new("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ"),
+                openOrders, 
+                PerpOrderType.ImmediateOrCancel,
+                Side.Buy,
+                1_000,
+                1_000,
+                TriggerCondition.Below,
+                new(100),
+                1_000_000,
+                false
+                );
+            var expectedData = new byte[] 
+            { 
+                43, 0, 0, 0, 1, 0, 1, 0, 
+                64, 66, 15, 0, 0, 0, 0, 0, // client order id
+                232, 3, 0, 0, 0, 0, 0, 0, // price
+                232, 3, 0, 0, 0, 0, 0, 0, // quantity
+                0, 0, 0, 0, 0, 0, 100, 0, // trigger price
+                0, 0, 0, 0, 0, 0, 0, 0, // trigger price
+            };
+            Assert.AreEqual(22, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void RemoveAdvancedOrder()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+            var advancedOrders = mango.DeriveAdvancedOrdersAccountAddress(mangoAccount);
+
+            var ix = mango.RemoveAdvancedOrder(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 
+                advancedOrders,
+                (byte) 1
+                );
+            var expectedData = new byte[] 
+            { 
+                44, 0, 0, 0, 1,
+            };
+            Assert.AreEqual(5, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void AddMangoAccountInfo()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+
+            var ix = mango.AddMangoAccountInfo(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 
+                "Solnet Test v1"
+                );
+            var expectedData = new byte[] 
+            { 
+                34, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0,
+                83, 111, 108, 110, 101, 116, 32, 84, 101,
+                115, 116, 32, 118, 49, 0, 0, 0, 0, 0,
+                0, 0, 0, 0, 0
+            };
+            Assert.AreEqual(3, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
         }
     }
 }

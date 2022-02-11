@@ -136,7 +136,7 @@ namespace Solnet.Mango.Models
                 ClientOrderId = span.GetU64(ExtraLayout.ClientOrderIdOffset),
                 Price = span.GetS64(ExtraLayout.PriceOffset),
                 Quantity = span.GetS64(ExtraLayout.QuantityOffset),
-                TriggerPrice = I80F48.Deserialize(span.Slice(ExtraLayout.TriggerConditionOffset, I80F48.Length))
+                TriggerPrice = I80F48.Deserialize(span.Slice(ExtraLayout.TriggerPriceOffset, I80F48.Length))
             };
         }
     }

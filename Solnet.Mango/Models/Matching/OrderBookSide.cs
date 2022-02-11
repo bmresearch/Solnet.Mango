@@ -95,12 +95,18 @@ namespace Solnet.Mango.Models.Matching
         public List<Node> Nodes;
 
         /// <summary>
+        /// The orders.
+        /// </summary>
+        private List<OpenOrder> _orders;
+
+        /// <summary>
         /// Gets the list of orders in the order book.
         /// </summary>
         /// <returns></returns>
         public List<OpenOrder> GetOrders()
         {
-            return (from node in Nodes
+            bool isBids = Metadata.DataType == DataType.Bids;
+            _orders = (from node in Nodes
                     where node is LeafNode
                     select (LeafNode)node
                 into leafNode
@@ -113,6 +119,15 @@ namespace Solnet.Mango.Models.Matching
                         OrderIndex = leafNode.OwnerSlot,
                         OrderId = new BigInteger(leafNode.Key)
                     }).ToList();
+            if (!isBids)
+            {
+                _orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order.RawPrice.CompareTo(order1.RawPrice)));
+            }
+            else
+            {
+                _orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order1.RawPrice.CompareTo(order.RawPrice)));
+            }
+            return _orders;
         }
 
         /// <summary>
@@ -123,7 +138,7 @@ namespace Solnet.Mango.Models.Matching
         public long GetImpactPrice(long quantity)
         {
             long s = 0;
-            var orders = GetOrders();
+            var orders = _orders != null ? _orders : GetOrders();
             foreach (var order in orders)
             {
                 s += order.RawQuantity;
@@ -139,17 +154,9 @@ namespace Solnet.Mango.Models.Matching
         /// <returns>The order.</returns>
         public OpenOrder GetBest()
         {
-            bool isBids = Metadata.DataType == DataType.Bids;
-            var orders = GetOrders();
+            if (_orders != null) return _orders.FirstOrDefault();
+            return GetOrders().FirstOrDefault();
 
-            if (!isBids)
-            {
-                orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order.RawPrice.CompareTo(order1.RawPrice)));
-            } else
-            {
-                orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order1.RawPrice.CompareTo(order.RawPrice)));
-            }
-            return orders.FirstOrDefault();
         }
 
 

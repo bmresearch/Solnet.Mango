@@ -30,6 +30,32 @@ namespace Solnet.Mango
         }
 
         /// <summary>
+        /// Converts a humanized value to a native <see cref="I80F48"/> value.
+        /// </summary>
+        /// <param name="triggerPrice">The trigger price.</param>
+        /// <param name="baseDecimals">The base decimals.</param>
+        /// <param name="quoteDecimals">The quote decimals.</param>
+        /// <returns>The native value.</returns>
+        public static I80F48 TriggerPriceToNative(decimal triggerPrice, byte baseDecimals, byte quoteDecimals)
+        {
+            decimal uiToNative = (decimal)Math.Pow(10, quoteDecimals - baseDecimals);
+            return new I80F48(triggerPrice * uiToNative);
+        }
+
+        /// <summary>
+        /// Converts a humanized value to a native <see cref="I80F48"/> value.
+        /// </summary>
+        /// <param name="triggerPrice">The trigger price.</param>
+        /// <param name="baseDecimals">The base decimals.</param>
+        /// <param name="quoteDecimals">The quote decimals.</param>
+        /// <returns>The native value.</returns>
+        public static decimal TriggerPriceToNumber(I80F48 triggerPrice, byte baseDecimals, byte quoteDecimals)
+        {
+            decimal nativeToUi = (decimal)Math.Pow(10, baseDecimals - quoteDecimals);
+            return triggerPrice.ToDecimal() * nativeToUi;
+        }
+
+        /// <summary>
         /// Derives the <see cref="PublicKey"/> of a <see cref="MangoAccount"/> of <see cref="MetaData.Version"/> 1.
         /// </summary>
         /// <param name="programIdKey">The program id key.</param>
@@ -42,7 +68,7 @@ namespace Solnet.Mango
             byte[] accountNumByteSeed = new byte[8];
             accountNumByteSeed.WriteU64(accountNumber, 0);
 
-            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() { Constants.DevNetMangoGroup, owner, accountNumByteSeed },
+            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() { mangoGroup, owner, accountNumByteSeed },
                 programIdKey, out byte[] mangoAccount, out _);
 
             return success ? new(mangoAccount) : null;

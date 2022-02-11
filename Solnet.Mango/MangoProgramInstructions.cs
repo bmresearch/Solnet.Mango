@@ -37,7 +37,6 @@ namespace Solnet.Mango
             { Values.InitAdvancedOrders, "Initialize Advanced Orders Account" },
             { Values.AddPerpTriggerOrder, "Add Perp Trigger Order"},
             { Values.RemoveAdvancedOrder, "Remove Advanced Order" },
-            { Values.ExecutePerpTriggerOrder, "Execute Perp Trigger Order" },
             { Values.CloseMangoAccount, "Close Mango Account" },
             { Values.CloseSpotOpenOrders, "Close Spot Open Orders Account" },
             { Values.CloseAdvancedOrders, "Close Advanced Orders" },
@@ -146,11 +145,6 @@ namespace Solnet.Mango
             /// Remove an advanced order.
             /// </summary>
             RemoveAdvancedOrder = 44,
-
-            /// <summary>
-            /// Execute the perp trigger order.
-            /// </summary>
-            ExecutePerpTriggerOrder = 45,
 
             /// <summary>
             /// Closes the mango account.

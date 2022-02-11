@@ -1,4 +1,5 @@
 using Solnet.Mango.Models;
+using Solnet.Mango.Types;
 using Solnet.Programs;
 using Solnet.Programs.Abstract;
 using Solnet.Programs.Utilities;
@@ -1163,7 +1164,7 @@ namespace Solnet.Mango
         public TransactionInstruction AddPerpTriggerOrder(PublicKey mangoGroup, PublicKey mangoAccount,
             PublicKey owner, PublicKey advancedOrders, PublicKey mangoCache, PublicKey perpMarket,
             List<PublicKey> openOrdersAccounts, PerpOrderType orderType, Side side, long price, long quantity,
-            TriggerCondition triggerCondition, long triggerPrice, ulong clientOrderId, bool reduceOnly = false)
+            TriggerCondition triggerCondition, I80F48 triggerPrice, ulong clientOrderId, bool reduceOnly = false)
             => AddPerpTriggerOrder(ProgramIdKey, mangoGroup, mangoAccount, owner, advancedOrders, mangoCache,
                 perpMarket, openOrdersAccounts, orderType, side, price, quantity, triggerCondition, triggerPrice, clientOrderId, reduceOnly);
 
@@ -1190,7 +1191,7 @@ namespace Solnet.Mango
         public static TransactionInstruction AddPerpTriggerOrder(PublicKey programIdKey, PublicKey mangoGroup, PublicKey mangoAccount,
             PublicKey owner, PublicKey advancedOrders, PublicKey mangoCache, PublicKey perpMarket,
             List<PublicKey> openOrdersAccounts, PerpOrderType orderType, Side side, long price, long quantity,
-            TriggerCondition triggerCondition, BigInteger triggerPrice, ulong clientOrderId, bool reduceOnly = false)
+            TriggerCondition triggerCondition, I80F48 triggerPrice, ulong clientOrderId, bool reduceOnly = false)
         {
             List<AccountMeta> keys = new()
             {
@@ -1252,69 +1253,6 @@ namespace Solnet.Mango
                 ProgramId = programIdKey,
                 Keys = keys,
                 Data = MangoProgramData.EncodeRemoveAdvancedOrderData(orderIndex)
-            };
-        }
-
-        /// <summary>
-        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.ExecutePerpTriggerOrder"/> method.
-        /// </summary>
-        /// <param name="mangoGroup">The mango group.</param>
-        /// <param name="mangoAccount">The mango account.</param>
-        /// <param name="advancedOrders">The advanced orders account.</param>
-        /// <param name="agent">The agent.</param>
-        /// <param name="mangoCache">The mango cache.</param>
-        /// <param name="perpMarket">The perp market.</param>
-        /// <param name="bids">The perp market bids.</param>
-        /// <param name="asks">The perp market asks.</param>
-        /// <param name="eventQueue">The perp market event queue.</param>
-        /// <param name="openOrdersAccounts">The open orders accounts.</param>
-        /// <param name="orderIndex">The order index.</param>
-        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
-        public TransactionInstruction ExecutePerpTriggerOrder(PublicKey mangoGroup,
-            PublicKey mangoAccount, PublicKey advancedOrders, PublicKey agent, PublicKey mangoCache, PublicKey perpMarket,
-            PublicKey bids, PublicKey asks, PublicKey eventQueue, List<PublicKey> openOrdersAccounts, byte orderIndex)
-            => ExecutePerpTriggerOrder(ProgramIdKey, mangoGroup, mangoAccount, advancedOrders, agent, mangoCache, perpMarket,
-                bids, asks, eventQueue, openOrdersAccounts, orderIndex);
-
-        /// <summary>
-        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.ExecutePerpTriggerOrder"/> method.
-        /// </summary>
-        /// <param name="programIdKey">The program id key.</param>
-        /// <param name="mangoGroup">The mango group.</param>
-        /// <param name="mangoAccount">The mango account.</param>
-        /// <param name="advancedOrders">The advanced orders account.</param>
-        /// <param name="agent">The agent.</param>
-        /// <param name="mangoCache">The mango cache.</param>
-        /// <param name="perpMarket">The perp market.</param>
-        /// <param name="bids">The perp market bids.</param>
-        /// <param name="asks">The perp market asks.</param>
-        /// <param name="eventQueue">The perp market event queue.</param>
-        /// <param name="openOrdersAccounts">The open orders accounts.</param>
-        /// <param name="orderIndex">The order index.</param>
-        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
-        public static TransactionInstruction ExecutePerpTriggerOrder(PublicKey programIdKey, PublicKey mangoGroup,
-            PublicKey mangoAccount, PublicKey advancedOrders, PublicKey agent, PublicKey mangoCache, PublicKey perpMarket,
-            PublicKey bids, PublicKey asks, PublicKey eventQueue, List<PublicKey> openOrdersAccounts, byte orderIndex)
-        {
-            List<AccountMeta> keys = new()
-            {
-                AccountMeta.ReadOnly(mangoGroup, false),
-                AccountMeta.Writable(mangoAccount, false),
-                AccountMeta.Writable(advancedOrders, false),
-                AccountMeta.Writable(agent, true),
-                AccountMeta.ReadOnly(mangoCache, false),
-                AccountMeta.Writable(perpMarket, false),
-                AccountMeta.Writable(bids, false),
-                AccountMeta.Writable(asks, false),
-                AccountMeta.Writable(eventQueue, false),
-            };
-            keys.AddRange(openOrdersAccounts.Select(x => AccountMeta.ReadOnly(x, false)));
-
-            return new TransactionInstruction()
-            {
-                ProgramId = programIdKey,
-                Keys = keys,
-                Data = MangoProgramData.EncodeExecutePerpTriggerOrderData(orderIndex)
             };
         }
 
@@ -1729,9 +1667,6 @@ namespace Solnet.Mango
                     break;
                 case MangoProgramInstructions.Values.RemoveAdvancedOrder:
                     MangoProgramData.DecodeRemoveAdvancedOrderData(decodedInstruction, data, keys, keyIndices);
-                    break;
-                case MangoProgramInstructions.Values.ExecutePerpTriggerOrder:
-                    MangoProgramData.DecodeExecutePerpTriggerOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CloseAdvancedOrders:
                     MangoProgramData.DecodeCloseAdvancedOrdersData(decodedInstruction, keys, keyIndices);

@@ -1,4 +1,5 @@
 using Solnet.Mango.Models;
+using Solnet.Mango.Types;
 using Solnet.Programs;
 using Solnet.Programs.Utilities;
 using Solnet.Rpc.Models;
@@ -690,9 +691,11 @@ namespace Solnet.Mango
         }
 
         /// <summary>
-        /// 
+        /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.InitAdvancedOrders"/> method
         /// </summary>
-        /// <returns></returns>
+        /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
+        /// <param name="keys">The account keys present in the transaction.</param>
+        /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
         internal static void DecodeInitAdvancedOrdersData(DecodedInstruction decodedInstruction, IList<PublicKey> keys,
             byte[] keyIndices)
         {
@@ -716,7 +719,7 @@ namespace Solnet.Mango
         /// <param name="triggerPrice">The trigger price</param>
         /// <returns>The encoded data.</returns>
         internal static byte[] EncodeAddPerpTriggerOrderData(PerpOrderType orderType, Side side, TriggerCondition triggerCondition,
-            bool reduceOnly, ulong clientOrderId, long price, long quantity, BigInteger triggerPrice)
+            bool reduceOnly, ulong clientOrderId, long price, long quantity, I80F48 triggerPrice)
         {
             byte[] data = new byte[48];
             data.WriteU32((uint)MangoProgramInstructions.Values.AddPerpTriggerOrder, MangoProgramLayouts.MethodOffset);
@@ -727,7 +730,7 @@ namespace Solnet.Mango
             data.WriteU64(clientOrderId, MangoProgramLayouts.AddPerpTriggerOrder.ClientOrderIdOffset);
             data.WriteS64(price, MangoProgramLayouts.AddPerpTriggerOrder.PriceOffset);
             data.WriteS64(quantity, MangoProgramLayouts.AddPerpTriggerOrder.QuantityOffset);
-            data.WriteBigInt(triggerPrice, MangoProgramLayouts.AddPerpTriggerOrder.TriggerPriceOffset);
+            I80F48.Serialize(data, triggerPrice, MangoProgramLayouts.AddPerpTriggerOrder.TriggerPriceOffset);
             return data;
         }
 
@@ -752,6 +755,18 @@ namespace Solnet.Mango
             {
                 decodedInstruction.Values.Add($"Open Orders Account {i - 6}", keys[keyIndices[i]]);
             }
+            var triggerPrice = I80F48.Deserialize(data.Slice(MangoProgramLayouts.AddPerpTriggerOrder.TriggerPriceOffset, I80F48.Length));
+            decodedInstruction.Values.Add("Trigger Price", triggerPrice);
+            decodedInstruction.Values.Add("Price", data.GetS64(MangoProgramLayouts.AddPerpTriggerOrder.PriceOffset));
+            decodedInstruction.Values.Add("Quantity", data.GetS64(MangoProgramLayouts.AddPerpTriggerOrder.QuantityOffset));
+            decodedInstruction.Values.Add("Client Order Id", data.GetU64(MangoProgramLayouts.AddPerpTriggerOrder.ClientOrderIdOffset));
+            decodedInstruction.Values.Add("Trigger Condition",
+                (TriggerCondition)Enum.Parse(typeof(TriggerCondition), data.GetU8(MangoProgramLayouts.AddPerpTriggerOrder.TriggerConditionOffset).ToString()));
+            decodedInstruction.Values.Add("Side",
+                (Side)Enum.Parse(typeof(Side), data.GetU8(MangoProgramLayouts.AddPerpTriggerOrder.SideOffset).ToString()));
+            decodedInstruction.Values.Add("Order Type",
+                (OrderType)Enum.Parse(typeof(OrderType), data.GetU8(MangoProgramLayouts.AddPerpTriggerOrder.OrderTypeOffset).ToString()));
+            decodedInstruction.Values.Add("Reduce Only", data.GetBool(MangoProgramLayouts.AddPerpTriggerOrder.ReduceOnlyOffset));
         }
 
         /// <summary>
@@ -782,46 +797,6 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Owner", keys[keyIndices[2]]);
             decodedInstruction.Values.Add("Advanced Orders", keys[keyIndices[3]]);
             decodedInstruction.Values.Add("System Program", keys[keyIndices[4]]);
-            decodedInstruction.Values.Add("Order Index", data.GetU8(MangoProgramLayouts.OrderIndexOffset));
-        }
-
-
-        /// <summary>
-        /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.ExecutePerpTriggerOrder"/> method.
-        /// </summary>
-        /// <param name="orderIndex">The order index.</param>
-        /// <returns>The encoded data.</returns>
-        internal static byte[] EncodeExecutePerpTriggerOrderData(byte orderIndex)
-        {
-            byte[] data = new byte[5];
-            data.WriteU32((uint)MangoProgramInstructions.Values.ExecutePerpTriggerOrder, MangoProgramLayouts.MethodOffset);
-            data.WriteU8(orderIndex, MangoProgramLayouts.OrderIndexOffset);
-            return data;
-        }
-
-        /// <summary>
-        /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.ExecutePerpTriggerOrder"/> method
-        /// </summary>
-        /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
-        /// <param name="data">The instruction data to decode.</param>
-        /// <param name="keys">The account keys present in the transaction.</param>
-        /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
-        internal static void DecodeExecutePerpTriggerOrderData(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data,
-            IList<PublicKey> keys, byte[] keyIndices)
-        {
-            decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
-            decodedInstruction.Values.Add("Mango Account", keys[keyIndices[1]]);
-            decodedInstruction.Values.Add("Advanced Orders", keys[keyIndices[2]]);
-            decodedInstruction.Values.Add("Agent", keys[keyIndices[3]]);
-            decodedInstruction.Values.Add("Mango Cache", keys[keyIndices[4]]);
-            decodedInstruction.Values.Add("Perp Market", keys[keyIndices[5]]);
-            decodedInstruction.Values.Add("Bids", keys[keyIndices[6]]);
-            decodedInstruction.Values.Add("Asks", keys[keyIndices[7]]);
-            decodedInstruction.Values.Add("EventQueue", keys[keyIndices[8]]);
-            for (int i = 9; i < keyIndices.Length; i++)
-            {
-                decodedInstruction.Values.Add($"Open Orders Account {i - 8}", keys[keyIndices[i]]);
-            }
             decodedInstruction.Values.Add("Order Index", data.GetU8(MangoProgramLayouts.OrderIndexOffset));
         }
 
