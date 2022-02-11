@@ -1,0 +1,101 @@
+[
+  {
+    "hourly": "2022-01-12T00:00:00.000Z",
+    "name": "ADA-PERP",
+    "oldestLongFunding": 7274.738962455888,
+    "oldestShortFunding": 7274.738962455888,
+    "latestLongFunding": 7249.117970674486,
+    "latestShortFunding": 7249.117970674486,
+    "openInterest": 307708.0693641619,
+    "baseOraclePrice": 1.1974698007514433,
+    "time": "2022-01-12T00:00:06.614Z"
+  },
+  {
+    "hourly": "2022-01-12T00:00:00.000Z",
+    "name": "AVAX-PERP",
+    "oldestLongFunding": 12730.658088400596,
+    "oldestShortFunding": 12730.658088400596,
+    "latestLongFunding": 12735.220628265814,
+    "latestShortFunding": 12735.220628265814,
+    "openInterest": 2720185.861271676,
+    "baseOraclePrice": 89.49416218923754,
+    "time": "2022-01-12T00:00:06.614Z"
+  },
+  {
+    "hourly": "2022-01-12T00:00:00.000Z",
+    "name": "BNB-PERP",
+    "oldestLongFunding": 1248.5820098882034,
+    "oldestShortFunding": 1248.5820098882034,
+    "latestLongFunding": 1223.487169148584,
+    "latestShortFunding": 1223.487169148584,
+    "openInterest": 1290158,
+    "baseOraclePrice": 463.6127829479767,
+    "time": "2022-01-12T00:00:06.614Z"
+  },
+  {
+    "hourly": "2022-01-12T00:00:00.000Z",
+    "name": "BTC-PERP",
+    "oldestLongFunding": 650142.6307498823,
+    "oldestShortFunding": 648570.6077308253,
+    "latestLongFunding": 650091.5858054399,
+    "latestShortFunding": 648519.562786383,
+    "openInterest": 2081554.6820809247,
+    "baseOraclePrice": 42769.933346820806,
+    "time": "2022-01-12T00:00:06.612Z"
+  },
+  {
+    "hourly": "2022-01-12T00:00:00.000Z",
+    "name": "ETH-PERP",
+    "oldestLongFunding": 168326.69836724587,
+    "oldestShortFunding": 168326.69836724587,
+    "latestLongFunding": 168311.12867627412,
+    "latestShortFunding": 168311.12867627412,
+    "openInterest": 1040699.0231213872,
+    "baseOraclePrice": 3241.3155343930634,
+    "time": "2022-01-12T00:00:06.612Z"
+  },
+  {
+    "hourly": "2022-01-12T00:00:00.000Z",
+    "name": "FTT-PERP",
+    "oldestLongFunding": 186763.4056220338,
+    "oldestShortFunding": 186763.4056220338,
+    "latestLongFunding": 186677.06586393574,
+    "latestShortFunding": 186677.06586393574,
+    "openInterest": 71492.71098265896,
+    "baseOraclePrice": 39.840588499999996,
+    "time": "2022-01-12T00:00:06.613Z"
+  },
+  {
+    "hourly": "2022-01-12T00:00:00.000Z",
+    "name": "LUNA-PERP",
+    "oldestLongFunding": 5215.718071256195,
+    "oldestShortFunding": 5215.718071256195,
+    "latestLongFunding": 5281.2884393086415,
+    "latestShortFunding": 5281.2884393086415,
+    "openInterest": 5804601.953757226,
+    "baseOraclePrice": 73.86041418497109,
+    "time": "2022-01-12T00:00:06.615Z"
+  },
+  {
+    "hourly": "2022-01-12T00:00:00.000Z",
+    "name": "MNGO-PERP",
+    "oldestLongFunding": 23585.639278652056,
+    "oldestShortFunding": 23585.639278652056,
+    "latestLongFunding": 23593.06144300333,
+    "latestShortFunding": 23593.06144300333,
+    "openInterest": 2859108.202312139,
+    "baseOraclePrice": 0.20829710982658925,
+    "time": "2022-01-12T00:00:06.612Z"
+  },
+  {
+    "hourly": "2022-01-12T00:00:00.000Z",
+    "name": "RAY-PERP",
+    "oldestLongFunding": -51262.79029119452,
+    "oldestShortFunding": -51262.79029119452,
+    "latestLongFunding": -51328.837611330426,
+    "latestShortFunding": -51328.837611330426,
+    "openInterest": 1645565.6011560694,
+    "baseOraclePrice": 5.350361048843929,
+    "time": "2022-01-12T00:00:06.613Z"
+  }
+]
