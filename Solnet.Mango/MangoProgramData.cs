@@ -626,7 +626,7 @@ namespace Solnet.Mango
         {
             byte[] data = new byte[36];
             data.WriteU32((uint)MangoProgramInstructions.Values.AddMangoAccountInfo, MangoProgramLayouts.MethodOffset);
-            byte[] encodedInfo = Serialization.EncodeRustString(info);
+            byte[] encodedInfo = Serialization.EncodeBincodeString(info);
             data.WriteSpan(encodedInfo, MangoProgramLayouts.MangoAccountInfoOffset);
             return data;
         }
@@ -644,7 +644,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
             decodedInstruction.Values.Add("Mango Account", keys[keyIndices[1]]);
             decodedInstruction.Values.Add("Owner", keys[keyIndices[2]]);
-            (string accountInfo, _) = data.DecodeRustString(MangoProgramLayouts.MangoAccountInfoOffset);
+            (string accountInfo, _) = data.DecodeBincodeString(MangoProgramLayouts.MangoAccountInfoOffset);
             decodedInstruction.Values.Add("Account Info", accountInfo);
         }
 

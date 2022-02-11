@@ -63,7 +63,6 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
   - InitAdvancedOrders
   - AddPerpTriggerOrder
   - RemoveAdvancedOrder
-  - ExecutePerpTriggerOrder
   - CloseMangoAccount
   - CloseSpotOpenOrders
   - CloseAdvancedOrders
