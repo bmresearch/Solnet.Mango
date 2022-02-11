@@ -1,4 +1,5 @@
 using Solnet.Mango.Models.Matching;
+using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using System;
 using System.Collections.Generic;
@@ -94,12 +95,18 @@ namespace Solnet.Mango.Models.Matching
         public List<Node> Nodes;
 
         /// <summary>
+        /// The orders.
+        /// </summary>
+        private List<OpenOrder> _orders;
+
+        /// <summary>
         /// Gets the list of orders in the order book.
         /// </summary>
         /// <returns></returns>
         public List<OpenOrder> GetOrders()
         {
-            return (from node in Nodes
+            bool isBids = Metadata.DataType == DataType.Bids;
+            _orders = (from node in Nodes
                     where node is LeafNode
                     select (LeafNode)node
                 into leafNode
@@ -112,7 +119,46 @@ namespace Solnet.Mango.Models.Matching
                         OrderIndex = leafNode.OwnerSlot,
                         OrderId = new BigInteger(leafNode.Key)
                     }).ToList();
+            if (!isBids)
+            {
+                _orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order.RawPrice.CompareTo(order1.RawPrice)));
+            }
+            else
+            {
+                _orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order1.RawPrice.CompareTo(order.RawPrice)));
+            }
+            return _orders;
         }
+
+        /// <summary>
+        /// Gets the price reached for a given quantity up the book.
+        /// </summary>
+        /// <param name="quantity">The quantity.</param>
+        /// <returns>The price or zero if desired amount is not on the book.</returns>
+        public long GetImpactPrice(long quantity)
+        {
+            long s = 0;
+            var orders = _orders != null ? _orders : GetOrders();
+            foreach (var order in orders)
+            {
+                s += order.RawQuantity;
+                if (s > quantity)
+                    return order.RawPrice;
+            }
+            return 0;
+        }
+
+        /// <summary>
+        /// Gets the best order on the book.
+        /// </summary>
+        /// <returns>The order.</returns>
+        public OpenOrder GetBest()
+        {
+            if (_orders != null) return _orders.FirstOrDefault();
+            return GetOrders().FirstOrDefault();
+
+        }
+
 
         /// <summary>
         /// Deserialize a span of bytes into a <see cref="OrderBookSide"/> instance.

@@ -17,8 +17,8 @@ namespace Solnet.Mango.Examples
 {
     public static class ExampleHelpers
     {
-        public static void LogAccountStatus(IMangoClient mangoClient, MangoGroup mangoGroup, MangoCache mangoCache, MangoAccount mangoAccount,
-            List<I80F48> breakEvenPrices = null)
+        public static void LogAccountStatus(MangoGroup mangoGroup, MangoCache mangoCache, MangoAccount mangoAccount,
+            AdvancedOrdersAccount advancedOrders = null, List<I80F48> breakEvenPrices = null)
         {
             if (mangoGroup.RootBankAccounts.Count != 0)
             {
@@ -27,7 +27,7 @@ namespace Solnet.Mango.Examples
                 {
                     if (mangoGroup.Tokens[token].RootBank.Key == SystemProgram.ProgramIdKey.Key) continue;
                     Console.WriteLine(
-                        //$"Token: {mangoGroup.Tokens[token].Mint,-50}" +
+                        $"Token: {mangoGroup.Tokens[token].Mint,-50}" +
                         $"Deposits: {mangoAccount.GetUiDeposit(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal(),-25:N4}" +
                         $"Borrows: {mangoAccount.GetUiBorrow(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal(),-25:N4}" +
                         $"MaxWithBorrow: {mangoAccount.GetMaxWithBorrowForToken(mangoGroup, mangoCache, token).ToDecimal(),-25:N4}" +
@@ -35,22 +35,46 @@ namespace Solnet.Mango.Examples
                 }
             }
 
-               Console.WriteLine($"- - - - - - ACCOUNT PERP POSITIONS - - - - - -");
-            for (int p = 0; p < mangoGroup.PerpetualMarkets.Count; p++)
+            Console.WriteLine($"- - - - - - ACCOUNT PERP POSITIONS - - - - - -");
+            if (mangoGroup.PerpMarketAccounts.Count != 0)
             {
-                if (mangoGroup.PerpetualMarkets[p].Market.Equals(SystemProgram.ProgramIdKey)) continue;
-                var perpMarket = mangoClient.GetPerpMarket(mangoGroup.PerpetualMarkets[p].Market);
-                var notional = mangoAccount.PerpetualAccounts[p].GetNotionalSize(mangoGroup, mangoCache, perpMarket.ParsedResult, p);
-                var absNotional = notional < 0 ? notional * -1 : notional;
-                var msg = //$"Market: {mangoGroup.PerpetualMarkets[p].Market,-49}" +
-                    $"Position Size: {mangoAccount.PerpetualAccounts[p].GetUiBasePosition(perpMarket.ParsedResult, mangoGroup.Tokens[p].Decimals),-25:N4}" +
-                    $"Notional Size: ${absNotional,-25:N4}";
+                for (int p = 0; p < mangoGroup.PerpMarketAccounts.Count; p++)
+                {
+                    if (mangoGroup.PerpetualMarkets[p].Market.Equals(SystemProgram.ProgramIdKey)) continue;
+                    var notional = mangoAccount.PerpetualAccounts[p].GetNotionalSize(mangoGroup, mangoCache, mangoGroup.PerpMarketAccounts[p], p);
+                    var absNotional = notional < 0 ? notional * -1 : notional;
+                    var msg = //$"Market: {mangoGroup.PerpetualMarkets[p].Market,-49}" +
+                        $"Position Size: {mangoAccount.PerpetualAccounts[p].GetUiBasePosition(mangoGroup.PerpMarketAccounts[p], mangoGroup.Tokens[p].Decimals),-25:N4}" +
+                        $"Notional Size: ${absNotional,-25:N4}";
 
-                msg += breakEvenPrices != null ?
-                    $"PNL: {mangoAccount.PerpetualAccounts[p].GetProfitAndLoss(mangoGroup, mangoCache, perpMarket.ParsedResult, breakEvenPrices[p], p),-25:N4}" : "";
+                    msg += breakEvenPrices != null ?
+                        $"PNL: {mangoAccount.PerpetualAccounts[p].GetProfitAndLoss(mangoGroup, mangoCache, mangoGroup.PerpMarketAccounts[p], breakEvenPrices[p], p),-25:N4}" : "";
 
-                Console.WriteLine(msg);
+                    Console.WriteLine(msg);
+                }
+            }
 
+            Console.WriteLine($"- - - - - - ACCOUNT TRIGGER ORDERS - - - - - -");
+            if (advancedOrders != null)
+            {
+                foreach (var trigger in advancedOrders.AdvancedOrders)
+                {
+                    if (trigger is PerpTriggerOrder perpTrigger)
+                    {
+                        var baseToken = mangoGroup.Tokens[perpTrigger.MarketIndex];
+                        var quoteToken = mangoGroup.GetQuoteTokenInfo();
+                        var triggerPrice = MangoUtils.TriggerPriceToNumber(perpTrigger.TriggerPrice, baseToken.Decimals, quoteToken.Decimals);
+
+                        var price = mangoGroup.PerpMarketAccounts[perpTrigger.MarketIndex].PriceLotsToNumber(new(perpTrigger.Price), baseToken.Decimals, quoteToken.Decimals);
+                        var size = mangoGroup.PerpMarketAccounts[perpTrigger.MarketIndex].BaseLotsToNumber(perpTrigger.Quantity, baseToken.Decimals);
+
+                        var msg = $"If Price {perpTrigger.TriggerCondition} {triggerPrice:N4} {perpTrigger.OrderType} {perpTrigger.Side} {size:N4} AT {price:N4} ";
+
+                        if (perpTrigger.ReduceOnly) msg += " REDUCE ONLY";
+
+                        Console.WriteLine($"Market: {mangoGroup.PerpetualMarkets[perpTrigger.MarketIndex].Market.Key[..10],-15}..." + msg);
+                    }
+                }
             }
 
             Console.WriteLine($"- - - - - - - - - - ACCOUNT STATUS - - - - - - - - - -");
@@ -113,7 +137,7 @@ namespace Solnet.Mango.Examples
             string logs = PrettyPrintTransactionSimulationLogs(txSim.Result.Value.Logs);
             Console.WriteLine($"Transaction Simulation:\n\tError: {txSim.Result.Value.Error}\n\tLogs: \n" + logs);
 
-            RequestResult<string> txReq = rpcClient.SendTransaction(tx, true, commitment: Commitment.Confirmed);
+            RequestResult<string> txReq = rpcClient.SendTransaction(tx, commitment: Commitment.Confirmed);
             Console.WriteLine($"Tx Signature: {txReq.Result}");
 
             return txReq.Result;

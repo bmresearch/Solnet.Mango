@@ -1,5 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Solnet.Mango.Models.Banks;
+using Solnet.Wallet;
+using System;
 using System.Collections.Generic;
 
 namespace Solnet.Mango.Test
@@ -50,6 +52,33 @@ namespace Solnet.Mango.Test
 
             Assert.AreEqual(0.2305834989565909154407563619m, rootBank.GetBorrowRate(6).ToDecimal());
             Assert.AreEqual(0.1687440978769068067322223214m, rootBank.GetDepositRate(6).ToDecimal());
+        }
+
+        [TestMethod]
+        public void RootBankGetNodeBankIndex()
+        {
+            var prefix = "Resources/TokenBank/";
+
+            var rootBank = LoadRootBank(prefix + "USDCRootBank.txt").Result;
+            var nodeBank = LoadNodeBank(prefix + "USDCNodeBank.txt").Result;
+
+            rootBank.NodeBankAccounts = new List<NodeBank> { nodeBank };
+
+            Assert.AreEqual(0, rootBank.GetNodeBankIndex(rootBank.NodeBanks[0]));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(Exception))]
+        public void RootBankGetNodeBankIndexException()
+        {
+            var prefix = "Resources/TokenBank/";
+
+            var rootBank = LoadRootBank(prefix + "USDCRootBank.txt").Result;
+            var nodeBank = LoadNodeBank(prefix + "USDCNodeBank.txt").Result;
+
+            rootBank.NodeBankAccounts = new List<NodeBank> { nodeBank };
+
+            Assert.AreEqual(0, rootBank.GetNodeBankIndex(new Account()));
         }
     }
 }

@@ -27,19 +27,7 @@ namespace Solnet.Mango.Models.Matching
         public List<OpenOrder> GetBids()
         {
             if (Bids == null) return new List<OpenOrder>();
-            return (from node in Bids.Nodes
-                    where node is LeafNode
-                    select (LeafNode)node
-                into leafNode
-                    select new OpenOrder
-                    {
-                        RawPrice = leafNode.Price,
-                        RawQuantity = leafNode.Quantity,
-                        ClientOrderId = leafNode.ClientOrderId,
-                        Owner = leafNode.Owner,
-                        OrderIndex = leafNode.OwnerSlot,
-                        OrderId = new BigInteger(leafNode.Key)
-                    }).ToList();
+            return Bids.GetOrders();
         }
 
         /// <summary>
@@ -49,19 +37,7 @@ namespace Solnet.Mango.Models.Matching
         public List<OpenOrder> GetAsks()
         {
             if (Asks == null) return new List<OpenOrder>();
-            return (from node in Asks.Nodes
-                    where node is LeafNode
-                    select (LeafNode)node
-                into leafNode
-                    select new OpenOrder
-                    {
-                        RawPrice = leafNode.Price,
-                        RawQuantity = leafNode.Quantity,
-                        ClientOrderId = leafNode.ClientOrderId,
-                        Owner = leafNode.Owner,
-                        OrderIndex = leafNode.OwnerSlot,
-                        OrderId = new BigInteger(leafNode.Key)
-                    }).ToList();
+            return Asks.GetOrders();
         }
     }
 }

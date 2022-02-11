@@ -187,34 +187,45 @@ namespace Solnet.Mango.Types
         }
 
         /// <summary>
-        /// 
+        /// Get the underlying big integer.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The big integer.</returns>
         public BigInteger GetData() => _storage;
 
         /// <summary>
-        /// 
+        /// Get the underlying bytes.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The bytes.</returns>
         public byte[] GetBytes() => Serialize(this);
 
         /// <summary>
-        /// 
+        /// Deserialize a span of bytes into an <see cref="I80F48"/>.
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <param name="data">The data to deserialize.</param>
+        /// <returns>The <see cref="I80F48"/>.</returns>
         public static I80F48 Deserialize(ReadOnlySpan<byte> data)
         {
             var bigInt = data.GetBigInt(0, Length, false);
             return new I80F48(bigInt);
         }
 
+        /// <summary>
+        /// Deserialize a span of bytes into an <see cref="I80F48"/>.
+        /// </summary>
+        /// <param name="data">The data to deserialize.</param>
+        /// <param name="offset">The offset at which to start deserialization.</param>
+        /// <returns>The <see cref="I80F48"/>.</returns>
+        public static I80F48 Deserialize(ReadOnlySpan<byte> data, int offset)
+        {
+            var bigInt = data.GetBigInt(offset, Length, false);
+            return new I80F48(bigInt);
+        }
 
         /// <summary>
-        /// 
+        /// Serialize an <see cref="I80F48"/> into a byte array.
         /// </summary>
-        /// <param name="data"></param>
-        /// <returns></returns>
+        /// <param name="data">The <see cref="I80F48"/>.</param>
+        /// <returns>The byte array.</returns>
         public static byte[] Serialize(I80F48 data)
         {
             var buf = new byte[16];
@@ -223,12 +234,27 @@ namespace Solnet.Mango.Types
 
             if (!data.IsPositive && count != 16)
             {
-                //buf[count - 1] = (byte)(buf[count - 1] & 0x7F);
-                //buf[15] = 0x80;
                 while (count < 16) buf[count++] = 0xFF;
             }
 
             return buf;
+        }
+
+        /// <summary>
+        /// Serialize an <see cref="I80F48"/> into a byte array.
+        /// </summary>
+        /// <param name="buffer">The buffer to write on.</param>
+        /// <param name="data">The <see cref="I80F48"/>.</param>
+        /// <param name="offset">The offset at which to start deserialization.</param>
+        /// <returns>The byte array.</returns>
+        public static void Serialize(byte[] buffer, I80F48 data, int offset)
+        {
+            var count = buffer.WriteBigInt(data._storage, offset, false);
+
+            if (!data.IsPositive && count != Length)
+            {
+                while (count < 16) buffer[offset + count++] = 0xFF;
+            }
         }
 
         public I80F48 Min(I80F48 other) => this > other ? other : this;

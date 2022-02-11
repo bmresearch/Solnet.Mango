@@ -30,7 +30,7 @@ namespace Solnet.Mango.Examples
         {
             AccountResultWrapper<MangoGroup> mangoGroup = _mangoClient.GetMangoGroup(Constants.DevNetMangoGroup);
             MangoCache mangoCache = _mangoClient.GetMangoCache(mangoGroup.ParsedResult.MangoCache).ParsedResult;
-            mangoGroup.ParsedResult.LoadRootBanks(RpcClient);
+            mangoGroup.ParsedResult.LoadRootBanks(_mangoClient);
 
             ProgramAccountsResultWrapper<List<MangoAccount>> mangoAccounts = _mangoClient.GetMangoAccounts(Owner);
             for (int i = 0; i < mangoAccounts.ParsedResult.Count; i++)
@@ -38,7 +38,7 @@ namespace Solnet.Mango.Examples
                 Console.WriteLine(
                     $"Account: {mangoAccounts.OriginalRequest.Result[i].PublicKey} Owner: {mangoAccounts.ParsedResult[i].Owner}");
                 mangoAccounts.ParsedResult[i].LoadOpenOrdersAccounts(RpcClient);
-                ExampleHelpers.LogAccountStatus(_mangoClient, mangoGroup.ParsedResult, mangoCache, mangoAccounts.ParsedResult[i]);
+                ExampleHelpers.LogAccountStatus(mangoGroup.ParsedResult, mangoCache, mangoAccounts.ParsedResult[i]);
             }
 
             Console.ReadLine();

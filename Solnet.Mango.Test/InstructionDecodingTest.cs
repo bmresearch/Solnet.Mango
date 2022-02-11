@@ -44,6 +44,12 @@ namespace Solnet.Mango.Test
 
         private const string SettleFeesMessage = "AQAGDApz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4PXZlUykmGWoPjtNacJy3FdWu697umtHGPMe68DE4x2WYAxig2FEvystJRkjr1kfkvxGi/EKTL1QaZFDVZrfaJPzunXKJbtS8YLYgY2f11zGxHDuQhmnN4m8nFrEbWL7mjOkRwE+LS7mOqKst0t9XVKIjQLKnorTLqzoWt16QJOc8TQ4J2EPl9BDMF+zkq/DCJmIcxEjojfFW/ZpOiHHc6sohIC1MXuUx1BqubENkb/BfDUR2wytGaIy8quZuGSIhc1enabCRStasrnNU4+aP4LPFLTp9LFYZTQ1yFH/LwMX0sZDYUlptIBg9RW0ZzsuHXwOMLhTPIhTUezqL5RfJO6cwEDDqWqCTX/YYsLoZIm4/AOjtdu54FMVywS+aYKOBBt324ddloZPZy+FGzut5rBy0he1fWzeROoz1hX7/AKk5kw4m3RTlrY1U1TDoqPHph4SQpWHgwU5NDOx8pbUuMXbH15BXMTE9b0EDMhCHjJirqhVm0ZQt0Uw8u3N+OQVWAQsKBgcBAggDBAUJCgQdAAAA";
 
+        private const string SetDelegateMessage = "AQADBQpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4mAMYoNhRL8rLSUZI69ZH5L8RovxCky9UGmRQ1Wa32iTKISAtTF7lMdQarmxDZG/wXw1EdsMrRmiMvKrmbhkiIUdpq5cgS6g/sMruF/eGjx4HTlIVgaDYnZQ3napltxeyOZMOJt0U5a2NVNUw6Kjx6YeEkKVh4MFOTQzsfKW1LjFCOnISNMoN1q1oaY51oyod00EnC8RaGBYrGcg8VhA8LwEEBAIBAAMEOgAAAA==";
+
+        private const string AddPerpTriggerOrderMessage = "AQAGCApz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4rQqXXruIOVtp8L9IgE6vrVLzYNobX3u6/Rbj/+6kqIjKISAtTF7lMdQarmxDZG/wXw1EdsMrRmiMvKrmbhkiIVTo0h0JftHn9tx6NSAOOqytyt4VksgHKcuqfxgcBhksc1enabCRStasrnNU4+aP4LPFLTp9LFYZTQ1yFH/LwMU9dmVTKSYZag+O01pwnLcV1a7r3u6a0cY8x7rwMTjHZQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOZMOJt0U5a2NVNUw6Kjx6YeEkKVh4MFOTQzsfKW1LjFLew9i3W5WAGjIb8A2ki3kJqo/xqGKFgUQ3QYnHjiZoQEHFgIDAAEEBQYGBgYGBgYGBgYGBgYGBgYwKwAAAAEAAQFAQg8AAAAAAKCGAQAAAAAAoIYBAAAAAAAAAAAAAACghgEAAAAAAAAA";
+
+        private const string RemoveAdvancedOrderMessage = "AQAEBgpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4rQqXXruIOVtp8L9IgE6vrVLzYNobX3u6/Rbj/+6kqIjKISAtTF7lMdQarmxDZG/wXw1EdsMrRmiMvKrmbhkiIVTo0h0JftHn9tx6NSAOOqytyt4VksgHKcuqfxgcBhksAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5kw4m3RTlrY1U1TDoqPHph4SQpWHgwU5NDOx8pbUuMVy7776PgCLScUwD+RHspt3GxeMeP3YLDofTNwAmOLb5AgUFAgMAAQQFLAAAAAAFBQIDAAEEBSwAAAAB";
+
         [ClassInitialize]
         public static void Setup(TestContext tc)
         {
@@ -65,7 +71,7 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[1].Values.GetValueOrDefault("Mango Group").ToString());
             Assert.AreEqual("EEoHecXUMTx5omC1cTHDuv7VKGTmzq8M5d86GnBHYMPS", ix[1].Values.GetValueOrDefault("Mango Account").ToString());
             Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[1].Values.GetValueOrDefault("Owner").ToString());
-            Assert.AreEqual("SysvarRent111111111111111111111111111111111", ix[1].Values.GetValueOrDefault("Sysvar Rent").ToString());
+            Assert.AreEqual(SysVars.RentKey, ix[1].Values.GetValueOrDefault("Sysvar Rent").ToString());
 
             Assert.AreEqual("Add Mango Account Info", ix[2].InstructionName);
             Assert.AreEqual("Mango Program V3", ix[2].ProgramName);
@@ -131,7 +137,7 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", ix[0].Values.GetValueOrDefault("Mango Account").ToString());
             Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[0].Values.GetValueOrDefault("Owner").ToString());
             Assert.AreEqual("AZofyy49f3sY6bt3F1vgMse92eZdFuCM8jkV1USofneA", ix[0].Values.GetValueOrDefault("Advanced Orders").ToString());
-            Assert.AreEqual("11111111111111111111111111111111", ix[0].Values.GetValueOrDefault("System Program").ToString());
+            Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault("System Program").ToString());
         }
 
         [TestMethod]
@@ -182,7 +188,7 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("False", ix[2].Values.GetValueOrDefault("Allow Borrow").ToString());
             for (int i = 0; i < Constants.MaxPairs; i++)
             {
-                Assert.AreEqual("11111111111111111111111111111111", ix[2].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+                Assert.AreEqual(SystemProgram.ProgramIdKey, ix[2].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
             }
         }
 
@@ -204,14 +210,14 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("8GC81raaLjhTx3yedctxCJW46qdmmSRybH2s1eFYFFxT", ix[2].Values.GetValueOrDefault("Root Bank").ToString());
             Assert.AreEqual("7mYqCavd1K24fnL3oKTpX3YM66W5gfikmVHJWM3nrWKe", ix[2].Values.GetValueOrDefault("Node Bank").ToString());
             Assert.AreEqual("E79n2SiixBFrQqrq8JDCe1ZJXHcVADaQofe246b9qaRy", ix[2].Values.GetValueOrDefault("Vault").ToString());
-            Assert.AreEqual("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", ix[2].Values.GetValueOrDefault("Token Program").ToString());
+            Assert.AreEqual(TokenProgram.ProgramIdKey, ix[2].Values.GetValueOrDefault("Token Program").ToString());
             Assert.AreEqual("9pWQt8hxBdhufevcXibqH7EWVWtWewNy7EA5mBENRRDW", ix[2].Values.GetValueOrDefault("Owner Token Account").ToString());
             Assert.AreEqual("CFdbPXrnPLmo5Qrze7rw9ZNiD82R1VeNdoQosooSP1Ax", ix[2].Values.GetValueOrDefault("Mango Signer").ToString());
             Assert.AreEqual("1000000000", ix[2].Values.GetValueOrDefault("Quantity").ToString());
             Assert.AreEqual("True", ix[2].Values.GetValueOrDefault("Allow Borrow").ToString());
             for (int i = 0; i < Constants.MaxPairs; i++)
             {
-                Assert.AreEqual("11111111111111111111111111111111", ix[2].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+                Assert.AreEqual(SystemProgram.ProgramIdKey, ix[2].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
             }
         }
 
@@ -285,9 +291,9 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("HUBX4iwWEUK5VrXXXcB7uhuKrfT4fpu2T9iZbg712JrN", ix[0].Values.GetValueOrDefault("Quote Root Bank").ToString());
             Assert.AreEqual("J2Lmnc1e4frMnBEJARPoHtfpcohLfN67HdK1inXjTFSM", ix[0].Values.GetValueOrDefault("Quote Node Bank").ToString());
             Assert.AreEqual("AV4CuwdvnccZMXNhu9cSCx1mkpgHWcwWEJ7Yb8Xh8QMC", ix[0].Values.GetValueOrDefault("Quote Vault").ToString());
-            Assert.AreEqual("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", ix[0].Values.GetValueOrDefault("Token Program").ToString());
+            Assert.AreEqual(TokenProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault("Token Program").ToString());
             Assert.AreEqual("CFdbPXrnPLmo5Qrze7rw9ZNiD82R1VeNdoQosooSP1Ax", ix[0].Values.GetValueOrDefault("Mango Signer").ToString());
-            Assert.AreEqual("SysvarRent111111111111111111111111111111111", ix[0].Values.GetValueOrDefault("Sysvar Rent").ToString());
+            Assert.AreEqual(SysVars.RentKey, ix[0].Values.GetValueOrDefault("Sysvar Rent").ToString());
             Assert.AreEqual("21YuRgN6iHgsucfXT6Yzo2dV7dzuAdz2vxExahY3MueT", ix[0].Values.GetValueOrDefault("Dex Vault Signer").ToString());
             Assert.AreEqual("7nS8AgndAVYCfSTaXabwqcBWBc3xCLwwcPiMWzuTbfrf", ix[0].Values.GetValueOrDefault("Serum Vault").ToString());
             Assert.AreEqual("Sell", ix[0].Values.GetValueOrDefault("Side").ToString());
@@ -306,7 +312,7 @@ namespace Solnet.Mango.Test
                 }
                 else
                 {
-                    Assert.AreEqual("11111111111111111111111111111111", ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+                    Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
                 }
             }
 
@@ -327,7 +333,7 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("HUBX4iwWEUK5VrXXXcB7uhuKrfT4fpu2T9iZbg712JrN", ix[1].Values.GetValueOrDefault("Quote Root Bank").ToString());
             Assert.AreEqual("J2Lmnc1e4frMnBEJARPoHtfpcohLfN67HdK1inXjTFSM", ix[1].Values.GetValueOrDefault("Quote Node Bank").ToString());
             Assert.AreEqual("AV4CuwdvnccZMXNhu9cSCx1mkpgHWcwWEJ7Yb8Xh8QMC", ix[1].Values.GetValueOrDefault("Quote Vault").ToString());
-            Assert.AreEqual("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", ix[1].Values.GetValueOrDefault("Token Program").ToString());
+            Assert.AreEqual(TokenProgram.ProgramIdKey, ix[1].Values.GetValueOrDefault("Token Program").ToString());
             Assert.AreEqual("CFdbPXrnPLmo5Qrze7rw9ZNiD82R1VeNdoQosooSP1Ax", ix[1].Values.GetValueOrDefault("Mango Signer").ToString());
             Assert.AreEqual("8Z5esfhcw6zb9kBRSUH4SWfERoEDUH3cpMXFMnN2F1wC", ix[1].Values.GetValueOrDefault($"Open Orders Account").ToString());
         }
@@ -361,7 +367,7 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("HUBX4iwWEUK5VrXXXcB7uhuKrfT4fpu2T9iZbg712JrN", ix[0].Values.GetValueOrDefault("Quote Root Bank").ToString());
             Assert.AreEqual("J2Lmnc1e4frMnBEJARPoHtfpcohLfN67HdK1inXjTFSM", ix[0].Values.GetValueOrDefault("Quote Node Bank").ToString());
             Assert.AreEqual("AV4CuwdvnccZMXNhu9cSCx1mkpgHWcwWEJ7Yb8Xh8QMC", ix[0].Values.GetValueOrDefault("Quote Vault").ToString());
-            Assert.AreEqual("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", ix[0].Values.GetValueOrDefault("Token Program").ToString());
+            Assert.AreEqual(TokenProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault("Token Program").ToString());
             Assert.AreEqual("CFdbPXrnPLmo5Qrze7rw9ZNiD82R1VeNdoQosooSP1Ax", ix[0].Values.GetValueOrDefault("Mango Signer").ToString());
             Assert.AreEqual("21YuRgN6iHgsucfXT6Yzo2dV7dzuAdz2vxExahY3MueT", ix[0].Values.GetValueOrDefault("Dex Vault Signer").ToString());
             Assert.AreEqual("7nS8AgndAVYCfSTaXabwqcBWBc3xCLwwcPiMWzuTbfrf", ix[0].Values.GetValueOrDefault("Serum Vault").ToString());
@@ -381,7 +387,7 @@ namespace Solnet.Mango.Test
                 }
                 else
                 {
-                    Assert.AreEqual("11111111111111111111111111111111", ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+                    Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
                 }
             }
 
@@ -402,7 +408,7 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("HUBX4iwWEUK5VrXXXcB7uhuKrfT4fpu2T9iZbg712JrN", ix[1].Values.GetValueOrDefault("Quote Root Bank").ToString());
             Assert.AreEqual("J2Lmnc1e4frMnBEJARPoHtfpcohLfN67HdK1inXjTFSM", ix[1].Values.GetValueOrDefault("Quote Node Bank").ToString());
             Assert.AreEqual("AV4CuwdvnccZMXNhu9cSCx1mkpgHWcwWEJ7Yb8Xh8QMC", ix[1].Values.GetValueOrDefault("Quote Vault").ToString());
-            Assert.AreEqual("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", ix[1].Values.GetValueOrDefault("Token Program").ToString());
+            Assert.AreEqual(TokenProgram.ProgramIdKey, ix[1].Values.GetValueOrDefault("Token Program").ToString());
             Assert.AreEqual("CFdbPXrnPLmo5Qrze7rw9ZNiD82R1VeNdoQosooSP1Ax", ix[1].Values.GetValueOrDefault("Mango Signer").ToString());
             Assert.AreEqual("8Z5esfhcw6zb9kBRSUH4SWfERoEDUH3cpMXFMnN2F1wC", ix[1].Values.GetValueOrDefault($"Open Orders Account").ToString());
         }
@@ -463,7 +469,7 @@ namespace Solnet.Mango.Test
                 }
                 else
                 {
-                    Assert.AreEqual("11111111111111111111111111111111", ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+                    Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
                 }
             }
             Assert.AreEqual("Buy", ix[0].Values.GetValueOrDefault("Side").ToString());
@@ -505,7 +511,7 @@ namespace Solnet.Mango.Test
                 }
                 else
                 {
-                    Assert.AreEqual("11111111111111111111111111111111", ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+                    Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
                 }
             }
             Assert.AreEqual("Sell", ix[0].Values.GetValueOrDefault("Side").ToString());
@@ -536,7 +542,76 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("AV4CuwdvnccZMXNhu9cSCx1mkpgHWcwWEJ7Yb8Xh8QMC", ix[0].Values.GetValueOrDefault("Bank Vault").ToString());
             Assert.AreEqual("54PcMYTAZd8uRaYyb3Cwgctcfc1LchGMaqVrmxgr3yVs", ix[0].Values.GetValueOrDefault("Fees Vault").ToString());
             Assert.AreEqual("CFdbPXrnPLmo5Qrze7rw9ZNiD82R1VeNdoQosooSP1Ax", ix[0].Values.GetValueOrDefault("Signer").ToString());
-            Assert.AreEqual("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA", ix[0].Values.GetValueOrDefault("Token Program").ToString());
+            Assert.AreEqual(TokenProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault("Token Program").ToString());
+        }
+
+        [TestMethod]
+        public void SetDelegate()
+        {
+            Message msg = Message.Deserialize(Convert.FromBase64String(SetDelegateMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(1, ix.Count);
+            Assert.AreEqual("Set Delegate", ix[0].InstructionName);
+            Assert.AreEqual("Mango Program V3", ix[0].ProgramName);
+            Assert.AreEqual(0, ix[0].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[0].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", ix[0].Values.GetValueOrDefault("Mango Account").ToString());
+            Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[0].Values.GetValueOrDefault("Owner").ToString());
+            Assert.AreEqual("5omQJtDUHA3gMFdHEQg1zZSvcBUVzey5WaKWYRmqF1Vj", ix[0].Values.GetValueOrDefault("Delegate").ToString());
+        }
+
+        [TestMethod]
+        public void AddPerpTriggerOrder()
+        {
+            Message msg = Message.Deserialize(Convert.FromBase64String(AddPerpTriggerOrderMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(1, ix.Count);
+            Assert.AreEqual("Add Perp Trigger Order", ix[0].InstructionName);
+            Assert.AreEqual("Mango Program V3", ix[0].ProgramName);
+            Assert.AreEqual(0, ix[0].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[0].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("6iT9xdeMXqytgCpKqicPMJRCDk59mv7GYBSZkQAAP7R5", ix[0].Values.GetValueOrDefault("Mango Account").ToString());
+            Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[0].Values.GetValueOrDefault("Owner").ToString());
+            Assert.AreEqual("CeUu8EfRAptNPe98pma7RHX6t34C2U25dRhsS3tkRdUB", ix[0].Values.GetValueOrDefault("Advanced Orders").ToString());
+            Assert.AreEqual("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z", ix[0].Values.GetValueOrDefault("Mango Cache").ToString());
+            Assert.AreEqual("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ", ix[0].Values.GetValueOrDefault("Perp Market").ToString());
+            for (int i = 0; i < Constants.MaxPairs; i++)
+            {
+                Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+            }
+            Assert.AreEqual("Buy", ix[0].Values.GetValueOrDefault("Side").ToString());
+            Assert.AreEqual("100000", ix[0].Values.GetValueOrDefault("Price").ToString());
+            Assert.AreEqual("100000", ix[0].Values.GetValueOrDefault("Trigger Price").ToString());
+            Assert.AreEqual("100000", ix[0].Values.GetValueOrDefault("Quantity").ToString());
+            Assert.AreEqual("ImmediateOrCancel", ix[0].Values.GetValueOrDefault("Order Type").ToString());
+            Assert.AreEqual("Below", ix[0].Values.GetValueOrDefault("Trigger Condition").ToString());
+            Assert.AreEqual("1000000", ix[0].Values.GetValueOrDefault("Client Order Id").ToString());
+            Assert.AreEqual("True", ix[0].Values.GetValueOrDefault("Reduce Only").ToString());
+        }
+
+        [TestMethod]
+        public void RemoveAdvancedOrder()
+        {
+            Message msg = Message.Deserialize(Convert.FromBase64String(RemoveAdvancedOrderMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(2, ix.Count);
+            Assert.AreEqual("Remove Advanced Order", ix[0].InstructionName);
+            Assert.AreEqual("Mango Program V3", ix[0].ProgramName);
+            Assert.AreEqual(0, ix[0].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[0].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("6iT9xdeMXqytgCpKqicPMJRCDk59mv7GYBSZkQAAP7R5", ix[0].Values.GetValueOrDefault("Mango Account").ToString());
+            Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[0].Values.GetValueOrDefault("Owner").ToString());
+            Assert.AreEqual("CeUu8EfRAptNPe98pma7RHX6t34C2U25dRhsS3tkRdUB", ix[0].Values.GetValueOrDefault("Advanced Orders").ToString());
+            Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault("System Program").ToString());
+            Assert.AreEqual("0", ix[0].Values.GetValueOrDefault("Order Index").ToString());
+            Assert.AreEqual("Remove Advanced Order", ix[1].InstructionName);
+            Assert.AreEqual("1", ix[1].Values.GetValueOrDefault("Order Index").ToString());
         }
     }
 }

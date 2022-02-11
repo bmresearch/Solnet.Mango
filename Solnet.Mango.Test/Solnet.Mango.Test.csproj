@@ -15,9 +15,9 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Solnet.Rpc" Version="0.5.0" />
-        <PackageReference Include="Solnet.Wallet" Version="0.5.0" />
-        <PackageReference Include="Solnet.Serum" Version="1.2.0" />
+        <PackageReference Include="Solnet.Rpc" Version="0.6.0" />
+        <PackageReference Include="Solnet.Wallet" Version="0.6.0" />
+        <PackageReference Include="Solnet.Serum" Version="1.3.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -136,7 +136,16 @@
       <None Update="Resources\MangoClient\GetAdvancedOrdersAccountAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Resources\MangoClient\GetAdvancedOrdersAccountInfoWithOrders.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetEventQueueAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Resources\MangoClient\GetMangoAccountAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetMangoAccountsProgramAccounts.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Resources\MangoClient\GetMangoCacheAccountInfo.json">
@@ -148,10 +157,28 @@
       <None Update="Resources\MangoClient\GetNodeBankAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Resources\MangoClient\GetOrderBookMultipleAccounts.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetOrderBookSideAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetPerpMarketAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Resources\MangoClient\GetRootBankAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Resources\MangoClient\LoadBidsOrderBookSide.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Resources\MangoClient\LoadOpenOrdersGetMultiple.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadAsksOrderBookSide.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\LoadPerpMarketsGetMultiple.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Resources\MangoClient\LoadRootBanksGetMultiple.json">
@@ -215,6 +242,21 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Resources\OneDeposit\RootBank7.txt">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Streaming\SubscribeEventQueueFirstAccountInfoNotification.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Streaming\SubscribeEventQueueFirstAccountInfoNotificationNewEvents.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Streaming\SubscribeEventQueueSecondAccountInfoNotification.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Streaming\SubscribeEventQueueSecondAccountInfoNotificationNewEvents.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\Streaming\SubscribeEventQueueWithLiquidations.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="Resources\TokenBank\BTCNodeBank.txt">

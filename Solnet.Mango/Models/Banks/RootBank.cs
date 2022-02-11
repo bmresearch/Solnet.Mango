@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Solnet.Mango.Types;
 using Solnet.Programs;
+using Solnet.Programs.Models;
 using Solnet.Programs.Utilities;
 using Solnet.Rpc;
 using Solnet.Rpc.Core.Http;
@@ -128,34 +129,33 @@ namespace Solnet.Mango.Models.Banks
         /// <summary>
         /// Loads the node banks for this root bank. This is an asynchronous operation.
         /// </summary>
-        /// <param name="rpcClient">A rpc client instance.</param>
+        /// <param name="mangoClient">A mango client instance.</param>
         /// <param name="logger">A logger instance.</param>
-        public async Task<RequestResult<ResponseValue<List<AccountInfo>>>> LoadNodeBanksAsync(IRpcClient rpcClient,
+        public async Task<MultipleAccountsResultWrapper<List<NodeBank>>> LoadNodeBanksAsync(IMangoClient mangoClient,
             ILogger logger = null)
         {
-            IEnumerable<PublicKey> filteredNodes = NodeBanks.Where(x => !x.Equals(SystemProgram.ProgramIdKey));
-            RequestResult<ResponseValue<List<AccountInfo>>> nodeBankAccounts =
-                await rpcClient.GetMultipleAccountsAsync(filteredNodes.Select(x => x.Key).ToList());
-            if (!nodeBankAccounts.WasRequestSuccessfullyHandled)
+            List<PublicKey> filteredNodes = NodeBanks
+                .Where(x => !x.Equals(SystemProgram.ProgramIdKey))
+                .Select(x => x).ToList();
+            MultipleAccountsResultWrapper<List<NodeBank>> nodeBankAccounts =
+                await mangoClient.GetNodeBanksAsync(filteredNodes);
+            if (!nodeBankAccounts.WasSuccessful)
             {
                 logger?.LogInformation($"Could not fetch node bank accounts.");
                 return nodeBankAccounts;
             }
-            logger?.LogInformation($"Successfully fetched {nodeBankAccounts.Result.Value.Count} node banks.");
-            foreach (AccountInfo account in nodeBankAccounts.Result.Value)
-            {
-                NodeBankAccounts.Add(NodeBank.Deserialize(Convert.FromBase64String(account.Data[0])));
-            }
+            logger?.LogInformation($"Successfully fetched {nodeBankAccounts.ParsedResult.Count} node banks.");
+            NodeBankAccounts.AddRange(nodeBankAccounts.ParsedResult);
             return nodeBankAccounts;
         }
 
         /// <summary>
         /// Loads the node banks for this root bank.
         /// </summary>
-        /// <param name="rpcClient">A rpc client instance.</param>
+        /// <param name="mangoClient">A mango client instance.</param>
         /// <param name="logger">A logger instance.</param>
-        public RequestResult<ResponseValue<List<AccountInfo>>> LoadNodeBanks(IRpcClient rpcClient,
-            ILogger logger = null) => LoadNodeBanksAsync(rpcClient, logger).Result;
+        public MultipleAccountsResultWrapper<List<NodeBank>> LoadNodeBanks(IMangoClient mangoClient,
+            ILogger logger = null) => LoadNodeBanksAsync(mangoClient, logger).Result;
 
         /// <summary>
         /// Gets the index of the given node bank key.
