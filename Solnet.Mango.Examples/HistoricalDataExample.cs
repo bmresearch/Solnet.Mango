@@ -36,7 +36,7 @@ namespace Solnet.Mango.Examples
 
         public void Run()
         {
-            var spotStats = _mangoHistoricalDataService.GetSpotStats();
+            var spotStats = _mangoHistoricalDataService.GetMarginLendingStats();
             var perpStats = _mangoHistoricalDataService.GetPerpStats();
 
             var fundingRate = _mangoHistoricalDataService.GetHistoricalFundingRates("SOL-PERP");

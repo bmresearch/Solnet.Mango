@@ -1,20 +1,15 @@
 ﻿using Solnet.Mango.Historical.Converters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Solnet.Mango.Historical.Models
 {
     /// <summary>
-    /// 
+    /// Represents the volume info for a market.
     /// </summary>
     public class VolumeInfo
     {
         /// <summary>
-        /// 
+        /// The volume.
         /// </summary>
         [JsonConverter(typeof(StringToDecimalJsonConverter))]
         public decimal Volume { get; set; }

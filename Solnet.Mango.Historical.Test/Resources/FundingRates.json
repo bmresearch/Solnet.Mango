@@ -1,0 +1,821 @@
+[
+  {
+    "longFunding": "191372.08029403878",
+    "shortFunding": "191372.08029403878",
+    "openInterest": "18751856",
+    "baseOraclePrice": "99.83932099999748",
+    "time": "2022-02-11T19:25:39.145Z"
+  },
+  {
+    "longFunding": "191372.22571927027",
+    "shortFunding": "191372.22571927027",
+    "openInterest": "18753670",
+    "baseOraclePrice": "100.08159499999891",
+    "time": "2022-02-11T19:25:07.942Z"
+  },
+  {
+    "longFunding": "191372.39549218694",
+    "shortFunding": "191372.39549218694",
+    "openInterest": "18754500",
+    "baseOraclePrice": "100.16459399999889",
+    "time": "2022-02-11T19:24:37.007Z"
+  },
+  {
+    "longFunding": "191372.5188939231",
+    "shortFunding": "191372.5188939231",
+    "openInterest": "18754500",
+    "baseOraclePrice": "100.38662499999873",
+    "time": "2022-02-11T19:24:06.321Z"
+  },
+  {
+    "longFunding": "191372.71633871476",
+    "shortFunding": "191372.71633871476",
+    "openInterest": "18755130",
+    "baseOraclePrice": "100.56453299999646",
+    "time": "2022-02-11T19:23:35.579Z"
+  },
+  {
+    "longFunding": "191372.79642019625",
+    "shortFunding": "191372.79642019625",
+    "openInterest": "18754730",
+    "baseOraclePrice": "100.67499999999896",
+    "time": "2022-02-11T19:23:04.841Z"
+  },
+  {
+    "longFunding": "191372.9168918398",
+    "shortFunding": "191372.9168918398",
+    "openInterest": "18754730",
+    "baseOraclePrice": "100.77860999999899",
+    "time": "2022-02-11T19:22:33.904Z"
+  },
+  {
+    "longFunding": "191373.0657967009",
+    "shortFunding": "191373.0657967009",
+    "openInterest": "18754648",
+    "baseOraclePrice": "100.8790979999965",
+    "time": "2022-02-11T19:22:03.178Z"
+  },
+  {
+    "longFunding": "191373.12701475646",
+    "shortFunding": "191373.12701475646",
+    "openInterest": "18754648",
+    "baseOraclePrice": "100.72415999999862",
+    "time": "2022-02-11T19:21:32.270Z"
+  },
+  {
+    "longFunding": "191373.42160271943",
+    "shortFunding": "191373.42160271943",
+    "openInterest": "18755242",
+    "baseOraclePrice": "100.80886599999772",
+    "time": "2022-02-11T19:21:01.425Z"
+  },
+  {
+    "longFunding": "191373.49600665463",
+    "shortFunding": "191373.49600665463",
+    "openInterest": "18755242",
+    "baseOraclePrice": "100.73234599999736",
+    "time": "2022-02-11T19:20:26.899Z"
+  },
+  {
+    "longFunding": "191373.558777025",
+    "shortFunding": "191373.558777025",
+    "openInterest": "18754872",
+    "baseOraclePrice": "100.70357899999749",
+    "time": "2022-02-11T19:19:55.391Z"
+  },
+  {
+    "longFunding": "191373.8134446176",
+    "shortFunding": "191373.8134446176",
+    "openInterest": "18754828",
+    "baseOraclePrice": "100.48493699999739",
+    "time": "2022-02-11T19:19:24.463Z"
+  },
+  {
+    "longFunding": "191373.9797737843",
+    "shortFunding": "191373.9797737843",
+    "openInterest": "18754828",
+    "baseOraclePrice": "100.41811799999678",
+    "time": "2022-02-11T19:18:53.546Z"
+  },
+  {
+    "longFunding": "191374.13873721022",
+    "shortFunding": "191374.13873721022",
+    "openInterest": "18754836",
+    "baseOraclePrice": "100.45602599999981",
+    "time": "2022-02-11T19:18:16.337Z"
+  },
+  {
+    "longFunding": "191374.2607839695",
+    "shortFunding": "191374.2607839695",
+    "openInterest": "18754736",
+    "baseOraclePrice": "100.56177899999952",
+    "time": "2022-02-11T19:17:45.372Z"
+  },
+  {
+    "longFunding": "191374.30940966395",
+    "shortFunding": "191374.30940966395",
+    "openInterest": "18755252",
+    "baseOraclePrice": "100.59863699999738",
+    "time": "2022-02-11T19:17:14.422Z"
+  },
+  {
+    "longFunding": "191374.43971128433",
+    "shortFunding": "191374.43971128433",
+    "openInterest": "18755052",
+    "baseOraclePrice": "100.60380099999833",
+    "time": "2022-02-11T19:16:43.483Z"
+  },
+  {
+    "longFunding": "191374.5772006362",
+    "shortFunding": "191374.5772006362",
+    "openInterest": "18755398",
+    "baseOraclePrice": "100.95445999999697",
+    "time": "2022-02-11T19:16:12.784Z"
+  },
+  {
+    "longFunding": "191374.78985271955",
+    "shortFunding": "191374.78985271955",
+    "openInterest": "18754542",
+    "baseOraclePrice": "100.60742299999959",
+    "time": "2022-02-11T19:15:42.019Z"
+  },
+  {
+    "longFunding": "191374.93774681678",
+    "shortFunding": "191374.93774681678",
+    "openInterest": "18753880",
+    "baseOraclePrice": "100.38552599999662",
+    "time": "2022-02-11T19:15:11.102Z"
+  },
+  {
+    "longFunding": "191375.14498883067",
+    "shortFunding": "191375.14498883067",
+    "openInterest": "18751972",
+    "baseOraclePrice": "100.31917599999929",
+    "time": "2022-02-11T19:14:40.148Z"
+  },
+  {
+    "longFunding": "191375.26871255753",
+    "shortFunding": "191375.26871255753",
+    "openInterest": "18751964",
+    "baseOraclePrice": "100.4524879999984",
+    "time": "2022-02-11T19:14:09.184Z"
+  },
+  {
+    "longFunding": "191375.2757723955",
+    "shortFunding": "191375.2757723955",
+    "openInterest": "18751864",
+    "baseOraclePrice": "100.383941999997",
+    "time": "2022-02-11T19:13:38.265Z"
+  },
+  {
+    "longFunding": "191375.48254890012",
+    "shortFunding": "191375.48254890012",
+    "openInterest": "18744822",
+    "baseOraclePrice": "100.2911109999971",
+    "time": "2022-02-11T19:13:07.320Z"
+  },
+  {
+    "longFunding": "191375.624235127",
+    "shortFunding": "191375.624235127",
+    "openInterest": "18815384",
+    "baseOraclePrice": "100.34366699999708",
+    "time": "2022-02-11T19:12:36.625Z"
+  },
+  {
+    "longFunding": "191375.8336681131",
+    "shortFunding": "191375.8336681131",
+    "openInterest": "18815820",
+    "baseOraclePrice": "100.20942099999885",
+    "time": "2022-02-11T19:12:05.688Z"
+  },
+  {
+    "longFunding": "191376.16104658536",
+    "shortFunding": "191376.16104658536",
+    "openInterest": "18815992",
+    "baseOraclePrice": "100.45528599999898",
+    "time": "2022-02-11T19:11:34.759Z"
+  },
+  {
+    "longFunding": "191376.46158142333",
+    "shortFunding": "191376.46158142333",
+    "openInterest": "18819556",
+    "baseOraclePrice": "100.35496999999793",
+    "time": "2022-02-11T19:11:03.831Z"
+  },
+  {
+    "longFunding": "191376.51212204833",
+    "shortFunding": "191376.51212204833",
+    "openInterest": "18815690",
+    "baseOraclePrice": "100.27219899999906",
+    "time": "2022-02-11T19:10:32.899Z"
+  },
+  {
+    "longFunding": "191376.83826267335",
+    "shortFunding": "191376.83826267335",
+    "openInterest": "18831796",
+    "baseOraclePrice": "100.03179299999942",
+    "time": "2022-02-11T19:10:02.170Z"
+  },
+  {
+    "longFunding": "191377.16333130762",
+    "shortFunding": "191377.16333130762",
+    "openInterest": "18832014",
+    "baseOraclePrice": "99.99529099999904",
+    "time": "2022-02-11T19:09:31.462Z"
+  },
+  {
+    "longFunding": "191377.40260352983",
+    "shortFunding": "191377.40260352983",
+    "openInterest": "18832014",
+    "baseOraclePrice": "99.9868709999987",
+    "time": "2022-02-11T19:09:00.519Z"
+  },
+  {
+    "longFunding": "191377.81779253448",
+    "shortFunding": "191377.81779253448",
+    "openInterest": "18838366",
+    "baseOraclePrice": "100.20499999999899",
+    "time": "2022-02-11T19:08:29.793Z"
+  },
+  {
+    "longFunding": "191377.9133157984",
+    "shortFunding": "191377.9133157984",
+    "openInterest": "18837976",
+    "baseOraclePrice": "100.03764399999682",
+    "time": "2022-02-11T19:07:58.857Z"
+  },
+  {
+    "longFunding": "191378.12920468725",
+    "shortFunding": "191378.12920468725",
+    "openInterest": "18835610",
+    "baseOraclePrice": "100.00095799999897",
+    "time": "2022-02-11T19:07:27.890Z"
+  },
+  {
+    "longFunding": "191378.3076729743",
+    "shortFunding": "191378.3076729743",
+    "openInterest": "18836800",
+    "baseOraclePrice": "99.98381799999834",
+    "time": "2022-02-11T19:06:56.930Z"
+  },
+  {
+    "longFunding": "191378.24239265025",
+    "shortFunding": "191378.24239265025",
+    "openInterest": "18837378",
+    "baseOraclePrice": "99.46752599999797",
+    "time": "2022-02-11T19:06:26.187Z"
+  },
+  {
+    "longFunding": "191378.40259403916",
+    "shortFunding": "191378.40259403916",
+    "openInterest": "18797582",
+    "baseOraclePrice": "100.12835999999936",
+    "time": "2022-02-11T19:05:55.246Z"
+  },
+  {
+    "longFunding": "191378.36956811324",
+    "shortFunding": "191378.36956811324",
+    "openInterest": "18797582",
+    "baseOraclePrice": "100.46733399999752",
+    "time": "2022-02-11T19:05:24.520Z"
+  },
+  {
+    "longFunding": "191378.27271718733",
+    "shortFunding": "191378.27271718733",
+    "openInterest": "18758062",
+    "baseOraclePrice": "100.28125999999915",
+    "time": "2022-02-11T19:04:53.831Z"
+  },
+  {
+    "longFunding": "191378.29244982623",
+    "shortFunding": "191378.29244982623",
+    "openInterest": "18758480",
+    "baseOraclePrice": "100.36569999999756",
+    "time": "2022-02-11T19:04:23.119Z"
+  },
+  {
+    "longFunding": "191378.34206440957",
+    "shortFunding": "191378.34206440957",
+    "openInterest": "18808876",
+    "baseOraclePrice": "100.40166999999656",
+    "time": "2022-02-11T19:03:52.411Z"
+  },
+  {
+    "longFunding": "191378.34334380773",
+    "shortFunding": "191378.34334380773",
+    "openInterest": "18864290",
+    "baseOraclePrice": "100.27060799999887",
+    "time": "2022-02-11T19:03:21.728Z"
+  },
+  {
+    "longFunding": "191377.91400885404",
+    "shortFunding": "191377.91400885404",
+    "openInterest": "18860012",
+    "baseOraclePrice": "100.513626999998",
+    "time": "2022-02-11T19:02:50.988Z"
+  },
+  {
+    "longFunding": "191377.84685445591",
+    "shortFunding": "191377.84685445591",
+    "openInterest": "18844550",
+    "baseOraclePrice": "100.65070699999978",
+    "time": "2022-02-11T19:02:20.056Z"
+  },
+  {
+    "longFunding": "191377.78790538185",
+    "shortFunding": "191377.78790538185",
+    "openInterest": "18822730",
+    "baseOraclePrice": "100.9675219999977",
+    "time": "2022-02-11T19:01:49.341Z"
+  },
+  {
+    "longFunding": "191377.9825324652",
+    "shortFunding": "191377.9825324652",
+    "openInterest": "18839646",
+    "baseOraclePrice": "101.34726999999799",
+    "time": "2022-02-11T19:01:18.605Z"
+  },
+  {
+    "longFunding": "191378.29366961797",
+    "shortFunding": "191378.29366961797",
+    "openInterest": "18853392",
+    "baseOraclePrice": "101.2016289999984",
+    "time": "2022-02-11T19:00:47.885Z"
+  },
+  {
+    "longFunding": "191378.46358396986",
+    "shortFunding": "191378.46358396986",
+    "openInterest": "18766378",
+    "baseOraclePrice": "100.84038799999817",
+    "time": "2022-02-11T19:00:16.955Z"
+  },
+  {
+    "longFunding": "191378.56140734948",
+    "shortFunding": "191378.56140734948",
+    "openInterest": "18766180",
+    "baseOraclePrice": "100.86491599999903",
+    "time": "2022-02-11T18:59:46.304Z"
+  },
+  {
+    "longFunding": "191378.8020257523",
+    "shortFunding": "191378.8020257523",
+    "openInterest": "18765980",
+    "baseOraclePrice": "101.20047999999926",
+    "time": "2022-02-11T18:59:15.398Z"
+  },
+  {
+    "longFunding": "191378.95982193283",
+    "shortFunding": "191378.95982193283",
+    "openInterest": "18766516",
+    "baseOraclePrice": "101.1341779999988",
+    "time": "2022-02-11T18:58:44.693Z"
+  },
+  {
+    "longFunding": "191379.03696163194",
+    "shortFunding": "191379.03696163194",
+    "openInterest": "18766516",
+    "baseOraclePrice": "101.13409499999904",
+    "time": "2022-02-11T18:58:13.949Z"
+  },
+  {
+    "longFunding": "191379.26465607638",
+    "shortFunding": "191379.26465607638",
+    "openInterest": "18697028",
+    "baseOraclePrice": "101.22507399999847",
+    "time": "2022-02-11T18:57:43.028Z"
+  },
+  {
+    "longFunding": "191379.33899253473",
+    "shortFunding": "191379.33899253473",
+    "openInterest": "18696624",
+    "baseOraclePrice": "101.27737099999834",
+    "time": "2022-02-11T18:57:12.318Z"
+  },
+  {
+    "longFunding": "191379.554770081",
+    "shortFunding": "191379.554770081",
+    "openInterest": "18706022",
+    "baseOraclePrice": "101.37471899999895",
+    "time": "2022-02-11T18:56:41.631Z"
+  },
+  {
+    "longFunding": "191379.62268744214",
+    "shortFunding": "191379.62268744214",
+    "openInterest": "18706122",
+    "baseOraclePrice": "101.51292699999814",
+    "time": "2022-02-11T18:56:10.932Z"
+  },
+  {
+    "longFunding": "191379.91382471067",
+    "shortFunding": "191379.91382471067",
+    "openInterest": "18706104",
+    "baseOraclePrice": "101.72683699999752",
+    "time": "2022-02-11T18:55:39.976Z"
+  },
+  {
+    "longFunding": "191380.09629045142",
+    "shortFunding": "191380.09629045142",
+    "openInterest": "18706108",
+    "baseOraclePrice": "101.73466899999895",
+    "time": "2022-02-11T18:55:09.252Z"
+  },
+  {
+    "longFunding": "191380.16663350697",
+    "shortFunding": "191380.16663350697",
+    "openInterest": "18706108",
+    "baseOraclePrice": "101.62239599999978",
+    "time": "2022-02-11T18:54:38.333Z"
+  },
+  {
+    "longFunding": "191380.18143964125",
+    "shortFunding": "191380.18143964125",
+    "openInterest": "18683858",
+    "baseOraclePrice": "101.64237799999754",
+    "time": "2022-02-11T18:54:07.412Z"
+  },
+  {
+    "longFunding": "191380.3398204283",
+    "shortFunding": "191380.3398204283",
+    "openInterest": "18783858",
+    "baseOraclePrice": "101.66113799999721",
+    "time": "2022-02-11T18:53:36.456Z"
+  },
+  {
+    "longFunding": "191380.29381857647",
+    "shortFunding": "191380.29381857647",
+    "openInterest": "18784698",
+    "baseOraclePrice": "101.52363199999925",
+    "time": "2022-02-11T18:53:05.507Z"
+  },
+  {
+    "longFunding": "191380.1849592015",
+    "shortFunding": "191380.1849592015",
+    "openInterest": "18784748",
+    "baseOraclePrice": "101.48681099999735",
+    "time": "2022-02-11T18:52:34.515Z"
+  },
+  {
+    "longFunding": "191380.23083003482",
+    "shortFunding": "191380.23083003482",
+    "openInterest": "18742440",
+    "baseOraclePrice": "101.40958799999922",
+    "time": "2022-02-11T18:52:03.781Z"
+  },
+  {
+    "longFunding": "191380.30265596075",
+    "shortFunding": "191380.30265596075",
+    "openInterest": "18756608",
+    "baseOraclePrice": "101.32882299999935",
+    "time": "2022-02-11T18:51:32.814Z"
+  },
+  {
+    "longFunding": "191380.46766035893",
+    "shortFunding": "191380.46766035893",
+    "openInterest": "18756454",
+    "baseOraclePrice": "101.44491199999806",
+    "time": "2022-02-11T18:51:02.089Z"
+  },
+  {
+    "longFunding": "191380.3430635997",
+    "shortFunding": "191380.3430635997",
+    "openInterest": "18753544",
+    "baseOraclePrice": "101.74505399999845",
+    "time": "2022-02-11T18:50:31.390Z"
+  },
+  {
+    "longFunding": "191380.24945214135",
+    "shortFunding": "191380.24945214135",
+    "openInterest": "18753844",
+    "baseOraclePrice": "101.90032399999893",
+    "time": "2022-02-11T18:50:00.673Z"
+  },
+  {
+    "longFunding": "191380.33816799786",
+    "shortFunding": "191380.33816799786",
+    "openInterest": "18753844",
+    "baseOraclePrice": "101.89851199999822",
+    "time": "2022-02-11T18:49:29.965Z"
+  },
+  {
+    "longFunding": "191380.29579184044",
+    "shortFunding": "191380.29579184044",
+    "openInterest": "18752352",
+    "baseOraclePrice": "101.98991699999738",
+    "time": "2022-02-11T18:48:59.034Z"
+  },
+  {
+    "longFunding": "191380.35183917842",
+    "shortFunding": "191380.35183917842",
+    "openInterest": "18752952",
+    "baseOraclePrice": "102.05690499999776",
+    "time": "2022-02-11T18:48:28.109Z"
+  },
+  {
+    "longFunding": "191380.29787297474",
+    "shortFunding": "191380.29787297474",
+    "openInterest": "18752952",
+    "baseOraclePrice": "101.91275199999694",
+    "time": "2022-02-11T18:47:57.385Z"
+  },
+  {
+    "longFunding": "191380.33014484978",
+    "shortFunding": "191380.33014484978",
+    "openInterest": "18842546",
+    "baseOraclePrice": "101.82838099999714",
+    "time": "2022-02-11T18:47:26.678Z"
+  },
+  {
+    "longFunding": "191380.70347690996",
+    "shortFunding": "191380.70347690996",
+    "openInterest": "18725910",
+    "baseOraclePrice": "101.3351029999967",
+    "time": "2022-02-11T18:46:55.734Z"
+  },
+  {
+    "longFunding": "191380.46261116926",
+    "shortFunding": "191380.46261116926",
+    "openInterest": "18715336",
+    "baseOraclePrice": "101.77999999999798",
+    "time": "2022-02-11T18:46:24.814Z"
+  },
+  {
+    "longFunding": "191380.46261116926",
+    "shortFunding": "191380.46261116926",
+    "openInterest": "18715036",
+    "baseOraclePrice": "101.81499999999843",
+    "time": "2022-02-11T18:45:53.895Z"
+  },
+  {
+    "longFunding": "191380.957555035",
+    "shortFunding": "191380.957555035",
+    "openInterest": "18824706",
+    "baseOraclePrice": "102.06713499999864",
+    "time": "2022-02-11T18:45:23.187Z"
+  },
+  {
+    "longFunding": "191380.93104380817",
+    "shortFunding": "191380.93104380817",
+    "openInterest": "18877100",
+    "baseOraclePrice": "102.3928519999977",
+    "time": "2022-02-11T18:44:52.463Z"
+  },
+  {
+    "longFunding": "191380.46464797485",
+    "shortFunding": "191380.46464797485",
+    "openInterest": "18890456",
+    "baseOraclePrice": "103.1448079999997",
+    "time": "2022-02-11T18:44:21.747Z"
+  },
+  {
+    "longFunding": "191380.46525167857",
+    "shortFunding": "191380.46525167857",
+    "openInterest": "18890976",
+    "baseOraclePrice": "103.31309699999736",
+    "time": "2022-02-11T18:43:50.816Z"
+  },
+  {
+    "longFunding": "191380.35814704894",
+    "shortFunding": "191380.35814704894",
+    "openInterest": "18931040",
+    "baseOraclePrice": "103.37296699999854",
+    "time": "2022-02-11T18:43:19.870Z"
+  },
+  {
+    "longFunding": "191380.50681718785",
+    "shortFunding": "191380.50681718785",
+    "openInterest": "18920624",
+    "baseOraclePrice": "103.45049599999712",
+    "time": "2022-02-11T18:42:49.136Z"
+  },
+  {
+    "longFunding": "191380.7046491323",
+    "shortFunding": "191380.7046491323",
+    "openInterest": "18920324",
+    "baseOraclePrice": "103.64477699999952",
+    "time": "2022-02-11T18:42:18.286Z"
+  },
+  {
+    "longFunding": "191380.7273294564",
+    "shortFunding": "191380.7273294564",
+    "openInterest": "18920324",
+    "baseOraclePrice": "103.65519999999862",
+    "time": "2022-02-11T18:41:47.347Z"
+  },
+  {
+    "longFunding": "191380.70996163232",
+    "shortFunding": "191380.70996163232",
+    "openInterest": "18920324",
+    "baseOraclePrice": "103.60944699999663",
+    "time": "2022-02-11T18:41:16.396Z"
+  },
+  {
+    "longFunding": "191380.7648583916",
+    "shortFunding": "191380.7648583916",
+    "openInterest": "18920324",
+    "baseOraclePrice": "103.80351099999885",
+    "time": "2022-02-11T18:40:45.652Z"
+  },
+  {
+    "longFunding": "191380.70662899347",
+    "shortFunding": "191380.70662899347",
+    "openInterest": "18896672",
+    "baseOraclePrice": "103.52577299999766",
+    "time": "2022-02-11T18:40:14.728Z"
+  },
+  {
+    "longFunding": "191380.86619542865",
+    "shortFunding": "191380.86619542865",
+    "openInterest": "18901018",
+    "baseOraclePrice": "103.73345999999728",
+    "time": "2022-02-11T18:39:44.016Z"
+  },
+  {
+    "longFunding": "191380.876797512",
+    "shortFunding": "191380.876797512",
+    "openInterest": "18940300",
+    "baseOraclePrice": "103.75622599999801",
+    "time": "2022-02-11T18:39:13.097Z"
+  },
+  {
+    "longFunding": "191380.79677563702",
+    "shortFunding": "191380.79677563702",
+    "openInterest": "18941642",
+    "baseOraclePrice": "103.79163799999702",
+    "time": "2022-02-11T18:38:42.390Z"
+  },
+  {
+    "longFunding": "191380.9031442713",
+    "shortFunding": "191380.9031442713",
+    "openInterest": "18941696",
+    "baseOraclePrice": "103.78395699999743",
+    "time": "2022-02-11T18:38:11.678Z"
+  },
+  {
+    "longFunding": "191380.6337445028",
+    "shortFunding": "191380.6337445028",
+    "openInterest": "18942888",
+    "baseOraclePrice": "104.01223699999917",
+    "time": "2022-02-11T18:37:40.943Z"
+  },
+  {
+    "longFunding": "191380.45151487316",
+    "shortFunding": "191380.45151487316",
+    "openInterest": "18942896",
+    "baseOraclePrice": "104.30478899999684",
+    "time": "2022-02-11T18:37:10.209Z"
+  },
+  {
+    "longFunding": "191380.44853871578",
+    "shortFunding": "191380.44853871578",
+    "openInterest": "18942896",
+    "baseOraclePrice": "104.3795309999993",
+    "time": "2022-02-11T18:36:39.501Z"
+  },
+  {
+    "longFunding": "191380.38936371577",
+    "shortFunding": "191380.38936371577",
+    "openInterest": "18942762",
+    "baseOraclePrice": "104.35489299999645",
+    "time": "2022-02-11T18:36:08.794Z"
+  },
+  {
+    "longFunding": "191380.27188964174",
+    "shortFunding": "191380.27188964174",
+    "openInterest": "18942762",
+    "baseOraclePrice": "104.33252899999701",
+    "time": "2022-02-11T18:35:37.851Z"
+  },
+  {
+    "longFunding": "191380.2132838547",
+    "shortFunding": "191380.2132838547",
+    "openInterest": "18942762",
+    "baseOraclePrice": "104.45801599999882",
+    "time": "2022-02-11T18:35:07.138Z"
+  },
+  {
+    "longFunding": "191380.1615821186",
+    "shortFunding": "191380.1615821186",
+    "openInterest": "18942962",
+    "baseOraclePrice": "104.51128199999715",
+    "time": "2022-02-11T18:34:36.421Z"
+  },
+  {
+    "longFunding": "191379.91579334548",
+    "shortFunding": "191379.91579334548",
+    "openInterest": "18942962",
+    "baseOraclePrice": "104.37595699999846",
+    "time": "2022-02-11T18:34:05.690Z"
+  },
+  {
+    "longFunding": "191379.9642763316",
+    "shortFunding": "191379.9642763316",
+    "openInterest": "18942962",
+    "baseOraclePrice": "104.50476899999828",
+    "time": "2022-02-11T18:33:34.730Z"
+  },
+  {
+    "longFunding": "191380.11210723445",
+    "shortFunding": "191380.11210723445",
+    "openInterest": "18924456",
+    "baseOraclePrice": "105.03691499999945",
+    "time": "2022-02-11T18:33:04.013Z"
+  },
+  {
+    "longFunding": "191380.11210723445",
+    "shortFunding": "191380.11210723445",
+    "openInterest": "18924456",
+    "baseOraclePrice": "105.03691499999945",
+    "time": "2022-02-11T18:32:33.039Z"
+  },
+  {
+    "longFunding": "191380.11210723445",
+    "shortFunding": "191380.11210723445",
+    "openInterest": "18924456",
+    "baseOraclePrice": "105.03691499999945",
+    "time": "2022-02-11T18:32:02.126Z"
+  },
+  {
+    "longFunding": "191380.00023894742",
+    "shortFunding": "191380.00023894742",
+    "openInterest": "18924056",
+    "baseOraclePrice": "105.12870399999841",
+    "time": "2022-02-11T18:31:31.396Z"
+  },
+  {
+    "longFunding": "191379.90476197985",
+    "shortFunding": "191379.90476197985",
+    "openInterest": "18924056",
+    "baseOraclePrice": "105.23755299999848",
+    "time": "2022-02-11T18:31:00.447Z"
+  },
+  {
+    "longFunding": "191379.88197934098",
+    "shortFunding": "191379.88197934098",
+    "openInterest": "18924056",
+    "baseOraclePrice": "105.4159929999976",
+    "time": "2022-02-11T18:30:29.491Z"
+  },
+  {
+    "longFunding": "191379.8829029521",
+    "shortFunding": "191379.8829029521",
+    "openInterest": "18923056",
+    "baseOraclePrice": "105.41088299999757",
+    "time": "2022-02-11T18:29:58.757Z"
+  },
+  {
+    "longFunding": "191379.91265596135",
+    "shortFunding": "191379.91265596135",
+    "openInterest": "18921874",
+    "baseOraclePrice": "105.56727399999843",
+    "time": "2022-02-11T18:29:28.079Z"
+  },
+  {
+    "longFunding": "191379.99077517432",
+    "shortFunding": "191379.99077517432",
+    "openInterest": "18921874",
+    "baseOraclePrice": "105.53386199999792",
+    "time": "2022-02-11T18:28:57.151Z"
+  },
+  {
+    "longFunding": "191380.02102123917",
+    "shortFunding": "191380.02102123917",
+    "openInterest": "18921808",
+    "baseOraclePrice": "105.52969999999817",
+    "time": "2022-02-11T18:28:26.441Z"
+  },
+  {
+    "longFunding": "191380.08429276696",
+    "shortFunding": "191380.08429276696",
+    "openInterest": "18921808",
+    "baseOraclePrice": "105.71132399999783",
+    "time": "2022-02-11T18:27:55.516Z"
+  },
+  {
+    "longFunding": "191380.13870561417",
+    "shortFunding": "191380.13870561417",
+    "openInterest": "18921808",
+    "baseOraclePrice": "105.68499999999759",
+    "time": "2022-02-11T18:27:24.554Z"
+  },
+  {
+    "longFunding": "191380.2257278364",
+    "shortFunding": "191380.2257278364",
+    "openInterest": "18921808",
+    "baseOraclePrice": "105.75394799999671",
+    "time": "2022-02-11T18:26:53.654Z"
+  },
+  {
+    "longFunding": "191380.30242031327",
+    "shortFunding": "191380.30242031327",
+    "openInterest": "18921696",
+    "baseOraclePrice": "105.88444699999755",
+    "time": "2022-02-11T18:26:22.681Z"
+  },
+  {
+    "longFunding": "191380.36969438737",
+    "shortFunding": "191380.36969438737",
+    "openInterest": "18921696",
+    "baseOraclePrice": "105.89367099999691",
+    "time": "2022-02-11T18:25:51.746Z"
+  }
+]

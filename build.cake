@@ -5,6 +5,7 @@
 var testProjectsRelativePaths = new string[]
 {
     "./Solnet.Mango.Test/Solnet.Mango.Test.csproj",
+    "./Solnet.Mango.Historical.Test/Solnet.Mango.Historical.Test.csproj",
 };
 
 var target = Argument("target", "Pack");
@@ -14,9 +15,10 @@ var artifactsDir = MakeAbsolute(Directory("artifacts"));
 
 var reportTypes = "HtmlInline";
 var coverageFolder = "./code_coverage";
-var coverageFileName = "results.info";
+var coverageFileName = "results";
 
-var coverageFilePath = Directory(coverageFolder) + File(coverageFileName);
+var coverageFilePath = Directory(coverageFolder) + File(coverageFileName + ".cobertura.xml");
+var jsonFilePath = Directory(coverageFolder) + File(coverageFileName + ".json");
 var packagesDir = artifactsDir.Combine(Directory("packages"));
 
 
@@ -50,8 +52,7 @@ Task("Test")
         var coverletSettings = new CoverletSettings {
             CollectCoverage = true,
             CoverletOutputDirectory = coverageFolder,
-            CoverletOutputName = coverageFileName,
-            CoverletOutputFormat = CoverletOutputFormat.lcov
+            CoverletOutputName = coverageFileName
         };
 
         var testSettings = new DotNetCoreTestSettings
@@ -59,10 +60,20 @@ Task("Test")
             NoRestore = true,
             Configuration = configuration,
             NoBuild = true,
-            ArgumentCustomization = args => args.Append($"--logger trx"),
+            ArgumentCustomization = args => args.Append($"--logger trx")
         };
 
         DotNetCoreTest(testProjectsRelativePaths[0], testSettings, coverletSettings);
+
+        coverletSettings.MergeWithFile = jsonFilePath;
+        for (int i = 1; i < testProjectsRelativePaths.Length; i++)
+        {
+            if (i == testProjectsRelativePaths.Length - 1)
+            {
+                coverletSettings.CoverletOutputFormat  = CoverletOutputFormat.cobertura;
+            }
+            DotNetCoreTest(testProjectsRelativePaths[i], testSettings, coverletSettings);
+        }
     });
 
 
@@ -99,12 +110,11 @@ Task("Pack")
             Configuration = configuration,
             NoBuild = true,
             NoRestore = true,
-            IncludeSymbols = true,
             OutputDirectory = packagesDir,
         };
 
 
-        GetFiles("./src/*/*.csproj")
+        GetFiles("./*/*.csproj")
             .ToList()
             .ForEach(f => DotNetCorePack(f.FullPath, settings));
     });
