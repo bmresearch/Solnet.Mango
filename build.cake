@@ -17,7 +17,7 @@ var reportTypes = "HtmlInline";
 var coverageFolder = "./code_coverage";
 var coverageFileName = "results";
 
-var coverageFilePath = Directory(coverageFolder) + File(coverageFileName + ".cobertura.xml");
+var coverageFilePath = Directory(coverageFolder) + File(coverageFileName + ".info");
 var jsonFilePath = Directory(coverageFolder) + File(coverageFileName + ".json");
 var packagesDir = artifactsDir.Combine(Directory("packages"));
 
@@ -52,7 +52,7 @@ Task("Test")
         var coverletSettings = new CoverletSettings {
             CollectCoverage = true,
             CoverletOutputDirectory = coverageFolder,
-            CoverletOutputName = coverageFileName
+            CoverletOutputName = coverageFileName 
         };
 
         var testSettings = new DotNetCoreTestSettings
@@ -70,7 +70,7 @@ Task("Test")
         {
             if (i == testProjectsRelativePaths.Length - 1)
             {
-                coverletSettings.CoverletOutputFormat  = CoverletOutputFormat.cobertura;
+                coverletSettings.CoverletOutputFormat  = CoverletOutputFormat.lcov;
             }
             DotNetCoreTest(testProjectsRelativePaths[i], testSettings, coverletSettings);
         }
