@@ -457,7 +457,7 @@ namespace Solnet.Mango.Test
             Assert.IsFalse(resultNotification.Bankrupt);
             Assert.IsFalse(resultNotification.BeingLiquidated);
             Assert.IsFalse(resultNotification.NotUpgradeable);
-            Assert.AreEqual("\0\0\0\0\0\0\0Solnet Test v1", resultNotification.AccountInfo.Trim('\0'));
+            Assert.AreEqual("Solnet Test v1", resultNotification.AccountInfo);
             Assert.AreEqual(SystemProgram.ProgramIdKey, resultNotification.Delegate);
             Assert.AreEqual(Constants.DevNetMangoGroup, resultNotification.MangoGroup);
             Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", resultNotification.Owner);
@@ -526,7 +526,7 @@ namespace Solnet.Mango.Test
             Assert.IsFalse(resultNotification.Bankrupt);
             Assert.IsFalse(resultNotification.BeingLiquidated);
             Assert.IsFalse(resultNotification.NotUpgradeable);
-            Assert.AreEqual("\0\0\0\0\0\0\0Solnet Test v1", resultNotification.AccountInfo.Trim('\0'));
+            Assert.AreEqual("Solnet Test v1", resultNotification.AccountInfo);
             Assert.AreEqual(SystemProgram.ProgramIdKey, resultNotification.Delegate);
             Assert.AreEqual(Constants.DevNetMangoGroup, resultNotification.MangoGroup);
             Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", resultNotification.Owner);

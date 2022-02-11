@@ -352,7 +352,7 @@ namespace Solnet.Mango.Test
             Assert.IsFalse(mangoAccount.ParsedResult.Bankrupt);
             Assert.IsFalse(mangoAccount.ParsedResult.BeingLiquidated);
             Assert.IsFalse(mangoAccount.ParsedResult.NotUpgradeable);
-            Assert.AreEqual("\0\0\0\0\0\0\0Solnet Test v1", mangoAccount.ParsedResult.AccountInfo.Trim('\0'));
+            Assert.AreEqual("Solnet Test v1", mangoAccount.ParsedResult.AccountInfo);
             Assert.AreEqual(SystemProgram.ProgramIdKey, mangoAccount.ParsedResult.Delegate);
             Assert.AreEqual(Constants.DevNetMangoGroup, mangoAccount.ParsedResult.MangoGroup);
             Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", mangoAccount.ParsedResult.Owner);
@@ -571,7 +571,7 @@ namespace Solnet.Mango.Test
         [TestMethod]
         public void GetPerpMarket()
         {
-            string response = File.ReadAllText("Resources/MangoClient/GetPerpMArketAccountInfo.json");
+            string response = File.ReadAllText("Resources/MangoClient/GetPerpMarketAccountInfo.json");
             var rpc = SetupGetAccountInfo(response, "98wPi7vBkiJ1sXLPipQEjrgHYcMBcNUsg9avTyWUi26j", "https://api.devnet.solana.com");
 
             var mangoClient = ClientFactory.GetClient(rpc.Object);
