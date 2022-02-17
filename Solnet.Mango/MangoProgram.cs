@@ -1549,21 +1549,132 @@ namespace Solnet.Mango
         }
 
         /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SetReferrerMemory"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="referrerMemory">The referrer memory PDA.</param>
+        /// <param name="referrerMangoAccount">The referrer's mango account.</param>
+        /// <param name="payer">The payer of the rent for the new <see cref="ReferrerMemoryAccount"/>.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction SetReferrerMemory(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey referrerMemory, PublicKey referrerMangoAccount,
+            PublicKey payer)
+            => SetReferrerMemory(ProgramIdKey, mangoGroup, mangoAccount, owner, referrerMemory, referrerMangoAccount,
+                payer);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SetReferrerMemory"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The mango account owner.</param>
+        /// <param name="referrerMemory">The referrer memory PDA.</param>
+        /// <param name="referrerMangoAccount">The referrer's mango account.</param>
+        /// <param name="payer">The payer of the rent for the new <see cref="ReferrerMemoryAccount"/>.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction SetReferrerMemory(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey referrerMemory, PublicKey referrerMangoAccount,
+            PublicKey payer)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.ReadOnly(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+                AccountMeta.Writable(referrerMemory, false),
+                AccountMeta.ReadOnly(referrerMangoAccount, false),
+                AccountMeta.Writable(payer, true),
+                AccountMeta.ReadOnly(SystemProgram.ProgramIdKey, false),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeSetReferrerMemoryData()
+            };
+
+        }
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.RegisterReferrerId"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="referrerIdRecord">The referrer id record.</param>
+        /// <param name="referrerMangoAccount">The referrer's mango account.</param>
+        /// <param name="payer">The payer.</param>
+        /// <param name="referrerId">The referrer id.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction RegisterReferrerId(PublicKey mangoGroup,
+            PublicKey referrerIdRecord, PublicKey referrerMangoAccount,
+            PublicKey payer, string referrerId)
+            => RegisterReferrerId(ProgramIdKey, mangoGroup, referrerIdRecord, referrerMangoAccount,
+                payer, referrerId);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.RegisterReferrerId"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="referrerIdRecord">The referrer id record.</param>
+        /// <param name="referrerMangoAccount">The referrer's mango account.</param>
+        /// <param name="payer">The payer.</param>
+        /// <param name="referrerId">The referrer id.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction RegisterReferrerId(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey referrerIdRecord, PublicKey referrerMangoAccount, PublicKey payer, string referrerId)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(referrerMangoAccount, false),
+                AccountMeta.Writable(referrerIdRecord, false),
+                AccountMeta.Writable(payer, true),
+                AccountMeta.ReadOnly(SystemProgram.ProgramIdKey, false),
+            };
+            return new TransactionInstruction
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeRegisterReferrerIdData(referrerId)
+            };
+
+        }
+
+        /// <summary>
+        /// Derives the <see cref="PublicKey"/> of a <see cref="ReferrerMemoryAccount"/>.
+        /// </summary>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
+        public PublicKey DeriveReferrerMemory(PublicKey mangoAccount)
+        {
+            return MangoUtils.DeriveReferrerMemory(ProgramIdKey, mangoAccount);
+        }
+
+        /// <summary>
+        /// Derives the <see cref="PublicKey"/> of a <see cref="ReferrerMemoryAccount"/>.
+        /// </summary>
+        /// <param name="referrerId">The referrer id.</param>
+        /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
+        public PublicKey DeriveReferrerIdRecord(string referrerId)
+        {
+            if (ProgramIdKey == DevNetProgramIdKeyV3)
+            {
+                return MangoUtils.DeriveReferrerPda(ProgramIdKey, Constants.DevNetMangoGroup, referrerId);
+            }
+
+            return MangoUtils.DeriveReferrerPda(ProgramIdKey, Constants.MangoGroup, referrerId);
+        }
+
+        /// <summary>
         /// Derives the <see cref="PublicKey"/> of an <see cref="AdvancedOrdersAccount"/>.
         /// </summary>
         /// <param name="mangoAccount">The mango account.</param>
         /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
         public PublicKey DeriveAdvancedOrdersAccountAddress(PublicKey mangoAccount)
         {
-            if (ProgramIdKey == MainNetProgramIdKeyV3)
-            {
-                return MangoUtils.DeriveAdvancedOrdersAccountAddress(ProgramIdKey, mangoAccount);
-            }
-            else if (ProgramIdKey == DevNetProgramIdKeyV3)
-            {
-                return MangoUtils.DeriveAdvancedOrdersAccountAddress(ProgramIdKey, mangoAccount);
-            }
-
             return MangoUtils.DeriveAdvancedOrdersAccountAddress(ProgramIdKey, mangoAccount);
         }
 
@@ -1575,10 +1686,7 @@ namespace Solnet.Mango
         /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
         public PublicKey DeriveMangoAccountAddress(PublicKey owner, ulong accountNumber)
         {
-            if(ProgramIdKey == MainNetProgramIdKeyV3)
-            {
-                return MangoUtils.DeriveMangoAccountAddress(ProgramIdKey, Constants.MangoGroup, owner, accountNumber);
-            } else if(ProgramIdKey == DevNetProgramIdKeyV3)
+            if(ProgramIdKey == DevNetProgramIdKeyV3)
             {
                 return MangoUtils.DeriveMangoAccountAddress(ProgramIdKey, Constants.DevNetMangoGroup, owner, accountNumber);
             }
@@ -1688,6 +1796,12 @@ namespace Solnet.Mango
                     break;
                 case MangoProgramInstructions.Values.SetDelegate:
                     MangoProgramData.DecodeSetDelegateData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.SetReferrerMemory:
+                    MangoProgramData.DecodeSetReferrerMemoryData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.RegisterReferrerId:
+                    MangoProgramData.DecodeRegisterReferrerIdData(decodedInstruction, data, keys, keyIndices);
                     break;
             }
 

@@ -54,5 +54,15 @@ namespace Solnet.Mango.Models
         /// An advanced orders account for advanced order types such as conditional trigger orders.
         /// </summary>
         AdvancedOrders = 9,
+
+        /// <summary>
+        /// The referrer memory account.
+        /// </summary>
+        ReferrerMemory = 10,
+
+        /// <summary>
+        /// The referrer id record.
+        /// </summary>
+        ReferrerIdRecord = 11
     }
 }

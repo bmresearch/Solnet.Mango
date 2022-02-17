@@ -166,6 +166,12 @@
       <None Update="Resources\MangoClient\GetPerpMarketAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Resources\MangoClient\GetReferrerIdRecordAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="Resources\MangoClient\GetReferrerMemoryAccountInfo.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Resources\MangoClient\GetRootBankAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

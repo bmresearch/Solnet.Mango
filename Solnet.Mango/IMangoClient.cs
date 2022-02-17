@@ -304,6 +304,38 @@ namespace Solnet.Mango
             Commitment commitment = Commitment.Finalized);
 
         /// <summary>
+        /// Gets the given referrer memory. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="referrerMemory">The referrer memory.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The <see cref="ReferrerMemoryAccount"/> or null in case an error occurred.</returns>
+        Task<AccountResultWrapper<ReferrerMemoryAccount>> GetReferrerMemoryAccountAsync(PublicKey referrerMemory, Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the given referrer memory.
+        /// </summary>
+        /// <param name="referrerMemory">The referrer memory.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The <see cref="ReferrerMemoryAccount"/> or null in case an error occurred.</returns>
+        AccountResultWrapper<ReferrerMemoryAccount> GetReferrerMemoryAccount(PublicKey referrerMemory, Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the given referrer id record. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="referrerIdRecord">The referrer id record.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The <see cref="ReferrerIdRecordAccount"/> or null in case an error occurred.</returns>
+        Task<AccountResultWrapper<ReferrerIdRecordAccount>> GetReferrerIdRecordAccountAsync(PublicKey referrerIdRecord, Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
+        /// Gets the given referrer id record.
+        /// </summary>
+        /// <param name="referrerIdRecord">The referrer id record.</param>
+        /// <param name="commitment">The confirmation commitment parameter for the RPC call.</param>
+        /// <returns>The <see cref="ReferrerIdRecordAccount"/> or null in case an error occurred.</returns>
+        AccountResultWrapper<ReferrerIdRecordAccount> GetReferrerIdRecordAccount(PublicKey referrerIdRecord, Commitment commitment = Commitment.Finalized);
+
+        /// <summary>
         /// Subscribe to a live feed of an <see cref="EventQueue"/>. This is an asynchronous operation.
         /// </summary>
         /// <param name="action">An action which receives the <see cref="Subscription"/>, an <see cref="EventQueue"/> and the corresponding slot.</param>

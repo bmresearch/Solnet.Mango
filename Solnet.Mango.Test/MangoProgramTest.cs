@@ -74,6 +74,25 @@ namespace Solnet.Mango.Test
         }
 
         [TestMethod]
+        public void DeriveMainNetReferrerIdRecord()
+        {
+            var mango = MangoProgram.CreateMainNet();
+            var referrerIdRecord = mango.DeriveReferrerIdRecord("MangoSharp");
+
+            Assert.AreEqual("Bv5tz9AzgkpPCmsDVYAA5aM9tUncZbhLCESiWSmYB5en", referrerIdRecord);
+        }
+        
+
+        [TestMethod]
+        public void DeriveDevNetReferrerIdRecord()
+        {
+            var mango = MangoProgram.CreateDevNet();
+            var referrerIdRecord = mango.DeriveReferrerIdRecord("MangoSharp");
+
+            Assert.AreEqual("2SVASRV7NXFJSZQKdH3PYAphtMezXLFd2VDpfDifJ777", referrerIdRecord);
+        }
+
+        [TestMethod]
         public void InitializeMangoAccount()
         {
             var mango = MangoProgram.CreateDevNet();
@@ -1004,10 +1023,9 @@ namespace Solnet.Mango.Test
                 );
             var expectedData = new byte[] 
             { 
-                34, 0, 0, 0, 14, 0, 0, 0, 0, 0, 0, 0,
-                83, 111, 108, 110, 101, 116, 32, 84, 101,
+                34, 0, 0, 0, 83, 111, 108, 110, 101, 116, 32, 84, 101,
                 115, 116, 32, 118, 49, 0, 0, 0, 0, 0,
-                0, 0, 0, 0, 0
+                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             };
             Assert.AreEqual(3, ix.Keys.Count);
             CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
