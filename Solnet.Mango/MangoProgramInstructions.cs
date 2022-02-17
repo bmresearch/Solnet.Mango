@@ -43,7 +43,9 @@ namespace Solnet.Mango
             { Values.CreateMangoAccount, "Create Mango Account" },
             { Values.UpgradeMangoAccountV0V1, "Upgrade Mango Account V0V1" },
             { Values.CancelPerpOrdersSide, "Cancel Perp Orders Side" },
-            { Values.SetDelegate, "Set Delegate"}
+            { Values.SetDelegate, "Set Delegate"},
+            { Values.SetReferrerMemory, "Set Referrer Memory" },
+            { Values.RegisterReferrerId, "Register Referrer Id" }
         };
 
         /// <summary>
@@ -180,6 +182,16 @@ namespace Solnet.Mango
             /// Set an alternative authority/signer for mango account transactions.
             /// </summary>
             SetDelegate = 58,
+
+            /// <summary>
+            /// Sets the account's referrer memory.
+            /// </summary>
+            SetReferrerMemory = 62,
+
+            /// <summary>
+            /// Registers a referrer id.
+            /// </summary>
+            RegisterReferrerId = 63,
         };
     }
 }

@@ -89,6 +89,47 @@ namespace Solnet.Mango
         }
 
         /// <summary>
+        /// Derives the <see cref="PublicKey"/> of a referrer memory account.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
+        public static PublicKey DeriveReferrerMemory(PublicKey programIdKey, PublicKey mangoAccount)
+        {
+            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() { 
+                mangoAccount, 
+                Encoding.UTF8.GetBytes("ReferrerMemory") 
+            }, programIdKey, out byte[] referrerMemory, out _);
+
+            return success ? new(referrerMemory) : null;
+        }
+
+        /// <summary>
+        /// Derives the <see cref="PublicKey"/> of a referrer pda.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="referrerId">The referrer id.</param>
+        /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
+        public static PublicKey DeriveReferrerPda(PublicKey programIdKey, PublicKey mangoGroup, string referrerId)
+        {
+            byte[] buffer = new byte[Constants.InfoLength];
+            byte[] encoded = Encoding.UTF8.GetBytes(referrerId);
+            if (encoded.Length > Constants.InfoLength)
+                throw new ArgumentException($"referrer id is too long, must be less or equal than {Constants.InfoLength} bytes",
+                    nameof(referrerId));
+            encoded.CopyTo(buffer, 0);
+
+            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() {
+                mangoGroup,
+                Encoding.UTF8.GetBytes("ReferrerIdRecord"),
+                buffer
+            }, programIdKey, out byte[] referrerIdRecord, out _);
+
+            return success ? new(referrerIdRecord) : null;
+        }
+
+        /// <summary>
         /// Splits the open orders funds.
         /// </summary>
         /// <param name="openOrdersAccount">The open orders account.</param>

@@ -221,6 +221,24 @@ namespace Solnet.Mango
         public AccountResultWrapper<MangoAccount> GetMangoAccount(string account, Commitment commitment = Commitment.Finalized)
             => GetMangoAccountAsync(account, commitment).Result;
 
+        /// <inheritdoc cref="IMangoClient.GetReferrerMemoryAccountAsync(PublicKey, Commitment)"/>
+        public async Task<AccountResultWrapper<ReferrerMemoryAccount>> GetReferrerMemoryAccountAsync(PublicKey referrerMemory,
+            Commitment commitment = Commitment.Finalized)
+            => await GetAccount<ReferrerMemoryAccount>(referrerMemory, commitment);
+
+        /// <inheritdoc cref="IMangoClient.GetReferrerMemoryAccount(PublicKey,Commitment)"/>
+        public AccountResultWrapper<ReferrerMemoryAccount> GetReferrerMemoryAccount(PublicKey referrerMemory, Commitment commitment = Commitment.Finalized)
+            => GetReferrerMemoryAccountAsync(referrerMemory, commitment).Result;
+
+        /// <inheritdoc cref="IMangoClient.GetReferrerIdRecordAccountAsync(PublicKey, Commitment)"/>
+        public async Task<AccountResultWrapper<ReferrerIdRecordAccount>> GetReferrerIdRecordAccountAsync(PublicKey referrerIdRecord,
+            Commitment commitment = Commitment.Finalized)
+            => await GetAccount<ReferrerIdRecordAccount>(referrerIdRecord, commitment);
+
+        /// <inheritdoc cref="IMangoClient.GetReferrerIdRecordAccount(PublicKey,Commitment)"/>
+        public AccountResultWrapper<ReferrerIdRecordAccount> GetReferrerIdRecordAccount(PublicKey referrerIdRecord, Commitment commitment = Commitment.Finalized)
+            => GetReferrerIdRecordAccountAsync(referrerIdRecord, commitment).Result;
+
         /// <inheritdoc cref="IMangoClient.GetAdvancedOrdersAccountAsync(string,Commitment)"/>
         public async Task<AccountResultWrapper<AdvancedOrdersAccount>> GetAdvancedOrdersAccountAsync(string account,
             Commitment commitment = Commitment.Finalized)

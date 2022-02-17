@@ -50,6 +50,10 @@ namespace Solnet.Mango.Test
 
         private const string RemoveAdvancedOrderMessage = "AQAEBgpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4rQqXXruIOVtp8L9IgE6vrVLzYNobX3u6/Rbj/+6kqIjKISAtTF7lMdQarmxDZG/wXw1EdsMrRmiMvKrmbhkiIVTo0h0JftHn9tx6NSAOOqytyt4VksgHKcuqfxgcBhksAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5kw4m3RTlrY1U1TDoqPHph4SQpWHgwU5NDOx8pbUuMVy7776PgCLScUwD+RHspt3GxeMeP3YLDofTNwAmOLb5AgUFAgMAAQQFLAAAAAAFBQIDAAEEBSwAAAAB";
 
+        private const string RegisterReferrerIdMessage = "AQADBgpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4VOjSHQl+0ef23Ho1IA46rK3K3hWSyAcpy6p/GBwGGSyOp6NBx6ory8mCYmEEOJfjeV5Cnluo6hqEWgoNXV0QIMohIC1MXuUx1BqubENkb/BfDUR2wytGaIy8quZuGSIhAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5kw4m3RTlrY1U1TDoqPHph4SQpWHgwU5NDOx8pbUuMfzcPp0NtGiciNbubOEdIMRdL8iIdgd6VlVb297cJPymAQUFAwECAAQkPwAAAAsAAAAAAAAATWFuZ28gU2hhcnAAAAAAAAAAAAAAAAAA";
+
+        private const string CreateAddInfoAndSetReferrerMessage = "AQADBwpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4yiEgLUxe5THUGq5sQ2Rv8F8NRHbDK0ZojLyq5m4ZIiFUuwWRySJQNgY58mxU+b8uVIuhNTll53Dwl92OZZe3JkTFd9tOlil5/rnLZPD7yWlc3nbyadEvaHdN1aiMKRWiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5kw4m3RTlrY1U1TDoqPHph4SQpWHgwU5NDOx8pbUuMZgDGKDYUS/Ky0lGSOvWR+S/EaL8QpMvVBpkUNVmt9okws4NuTwmaDTUgOHsTuXuQqpZ4EMZU8FTWTackpIQdPoDBQQBAgAEDDcAAAAEAAAAAAAAAAUDAQIAJCIAAABNYW5nbyBTaGFycCBSZWYgVGVzdAAAAAAAAAAAAAAAAAUHAQIAAwYABAQ+AAAA";
+
         [ClassInitialize]
         public static void Setup(TestContext tc)
         {
@@ -79,7 +83,7 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[2].Values.GetValueOrDefault("Mango Group").ToString());
             Assert.AreEqual("EEoHecXUMTx5omC1cTHDuv7VKGTmzq8M5d86GnBHYMPS", ix[2].Values.GetValueOrDefault("Mango Account").ToString());
             Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[2].Values.GetValueOrDefault("Owner").ToString());
-            Assert.AreEqual("Solnet Test v1", ix[2].Values.GetValueOrDefault("Account Info"));
+            Assert.AreEqual("\0\0\0\0\0\0\0Solnet Test v1", ix[2].Values.GetValueOrDefault("Account Info"));
         }
 
         [TestMethod]
@@ -103,7 +107,7 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[1].Values.GetValueOrDefault("Mango Group").ToString());
             Assert.AreEqual("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", ix[1].Values.GetValueOrDefault("Mango Account").ToString());
             Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[1].Values.GetValueOrDefault("Owner").ToString());
-            Assert.AreEqual("Solnet Test v1", ix[1].Values.GetValueOrDefault("Account Info"));
+            Assert.AreEqual("\0\0\0\0\0\0\0Solnet Test v1", ix[1].Values.GetValueOrDefault("Account Info"));
         }
 
         [TestMethod]
@@ -612,6 +616,45 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("0", ix[0].Values.GetValueOrDefault("Order Index").ToString());
             Assert.AreEqual("Remove Advanced Order", ix[1].InstructionName);
             Assert.AreEqual("1", ix[1].Values.GetValueOrDefault("Order Index").ToString());
+        }
+
+        [TestMethod]
+        public void CreateAddInfoAndSetReferral()
+        {
+            Message msg = Message.Deserialize(Convert.FromBase64String(CreateAddInfoAndSetReferrerMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(3, ix.Count);
+            Assert.AreEqual("Mango Program V3", ix[2].ProgramName);
+            Assert.AreEqual("Set Referrer Memory", ix[2].InstructionName);
+            Assert.AreEqual(0, ix[2].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[2].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("6hkegFv9bCeKpKJdvhJwbmrKyAAeDS3vkkWC5RHeBWUM", ix[2].Values.GetValueOrDefault("Mango Account").ToString());
+            Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[2].Values.GetValueOrDefault("Owner").ToString());
+            Assert.AreEqual("5dTNBvZcxPP6p989uXZZZAasUCRYne9x5fnnVLTB3rND", ix[2].Values.GetValueOrDefault("Referrer Memory").ToString());
+            Assert.AreEqual("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", ix[2].Values.GetValueOrDefault("Referrer Mango Account").ToString());
+            Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[2].Values.GetValueOrDefault("Payer").ToString());
+            Assert.AreEqual(SystemProgram.ProgramIdKey, ix[2].Values.GetValueOrDefault("System Program").ToString());
+        }
+
+        [TestMethod]
+        public void RegisterReferrerId()
+        {
+            Message msg = Message.Deserialize(Convert.FromBase64String(RegisterReferrerIdMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(1, ix.Count);
+            Assert.AreEqual("Mango Program V3", ix[0].ProgramName);
+            Assert.AreEqual("Register Referrer Id", ix[0].InstructionName);
+            Assert.AreEqual(0, ix[0].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[0].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("6iT9xdeMXqytgCpKqicPMJRCDk59mv7GYBSZkQAAP7R5", ix[0].Values.GetValueOrDefault("Referrer Mango Account").ToString());
+            Assert.AreEqual("Abs9roAyf35gb7xf7FTMoxfGviLMGQpMdVhydpDmcJFR", ix[0].Values.GetValueOrDefault("Referrer Id Record").ToString());
+            Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[0].Values.GetValueOrDefault("Payer").ToString());
+            Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault("System Program").ToString());
+            Assert.AreEqual("\v\0\0\0\0\0\0\0Mango Sharp", ix[0].Values.GetValueOrDefault("Referrer Id").ToString());
         }
     }
 }

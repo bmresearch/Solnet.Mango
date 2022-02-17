@@ -1143,11 +1143,7 @@ namespace Solnet.Mango.Models
             {
                 clientOrderIds.Add(clientOrderIdsBytes.GetU64(i * sizeof(ulong)));
             }
-
-            var accountInfoLength = span.GetU64(Layout.InfoOffset);
-            if (accountInfoLength > Constants.InfoLength)
-                accountInfoLength = Constants.InfoLength;
-            
+                        
             return new MangoAccount
             {
                 Metadata = MetaData.Deserialize(span.Slice(Layout.MetadataOffset, MetaData.Layout.Length)),
@@ -1166,7 +1162,7 @@ namespace Solnet.Mango.Models
                 MegaSerumAmount = span.GetU64(Layout.MegaSerumAmountOffset),
                 BeingLiquidated = span.GetU8(Layout.BeingLiquidatedOffset) == 1,
                 Bankrupt = span.GetU8(Layout.BankruptOffset) == 1,
-                AccountInfo = Encoding.UTF8.GetString(span.GetSpan(Layout.InfoOffset + sizeof(ulong), (int) accountInfoLength)),
+                AccountInfo = Encoding.UTF8.GetString(span.GetSpan(Layout.InfoOffset, Constants.InfoLength)).Trim('\0'),
                 OpenOrdersAccounts = new List<OpenOrdersAccount>(Constants.MaxPairs),
                 AdvancedOrdersAccount = span.GetPubKey(Layout.AdvancedOrdersOffset),
                 NotUpgradeable = span.GetU8(Layout.NotUpgradeableOffset) == 1,

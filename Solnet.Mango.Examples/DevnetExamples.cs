@@ -76,7 +76,13 @@ namespace Solnet.Mango.Examples
             ulong balance = _rpcClient.GetBalance(_wallet.Account.PublicKey).Result.Value;
             Console.WriteLine($"Account {_wallet.Account.PublicKey}\tBalance {(decimal)balance / SolHelper.LAMPORTS_PER_SOL}");
 
-            var mangoAccountAddress = _mango.DeriveMangoAccountAddress(_wallet.Account, 2);
+            /* 
+             * Fetch data, depending on examples you may need to comment out certain RPC calls
+             * i.e if creating an Advanced Orders Account you can't perform the request  for it beforehand
+             * same goes if testing creation of Mango Account
+             */
+
+            var mangoAccountAddress = _mango.DeriveMangoAccountAddress(_wallet.Account, 4);
 
             var mangoGroup = _mangoClient.GetMangoGroup(Constants.DevNetMangoGroup);
             mangoGroup.ParsedResult.LoadPerpMarkets(_mangoClient);
@@ -84,18 +90,29 @@ namespace Solnet.Mango.Examples
             mangoGroup.ParsedResult.LoadRootBanks(_mangoClient, _logger);
             var mangoCache = _mangoClient.GetMangoCache(mangoGroup.ParsedResult.MangoCache);
 
-            var mangoAccount = _mangoClient.GetMangoAccount(mangoAccountAddress);
-            mangoAccount.ParsedResult.LoadOpenOrdersAccounts(_rpcClient, _logger);
+            //var mangoAccount = _mangoClient.GetMangoAccount(mangoAccountAddress);
+            //mangoAccount.ParsedResult.LoadOpenOrdersAccounts(_rpcClient, _logger);
 
-            var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
+            //var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
 
-            ExampleHelpers.LogAccountStatus(mangoGroup.ParsedResult, mangoCache.ParsedResult, mangoAccount.ParsedResult, advancedOrders.ParsedResult);
+            /* 
+             * Example transaction submissions 
+             * 
+             */
+
+            // create account, add account info and set it's referral
+            var msg = CreateMangoAccountAddInfoAndSetReferral(mangoAccountAddress, "Mango Sharp Ref Test", "Mango Sharp");
+
+            // register a referrer id
+            //var msg = RegisterReferrerIdRecordIx(mangoAccountAddress, "Mango Sharp");
+
+            //ExampleHelpers.LogAccountStatus(mangoGroup.ParsedResult, mangoCache.ParsedResult, mangoAccount.ParsedResult, advancedOrders.ParsedResult);
 
             // remove perp trigger buy
             //var msg = RemoveAdvancedOrderIx(mangoAccountAddress, mangoAccount.ParsedResult.AdvancedOrdersAccount, advancedOrders.ParsedResult);
 
             // set perp trigger buy
-            var msg = SetTriggerOrderSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
+            //var msg = SetTriggerOrderSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
 
             // close LONG on SOL-PERP
             // var msg = ClosePositionSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
@@ -308,6 +325,79 @@ namespace Solnet.Mango.Examples
 
             return DepositIx(mangoGroup, mangoAccount, tokenInfo.RootBank, nodeBankKey, nodeBank.ParsedResult.Vault, amount,
                 tokenAccount != null ? new(tokenAccount) : null);
+        }
+
+        private byte[] CreateMangoAccountAddInfoAndSetReferral(PublicKey mangoAccountAddress, string accountInfo, string referrerId)
+        {
+            var blockhash = _rpcClient.GetRecentBlockHash();
+
+            var referrerMemory = _mango.DeriveReferrerMemory(mangoAccountAddress);
+            var referrerIdRecord = _mango.DeriveReferrerIdRecord(referrerId);
+            var referrerIdRecordAccount = _mangoClient.GetReferrerIdRecordAccount(referrerIdRecord);
+
+            Console.WriteLine($"Referrer Id: {referrerId} Referrer Id Record: {referrerIdRecord} Referrer Mango Account: {referrerIdRecordAccount.ParsedResult.Referrer}");
+
+            TransactionBuilder txBuilder = new TransactionBuilder()
+                .SetFeePayer(_wallet.Account)
+                .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
+                .AddInstruction(_mango.CreateMangoAccount(
+                    Constants.DevNetMangoGroup,
+                    mangoAccountAddress,
+                    _wallet.Account,
+                    4))
+                .AddInstruction(_mango.AddMangoAccountInfo(
+                    Constants.DevNetMangoGroup,
+                    mangoAccountAddress,
+                    _wallet.Account,
+                    accountInfo))
+                .AddInstruction(_mango.SetReferrerMemory(
+                    Constants.DevNetMangoGroup,
+                    mangoAccountAddress,
+                    _wallet.Account,
+                    referrerMemory, 
+                    referrerIdRecordAccount.ParsedResult.Referrer,
+                    _wallet.Account));
+
+            return txBuilder.CompileMessage();
+        }
+
+        private byte[] RegisterReferrerIdRecordIx(PublicKey mangoAccountAddress, string referrerId)
+        {
+            var blockhash = _rpcClient.GetRecentBlockHash();
+
+            var referrerIdRecord = _mango.DeriveReferrerIdRecord(referrerId);
+
+            TransactionBuilder txBuilder = new TransactionBuilder()
+                .SetFeePayer(_wallet.Account)
+                .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
+                .AddInstruction(_mango.RegisterReferrerId(
+                    Constants.DevNetMangoGroup,
+                    referrerIdRecord,
+                    mangoAccountAddress,
+                    _wallet.Account,
+                    referrerId));
+
+            return txBuilder.CompileMessage();
+        }
+
+        private byte[] SetReferrerMemoryIx(PublicKey mangoAccountAddress, PublicKey referrerMangoAccount)
+        {
+            var blockhash = _rpcClient.GetRecentBlockHash();
+
+            var referrerMemory = _mango.DeriveReferrerMemory(mangoAccountAddress);
+
+            TransactionBuilder txBuilder = new TransactionBuilder()
+                .SetFeePayer(_wallet.Account)
+                .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
+                .AddInstruction(_mango.SetReferrerMemory(
+                    Constants.DevNetMangoGroup,
+                    mangoAccountAddress,
+                    _wallet.Account,
+                    referrerMemory,
+                    referrerMangoAccount,
+                    _wallet.Account));
+
+            return txBuilder.CompileMessage();
         }
 
         private byte[] RemoveAdvancedOrderIx(PublicKey mangoAccountAddress, PublicKey advancedOrdersAddress, AdvancedOrdersAccount advancedOrders)

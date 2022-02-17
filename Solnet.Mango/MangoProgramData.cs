@@ -8,6 +8,7 @@ using Solnet.Wallet;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Text;
 
 namespace Solnet.Mango
 {
@@ -626,7 +627,7 @@ namespace Solnet.Mango
         {
             byte[] data = new byte[36];
             data.WriteU32((uint)MangoProgramInstructions.Values.AddMangoAccountInfo, MangoProgramLayouts.MethodOffset);
-            byte[] encodedInfo = Serialization.EncodeBincodeString(info);
+            var encodedInfo = Encoding.UTF8.GetBytes(info);
             data.WriteSpan(encodedInfo, MangoProgramLayouts.MangoAccountInfoOffset);
             return data;
         }
@@ -644,7 +645,7 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
             decodedInstruction.Values.Add("Mango Account", keys[keyIndices[1]]);
             decodedInstruction.Values.Add("Owner", keys[keyIndices[2]]);
-            (string accountInfo, _) = data.DecodeBincodeString(MangoProgramLayouts.MangoAccountInfoOffset);
+            var accountInfo = Encoding.UTF8.GetString(data.GetSpan(MangoProgramLayouts.MangoAccountInfoOffset, Constants.InfoLength)).Trim('\0');
             decodedInstruction.Values.Add("Account Info", accountInfo);
         }
 
@@ -994,6 +995,68 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Mango Account", keys[keyIndices[1]]);
             decodedInstruction.Values.Add("Owner", keys[keyIndices[2]]);
             decodedInstruction.Values.Add("Delegate", keys[keyIndices[3]]);
+        }
+
+        /// <summary>
+        /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.SetReferrerMemory"/> method.
+        /// </summary>
+        /// <returns>The encoded data.</returns>
+        internal static byte[] EncodeSetReferrerMemoryData()
+        {
+            byte[] data = new byte[4];
+            data.WriteU32((uint)MangoProgramInstructions.Values.SetReferrerMemory, MangoProgramLayouts.MethodOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.SetReferrerMemory"/> method
+        /// </summary>
+        /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
+        /// <param name="keys">The account keys present in the transaction.</param>
+        /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
+        internal static void DecodeSetReferrerMemoryData(DecodedInstruction decodedInstruction, IList<PublicKey> keys,
+            byte[] keyIndices)
+        {
+            decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
+            decodedInstruction.Values.Add("Mango Account", keys[keyIndices[1]]);
+            decodedInstruction.Values.Add("Owner", keys[keyIndices[2]]);
+            decodedInstruction.Values.Add("Referrer Memory", keys[keyIndices[3]]);
+            decodedInstruction.Values.Add("Referrer Mango Account", keys[keyIndices[4]]);
+            decodedInstruction.Values.Add("Payer", keys[keyIndices[5]]);
+            decodedInstruction.Values.Add("System Program", keys[keyIndices[6]]);
+        }
+
+        /// <summary>
+        /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.RegisterReferrerId"/> method.
+        /// </summary>
+        /// <param name="referrerId">The referrer id.</param>
+        /// <returns>The encoded data.</returns>
+        internal static byte[] EncodeRegisterReferrerIdData(string referrerId)
+        {
+            byte[] data = new byte[36];
+            data.WriteU32((uint)MangoProgramInstructions.Values.RegisterReferrerId, MangoProgramLayouts.MethodOffset);
+            var encodedInfo = Encoding.UTF8.GetBytes(referrerId);
+            data.WriteSpan(encodedInfo, MangoProgramLayouts.MangoAccountInfoOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.RegisterReferrerId"/> method
+        /// </summary>
+        /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
+        /// <param name="data">The instruction data to decode.</param>
+        /// <param name="keys">The account keys present in the transaction.</param>
+        /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
+        internal static void DecodeRegisterReferrerIdData(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data,
+            IList<PublicKey> keys, byte[] keyIndices)
+        {
+            decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
+            decodedInstruction.Values.Add("Referrer Mango Account", keys[keyIndices[1]]);
+            decodedInstruction.Values.Add("Referrer Id Record", keys[keyIndices[2]]);
+            decodedInstruction.Values.Add("Payer", keys[keyIndices[3]]);
+            decodedInstruction.Values.Add("System Program", keys[keyIndices[4]]);
+            var accountInfo = Encoding.UTF8.GetString(data.GetSpan(MangoProgramLayouts.MangoAccountInfoOffset, Constants.InfoLength)).Trim('\0');
+            decodedInstruction.Values.Add("Referrer Id", accountInfo);
         }
     }
 }

@@ -352,7 +352,7 @@ namespace Solnet.Mango.Test
             Assert.IsFalse(mangoAccount.ParsedResult.Bankrupt);
             Assert.IsFalse(mangoAccount.ParsedResult.BeingLiquidated);
             Assert.IsFalse(mangoAccount.ParsedResult.NotUpgradeable);
-            Assert.AreEqual("Solnet Test v1", mangoAccount.ParsedResult.AccountInfo);
+            Assert.AreEqual("\0\0\0\0\0\0\0Solnet Test v1", mangoAccount.ParsedResult.AccountInfo);
             Assert.AreEqual(SystemProgram.ProgramIdKey, mangoAccount.ParsedResult.Delegate);
             Assert.AreEqual(Constants.DevNetMangoGroup, mangoAccount.ParsedResult.MangoGroup);
             Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", mangoAccount.ParsedResult.Owner);
@@ -566,6 +566,39 @@ namespace Solnet.Mango.Test
             Assert.AreEqual(DataType.Asks, obs.ParsedResult.Metadata.DataType);
             var asks = obs.ParsedResult.GetOrders();
             Assert.AreEqual(8, asks.Count);
+        }
+
+        [TestMethod]
+        public void GetReferrerMemory()
+        {
+            string response = File.ReadAllText("Resources/MangoClient/GetReferrerMemoryAccountInfo.json");
+            var rpc = SetupGetAccountInfo(response, "CieTZBNze2T4FqzG6s4uRjQcekuV7EqK1qSWMnK7FjUZ", "https://api.devnet.solana.com");
+
+            var mangoClient = ClientFactory.GetClient(rpc.Object);
+
+            var referrer = mangoClient.GetReferrerMemoryAccount(new("CieTZBNze2T4FqzG6s4uRjQcekuV7EqK1qSWMnK7FjUZ"));
+
+            Assert.IsNotNull(referrer);
+            Assert.IsTrue(referrer.ParsedResult.Metadata.IsInitialized);
+            Assert.AreEqual(DataType.ReferrerMemory, referrer.ParsedResult.Metadata.DataType);
+            Assert.AreEqual("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", referrer.ParsedResult.Referrer);
+        }
+
+        [TestMethod]
+        public void GetReferrerIdRecord()
+        {
+            string response = File.ReadAllText("Resources/MangoClient/GetReferrerIdRecordAccountInfo.json");
+            var rpc = SetupGetAccountInfo(response, "98wPi7vBkiJ1sXLPipQEjrgHYcMBcNUsg9avTyWUi26j", "https://api.devnet.solana.com");
+
+            var mangoClient = ClientFactory.GetClient(rpc.Object);
+
+            var referrer = mangoClient.GetReferrerIdRecordAccount(new("98wPi7vBkiJ1sXLPipQEjrgHYcMBcNUsg9avTyWUi26j"));
+
+            Assert.IsNotNull(referrer);
+            Assert.IsTrue(referrer.ParsedResult.Metadata.IsInitialized);
+            Assert.AreEqual(DataType.ReferrerIdRecord, referrer.ParsedResult.Metadata.DataType);
+            Assert.AreEqual("\n\0\0\0\0\0\0\0Hoak Sharp", referrer.ParsedResult.Id);
+            Assert.AreEqual("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", referrer.ParsedResult.Referrer);
         }
 
         [TestMethod]
