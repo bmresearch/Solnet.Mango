@@ -39,10 +39,13 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
     - `MangoAccount`
     - `AdvancedOrdersAccount`
     - `PerpMarket`
+    - `PerpAccount`
     - `RootBank`
     - `NodeBank`
     - `OrderBookSide` (`Node`s are decoded and processed into a friendlier structure)
     - `EventQueue`
+    - `ReferrerMemoryAccount`
+    - `ReferrerIdRecordAccount`
 - `MangoProgram` instructions implemented:
   - InitMangoAccount
   - Deposit
@@ -70,6 +73,8 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
   - UpgradeMangoAccountV0V1
   - CancelPerpOrdersSide
   - SetDelegate
+  - SetReferralMemory
+  - RegisterReferralId
 - `MangoClient` class which allows to:
     - Get these structures and decode them only by having their address
     - Subscribing to these accounts in real time, getting notifications with their decoded structures
@@ -97,6 +102,10 @@ The [Solnet.Mango.Examples](https://github.com/bmresearch/Solnet.Mango/tree/mast
 - Submitting orders (spot, perps)
 - Cancelling orders (spot, perps)
 - Creating new mango accounts
+
+## Support
+
+If you use this library, or any other adjacent libraries please consider using our [Mango ref link](https://trade.mango.markets/?ref=MangoSharp) or the referrer id `MangoSharp`.
 
 ## Contribution
 
