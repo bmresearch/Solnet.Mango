@@ -1710,7 +1710,7 @@ namespace Solnet.Mango
 
             DecodedInstruction decodedInstruction = new()
             {
-                PublicKey = DevNetProgramIdKeyV3,
+                PublicKey = MainNetProgramIdKeyV3,
                 InstructionName = MangoProgramInstructions.Names[instructionValue],
                 ProgramName = DefaultProgramName,
                 Values = new Dictionary<string, object>(),
