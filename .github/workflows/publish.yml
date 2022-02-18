@@ -22,7 +22,6 @@ jobs:
           target: Pack
           cake-bootstrap: true
       - name: Publish Solnet.Mango on version change
-        id: publish_nuget
         uses: bmresearch/publish-nuget@master
         with:
           PROJECT_FILE_PATH: Solnet.Mango/Solnet.Mango.csproj
@@ -33,6 +32,7 @@ jobs:
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
           INCLUDE_SYMBOLS: true
       - name: Publish Solnet.Mango.Historical on version change
+        id: publish_nuget
         uses: bmresearch/publish-nuget@master
         with:
           PROJECT_FILE_PATH: Solnet.Mango.Historical/Solnet.Mango.Historical.csproj
