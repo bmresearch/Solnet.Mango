@@ -68,10 +68,10 @@ namespace Solnet.Mango
             byte[] accountNumByteSeed = new byte[8];
             accountNumByteSeed.WriteU64(accountNumber, 0);
 
-            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() { mangoGroup, owner, accountNumByteSeed },
-                programIdKey, out byte[] mangoAccount, out _);
+            _ = PublicKey.TryFindProgramAddress(new List<byte[]>() { mangoGroup, owner, accountNumByteSeed },
+                programIdKey, out PublicKey mangoAccount, out int _);
 
-            return success ? new(mangoAccount) : null;
+            return mangoAccount;
         }
 
         /// <summary>
@@ -82,10 +82,10 @@ namespace Solnet.Mango
         /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
         public static PublicKey DeriveAdvancedOrdersAccountAddress(PublicKey programIdKey, PublicKey mangoAccount)
         {
-            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() { mangoAccount },
-                programIdKey, out byte[] advancedOrdersAccount, out _);
+            _ = PublicKey.TryFindProgramAddress(new List<byte[]>() { mangoAccount },
+                programIdKey, out PublicKey advancedOrdersAccount, out _);
 
-            return success ? new(advancedOrdersAccount) : null;
+            return advancedOrdersAccount;
         }
 
         /// <summary>
@@ -96,12 +96,12 @@ namespace Solnet.Mango
         /// <returns>The derived <see cref="PublicKey"/> if it was found, otherwise null.</returns>
         public static PublicKey DeriveReferrerMemory(PublicKey programIdKey, PublicKey mangoAccount)
         {
-            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() { 
+            _ = PublicKey.TryFindProgramAddress(new List<byte[]>() { 
                 mangoAccount, 
                 Encoding.UTF8.GetBytes("ReferrerMemory") 
-            }, programIdKey, out byte[] referrerMemory, out _);
+            }, programIdKey, out PublicKey referrerMemory, out _);
 
-            return success ? new(referrerMemory) : null;
+            return referrerMemory;
         }
 
         /// <summary>
@@ -120,13 +120,13 @@ namespace Solnet.Mango
                     nameof(referrerId));
             encoded.CopyTo(buffer, 0);
 
-            bool success = AddressExtensions.TryFindProgramAddress(new List<byte[]>() {
+            _ = PublicKey.TryFindProgramAddress(new List<byte[]>() {
                 mangoGroup,
                 Encoding.UTF8.GetBytes("ReferrerIdRecord"),
                 buffer
-            }, programIdKey, out byte[] referrerIdRecord, out _);
+            }, programIdKey, out PublicKey referrerIdRecord, out _);
 
-            return success ? new(referrerIdRecord) : null;
+            return referrerIdRecord;
         }
 
         /// <summary>

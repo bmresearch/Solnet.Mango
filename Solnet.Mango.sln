@@ -23,13 +23,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\publish.yml = .github\workflows\publish.yml
 		PULL_REQUEST_TEMPLATE.md = PULL_REQUEST_TEMPLATE.md
 		README.md = README.md
+		RELEASE-NOTES.txt = RELEASE-NOTES.txt
 		SharedBuildProperties.props = SharedBuildProperties.props
 		Solnet.Mango.sln.DotSettings = Solnet.Mango.sln.DotSettings
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solnet.Mango.Historical", "Solnet.Mango.Historical\Solnet.Mango.Historical.csproj", "{DB20BC5F-41CD-43AB-8D87-39E0184AB608}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solnet.Mango.Historical", "Solnet.Mango.Historical\Solnet.Mango.Historical.csproj", "{DB20BC5F-41CD-43AB-8D87-39E0184AB608}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Solnet.Mango.Historical.Test", "Solnet.Mango.Historical.Test\Solnet.Mango.Historical.Test.csproj", "{2C9E9D74-C56F-4D00-80B2-41E70DCC222E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Solnet.Mango.Historical.Test", "Solnet.Mango.Historical.Test\Solnet.Mango.Historical.Test.csproj", "{2C9E9D74-C56F-4D00-80B2-41E70DCC222E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
