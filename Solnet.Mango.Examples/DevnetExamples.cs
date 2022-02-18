@@ -638,7 +638,7 @@ namespace Solnet.Mango.Examples
 
             order.ConvertOrderValues(baseTokenInfo.Decimals, quoteTokenInfo.Decimals, market);
 
-            var dexSigner = new PublicKey(SerumProgramData.DeriveVaultSignerAddress(market, _serum.ProgramIdKey));
+            var dexSigner = SerumProgramData.DeriveVaultSignerAddress(market, _serum.ProgramIdKey);
             var openOrders = mangoAccount.SpotOpenOrders.Where((t, i) => t != null && mangoAccount.InMarginBasket[i]).ToList();
             if (openOrders.Count == 0) openOrders.Add(mangoAccount.SpotOpenOrders[baseTokenIndex]);
 
