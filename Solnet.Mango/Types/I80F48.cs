@@ -205,7 +205,7 @@ namespace Solnet.Mango.Types
         /// <returns>The <see cref="I80F48"/>.</returns>
         public static I80F48 Deserialize(ReadOnlySpan<byte> data)
         {
-            var bigInt = data.GetBigInt(0, Length, false);
+            var bigInt = data.GetBigInt(0, Length);
             return new I80F48(bigInt);
         }
 
@@ -217,7 +217,7 @@ namespace Solnet.Mango.Types
         /// <returns>The <see cref="I80F48"/>.</returns>
         public static I80F48 Deserialize(ReadOnlySpan<byte> data, int offset)
         {
-            var bigInt = data.GetBigInt(offset, Length, false);
+            var bigInt = data.GetBigInt(offset, Length);
             return new I80F48(bigInt);
         }
 
@@ -230,7 +230,7 @@ namespace Solnet.Mango.Types
         {
             var buf = new byte[16];
 
-            var count = buf.WriteBigInt(data._storage, 0, false);
+            var count = buf.WriteBigInt(data._storage, 0, Length);
 
             if (!data.IsPositive && count != 16)
             {
@@ -249,7 +249,7 @@ namespace Solnet.Mango.Types
         /// <returns>The byte array.</returns>
         public static void Serialize(byte[] buffer, I80F48 data, int offset)
         {
-            var count = buffer.WriteBigInt(data._storage, offset, false);
+            var count = buffer.WriteBigInt(data._storage, offset, Length);
 
             if (!data.IsPositive && count != Length)
             {
