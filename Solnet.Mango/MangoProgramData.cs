@@ -392,7 +392,7 @@ namespace Solnet.Mango
         {
             byte[] data = new byte[21];
             data.WriteU32((uint)MangoProgramInstructions.Values.CancelPerpOrder, MangoProgramLayouts.MethodOffset);
-            data.WriteBigInt(orderId, MangoProgramLayouts.CancelPerpOrder.OrderIdOffset);
+            data.WriteBigInt(orderId, MangoProgramLayouts.CancelPerpOrder.OrderIdOffset, 16);
             data.WriteU8(invalidIdOk ? (byte)1 : (byte)0, MangoProgramLayouts.CancelPerpOrder.InvalidIdOkOffset);
             return data;
         }
@@ -498,7 +498,7 @@ namespace Solnet.Mango
             byte[] data = new byte[24];
             data.WriteU32((uint)MangoProgramInstructions.Values.CancelSpotOrder, MangoProgramLayouts.MethodOffset);
             data.WriteU32((uint)side, MangoProgramLayouts.CancelSpotOrder.SideOffset);
-            data.WriteBigInt(orderId, MangoProgramLayouts.CancelSpotOrder.OrderIdOffset);
+            data.WriteBigInt(orderId, MangoProgramLayouts.CancelSpotOrder.OrderIdOffset, 16, true);
             return data;
         }
 

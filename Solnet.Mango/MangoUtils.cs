@@ -69,7 +69,7 @@ namespace Solnet.Mango
             accountNumByteSeed.WriteU64(accountNumber, 0);
 
             _ = PublicKey.TryFindProgramAddress(new List<byte[]>() { mangoGroup, owner, accountNumByteSeed },
-                programIdKey, out PublicKey mangoAccount, out int _);
+                programIdKey, out PublicKey mangoAccount, out byte _);
 
             return mangoAccount;
         }
