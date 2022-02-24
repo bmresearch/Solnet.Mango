@@ -691,6 +691,62 @@ namespace Solnet.Mango.Test
         }
 
         [TestMethod]
+        public void PlacePerpOrderWithReferrer()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var referrer = new Account();
+
+            var mangoAccount = mango.DeriveMangoAccountAddress(new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"), 1);
+
+            var openOrders = new List<PublicKey>();
+            for (int i = 0; i < Constants.MaxPairs; i++)
+            {
+                if (i == 3)
+                {
+                    openOrders.Add(new("8Z5esfhcw6zb9kBRSUH4SWfERoEDUH3cpMXFMnN2F1wC"));
+                }
+                else
+                {
+                    openOrders.Add(SystemProgram.ProgramIdKey);
+                }
+            }
+
+            var ix = mango.PlacePerpOrder(
+                Constants.DevNetMangoGroup,
+                mangoAccount,
+                new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh"),
+                new("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z"),
+                new("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ"),
+                new("7HRgm8iXEDx2TmSETo3Lq9SXkF954HMVKNiq8t5sKvQS"),
+                new("4oNxXQv1Rx3h7aNWjhTs3PWBoXdoPZjCaikSThV4yGb8"),
+                new("CZ5MCRvkN38d5pnZDDEEyMiED3drgDUVpEUjkuJq31Kf"),
+                openOrders,
+                Side.Buy,
+                PerpOrderType.Limit,
+                10500,
+                25000,
+                1000000,
+                false,
+                referrer
+                );
+
+            var expectedData = new byte[] 
+            { 
+                12, 0, 0, 0, 4, 41, 0, 0, 0, 0, 0, 0,
+                168, 97, 0, 0, 0, 0, 0, 0, 64, 66, 15,
+                0, 0, 0, 0, 0, 0, 0, 0
+            };
+
+            Assert.AreEqual(24, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
         public void CancelPerpOrderByClientId()
         {
             var mango = MangoProgram.CreateDevNet();
