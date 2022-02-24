@@ -488,13 +488,16 @@ namespace Solnet.Mango
         /// <param name="quantity">The quantity.</param>
         /// <param name="clientOrderId">The client order id.</param>
         /// <param name="reduceOnly">Whether the order is reduce only or not.</param>
+        /// <param name="referrerMangoAccount">The mango account of the referrer.</param>
         /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public TransactionInstruction PlacePerpOrder(PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
             PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
-            Side side, PerpOrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false)
+            Side side, PerpOrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false,
+            PublicKey referrerMangoAccount = null)
             => PlacePerpOrder(ProgramIdKey, mangoGroup, mangoAccount, owner, mangoCache, perpetualMarket,
-                bids, asks, eventQueue, openOrdersAccounts, side, orderType, price, quantity, clientOrderId, reduceOnly);
+                bids, asks, eventQueue, openOrdersAccounts, side, orderType, price, quantity, clientOrderId,
+                reduceOnly, referrerMangoAccount);
 
         /// <summary>
         /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.PlacePerpOrder"/> method.
@@ -515,11 +518,13 @@ namespace Solnet.Mango
         /// <param name="quantity">The quantity.</param>
         /// <param name="clientOrderId">The client order id.</param>
         /// <param name="reduceOnly">Whether the order is reduce only or not.</param>
+        /// <param name="referrerMangoAccount">The mango account of the referrer.</param>
         /// <returns>The <see cref="TransactionInstruction"/>.</returns>
         public static TransactionInstruction PlacePerpOrder(PublicKey programIdKey, PublicKey mangoGroup,
             PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
             PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
-            Side side, PerpOrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false)
+            Side side, PerpOrderType orderType, long price, long quantity, ulong clientOrderId, bool reduceOnly = false,
+            PublicKey referrerMangoAccount = null)
         {
             List<AccountMeta> keys = new()
             {
@@ -533,6 +538,9 @@ namespace Solnet.Mango
                 AccountMeta.Writable(eventQueue, false)
             };
             keys.AddRange(openOrdersAccounts.Select(key => AccountMeta.ReadOnly(key, false)));
+
+            if (referrerMangoAccount != null)
+                keys.Add(AccountMeta.Writable(referrerMangoAccount, false));
 
             return new TransactionInstruction
             {
