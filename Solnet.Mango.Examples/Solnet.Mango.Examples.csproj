@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -13,12 +13,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Solnet.Programs" Version="6.0.0" />
-        <PackageReference Include="Solnet.Rpc" Version="6.0.0" />
-        <PackageReference Include="Solnet.Wallet" Version="6.0.0" />
-        <PackageReference Include="Solnet.KeyStore" Version="6.0.0" />
-		<PackageReference Include="Solnet.Pyth" Version="6.0.0" />
-        <PackageReference Include="Solnet.Serum" Version="6.0.0" />
+        <PackageReference Include="Solnet.Programs" Version="6.0.1" />
+        <PackageReference Include="Solnet.Rpc" Version="6.0.1" />
+        <PackageReference Include="Solnet.Wallet" Version="6.0.1" />
+        <PackageReference Include="Solnet.KeyStore" Version="6.0.1" />
+		<PackageReference Include="Solnet.Pyth" Version="6.0.1" />
+        <PackageReference Include="Solnet.Serum" Version="6.0.1" />
     </ItemGroup>
 
 </Project>
