@@ -77,6 +77,57 @@ namespace Solnet.Mango
         }
 
         /// <summary>
+        /// Represents the layout of the <see cref="MangoProgramInstructions.Values.PlacePerpOrder2"/> method encoded data structure.
+        /// </summary>
+        internal static class PlacePerpOrder2
+        {
+            /// <summary>
+            /// The offset at which to write the price value.
+            /// </summary>
+            internal const int PriceOffset = 4;
+
+            /// <summary>
+            /// The offset at which to write the max base quantity value.
+            /// </summary>
+            internal const int MaxBaseQuantityOffset = 12;
+
+            /// <summary>
+            /// The offset at which to write the max quote quantity value.
+            /// </summary>
+            internal const int MaxQuoteQuantityOffset = 20;
+
+            /// <summary>
+            /// The offset at which to write the client order id value.
+            /// </summary>
+            internal const int ClientOrderIdOffset = 28;
+
+            /// <summary>
+            /// The offset at which to write the expiry timestamp value.
+            /// </summary>
+            internal const int ExpiryTimestampOffset = 36;
+
+            /// <summary>
+            /// The offset at which to write the side value.
+            /// </summary>
+            internal const int SideOffset = 44;
+
+            /// <summary>
+            /// The offset at which to write the order type value.
+            /// </summary>
+            internal const int OrderTypeOffset = 45;
+
+            /// <summary>
+            /// The offset at which to write the reduce only flag value.
+            /// </summary>
+            internal const int ReduceOnlyOffset = 46;
+
+            /// <summary>
+            /// The offset at which to write the limit value.
+            /// </summary>
+            internal const int LimitOffset = 47;
+        }
+
+        /// <summary>
         /// Represents the layout of the <see cref="MangoProgramInstructions.Values.CancelPerpOrderByClientId"/> method encoded data structure.
         /// </summary>
         internal static class CancelPerpOrderByClientId

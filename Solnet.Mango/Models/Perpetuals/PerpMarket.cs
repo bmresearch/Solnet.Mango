@@ -243,6 +243,19 @@ namespace Solnet.Mango.Models.Perpetuals
         }
 
         /// <summary>
+        /// Converts an amount in the quote quantity to the lots quantity.
+        /// </summary>
+        /// <param name="quote">The quote amount.</param>
+        /// <param name="quoteDecimals">The quote decimals.</param>
+        /// <returns>The amount of lots.</returns>
+        public long UiQuoteToLots(double quote, byte quoteDecimals)
+        {
+            var quoteUnit = Math.Pow(10, quoteDecimals);
+
+            return (long) (quote * quoteUnit) / QuoteLotSize;
+        }
+
+        /// <summary>
         /// Deserialize a span of bytes into a <see cref="PerpMarket"/> instance.
         /// </summary>
         /// <param name="data">The data to deserialize into the structure.</param>

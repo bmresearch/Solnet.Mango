@@ -569,6 +569,25 @@ namespace Solnet.Mango.Test
         }
 
         [TestMethod]
+        public void GetOrderBookSideWithExpired()
+        {
+            string response = File.ReadAllText("Resources/MangoClient/GetOrderBookSideAccountInfoWithExpired.json");
+            var rpc = SetupGetAccountInfo(response, "7HRgm8iXEDx2TmSETo3Lq9SXkF954HMVKNiq8t5sKvQS", "https://api.devnet.solana.com");
+
+            var mangoClient = ClientFactory.GetClient(rpc.Object);
+
+            var obs = mangoClient.GetOrderBookSide("7HRgm8iXEDx2TmSETo3Lq9SXkF954HMVKNiq8t5sKvQS");
+
+            Assert.IsNotNull(obs);
+            Assert.IsTrue(obs.ParsedResult.Metadata.IsInitialized);
+            Assert.AreEqual(DataType.Bids, obs.ParsedResult.Metadata.DataType);
+            var bids = obs.ParsedResult.GetOrders();
+            Assert.AreEqual(11, bids.Count); // there's 11 orders without expiry
+            var bidsWithExpired = obs.ParsedResult.GetOrders(true);
+            Assert.AreEqual(16, bidsWithExpired.Count); // there's 16 orders total including expired
+        }
+
+        [TestMethod]
         public void GetReferrerMemory()
         {
             string response = File.ReadAllText("Resources/MangoClient/GetReferrerMemoryAccountInfo.json");

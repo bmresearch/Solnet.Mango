@@ -551,6 +551,93 @@ namespace Solnet.Mango
         }
 
         /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.PlacePerpOrder2"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="eventQueue">The perp market event queue.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="side">The side of the order.</param>
+        /// <param name="orderType">The order type.</param>
+        /// <param name="price">The price.</param>
+        /// <param name="maxBaseQuantity">The max base quantity to sell, in lots.</param>
+        /// <param name="maxQuoteQuantity">The max quote quantity to pay/receive, in lots (not taking fees into account).</param>
+        /// <param name="clientOrderId">The client order id.</param>
+        /// <param name="expiryTimestamp">The expiry timestamp, pass 0 if you want the order to never expire, timestamps in the past mean the instruction is skipped, timestamps in the future are reduced to now + 255s.</param>
+        /// <param name="reduceOnly">Whether the order is reduce only or not.</param>
+        /// <param name="referrerMangoAccount">The mango account of the referrer.</param>
+        /// <param name="limit">Maximum number of orders from the book to fill, use this to limit compute used during order matching. When the limit is reached, processing stops.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction PlacePerpOrder2(PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
+            PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
+            Side side, PerpOrderType orderType, long price, long maxBaseQuantity,
+            ulong clientOrderId, ulong expiryTimestamp, long maxQuoteQuantity = long.MaxValue,
+            bool reduceOnly = false, PublicKey referrerMangoAccount = null, byte limit = byte.MaxValue)
+            => PlacePerpOrder2(ProgramIdKey, mangoGroup, mangoAccount, owner, mangoCache, perpetualMarket,
+                bids, asks, eventQueue, openOrdersAccounts, side, orderType, price, maxBaseQuantity, clientOrderId,
+                expiryTimestamp, maxQuoteQuantity, reduceOnly, referrerMangoAccount, limit);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.PlacePerpOrder"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoAccount">The mango account.</param>
+        /// <param name="owner">The owner of the mango account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="bids">The perp market bids.</param>
+        /// <param name="asks">The perp market asks.</param>
+        /// <param name="eventQueue">The perp market event queue.</param>
+        /// <param name="openOrdersAccounts">The open orders accounts.</param>
+        /// <param name="side">The side of the order.</param>
+        /// <param name="orderType">The order type.</param>
+        /// <param name="price">The price.</param>
+        /// <param name="maxBaseQuantity">The max base quantity to sell, in lots.</param>
+        /// <param name="maxQuoteQuantity">The max quote quantity to pay/receive, in lots (not taking fees into account).</param>
+        /// <param name="clientOrderId">The client order id.</param>
+        /// <param name="expiryTimestamp">The expiry timestamp, pass 0 if you want the order to never expire, timestamps in the past mean the instruction is skipped, timestamps in the future are reduced to now + 255s.</param>
+        /// <param name="reduceOnly">Whether the order is reduce only or not.</param>
+        /// <param name="referrerMangoAccount">The mango account of the referrer.</param>
+        /// <param name="limit">Maximum number of orders from the book to fill, use this to limit compute used during order matching. When the limit is reached, processing stops.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction PlacePerpOrder2(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoAccount, PublicKey owner, PublicKey mangoCache, PublicKey perpetualMarket,
+            PublicKey bids, PublicKey asks, PublicKey eventQueue, IList<PublicKey> openOrdersAccounts,
+            Side side, PerpOrderType orderType, long price, long maxBaseQuantity, 
+            ulong clientOrderId, ulong expiryTimestamp, long maxQuoteQuantity = long.MaxValue, bool reduceOnly = false, PublicKey referrerMangoAccount = null,
+            byte limit = byte.MaxValue)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoAccount, false),
+                AccountMeta.ReadOnly(owner, true),
+                AccountMeta.ReadOnly(mangoCache, false),
+                AccountMeta.Writable(perpetualMarket, false),
+                AccountMeta.Writable(bids, false),
+                AccountMeta.Writable(asks, false),
+                AccountMeta.Writable(eventQueue, false),
+                AccountMeta.Writable(referrerMangoAccount ?? mangoAccount, false)
+            };
+            keys.AddRange(openOrdersAccounts.Select(key => AccountMeta.ReadOnly(key, false)));
+
+            return new TransactionInstruction
+            {
+                Keys = keys,
+                ProgramId = programIdKey,
+                Data = MangoProgramData.EncodePlacePerpOrder2Data(side, orderType, price, maxBaseQuantity,
+                maxQuoteQuantity, clientOrderId, expiryTimestamp, reduceOnly, limit)
+            };
+        }
+
+        /// <summary>
         /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.CancelPerpOrderByClientId"/> method.
         /// </summary>
         /// <param name="mangoGroup">The mango group.</param>
@@ -1810,6 +1897,9 @@ namespace Solnet.Mango
                     break;
                 case MangoProgramInstructions.Values.RegisterReferrerId:
                     MangoProgramData.DecodeRegisterReferrerIdData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.PlacePerpOrder2:
+                    MangoProgramData.DecodePlacePerpOrder2Data(decodedInstruction, data, keys, keyIndices);
                     break;
             }
 

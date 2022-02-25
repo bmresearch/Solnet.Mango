@@ -163,6 +163,9 @@
       <None Update="Resources\MangoClient\GetOrderBookSideAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="Resources\MangoClient\GetOrderBookSideAccountInfoWithExpired.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
       <None Update="Resources\MangoClient\GetPerpMarketAccountInfo.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
