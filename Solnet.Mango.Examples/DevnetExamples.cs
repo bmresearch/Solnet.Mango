@@ -82,7 +82,7 @@ namespace Solnet.Mango.Examples
              * same goes if testing creation of Mango Account
              */
 
-            var mangoAccountAddress = _mango.DeriveMangoAccountAddress(_wallet.Account, 4);
+            var mangoAccountAddress = _mango.DeriveMangoAccountAddress(_wallet.Account, 1);
 
             var mangoGroup = _mangoClient.GetMangoGroup(Constants.DevNetMangoGroup);
             mangoGroup.ParsedResult.LoadPerpMarkets(_mangoClient);
@@ -90,23 +90,24 @@ namespace Solnet.Mango.Examples
             mangoGroup.ParsedResult.LoadRootBanks(_mangoClient, _logger);
             var mangoCache = _mangoClient.GetMangoCache(mangoGroup.ParsedResult.MangoCache);
 
-            //var mangoAccount = _mangoClient.GetMangoAccount(mangoAccountAddress);
-            //mangoAccount.ParsedResult.LoadOpenOrdersAccounts(_rpcClient, _logger);
+            var mangoAccount = _mangoClient.GetMangoAccount(mangoAccountAddress);
+            mangoAccount.ParsedResult.LoadOpenOrdersAccounts(_rpcClient, _logger);
 
-            //var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
+            var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
 
             /* 
              * Example transaction submissions 
              * 
              */
+            ExampleHelpers.LogAccountStatus(mangoGroup.ParsedResult, mangoCache.ParsedResult, mangoAccount.ParsedResult, advancedOrders.ParsedResult);
+
+            var msg = BuyWithTimeInForceSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
 
             // create account, add account info and set it's referral
-            var msg = CreateMangoAccountAddInfoAndSetReferral(mangoAccountAddress, "Mango Sharp Ref Test", "Mango Sharp");
+            //var msg = CreateMangoAccountAddInfoAndSetReferral(mangoAccountAddress, "Mango Sharp Ref Test", "Mango Sharp");
 
             // register a referrer id
             //var msg = RegisterReferrerIdRecordIx(mangoAccountAddress, "Mango Sharp");
-
-            //ExampleHelpers.LogAccountStatus(mangoGroup.ParsedResult, mangoCache.ParsedResult, mangoAccount.ParsedResult, advancedOrders.ParsedResult);
 
             // remove perp trigger buy
             //var msg = RemoveAdvancedOrderIx(mangoAccountAddress, mangoAccount.ParsedResult.AdvancedOrdersAccount, advancedOrders.ParsedResult);
@@ -219,6 +220,23 @@ namespace Solnet.Mango.Examples
 
             return PlacePerpOrder(mangoGroup, mangoAccount, mangoAccountAddress, wrappedSolTokenInfo, quoteTokenInfo,
                 market.ParsedResult, mangoGroup.PerpetualMarkets[tokenIndex].Market, Side.Buy, PerpOrderType.ImmediateOrCancel, 100, 112, false);
+        }
+
+        private byte[] BuyWithTimeInForceSOLPERP(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress, PublicKey referrer = null)
+        {
+            TokenInfo wrappedSolTokenInfo =
+                mangoGroup.Tokens.FirstOrDefault(x => x.Mint.Key == MarketUtils.WrappedSolMint);
+            if (wrappedSolTokenInfo == null) return null;
+            int tokenIndex = mangoGroup.GetTokenIndex(wrappedSolTokenInfo.Mint);
+
+            TokenInfo quoteTokenInfo =
+                mangoGroup.GetQuoteTokenInfo();
+
+            var market = _mangoClient.GetPerpMarket(mangoGroup.PerpetualMarkets[tokenIndex].Market);
+
+            return PlacePerpOrder2(mangoGroup, mangoAccount, mangoAccountAddress, wrappedSolTokenInfo, quoteTokenInfo,
+                market.ParsedResult, mangoGroup.PerpetualMarkets[tokenIndex].Market, Side.Buy, PerpOrderType.Limit, 100, 75, false,
+                120, 1, referrer);
         }
 
         private byte[] MarketSellSpotSOLUSDC(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress)
@@ -609,6 +627,48 @@ namespace Solnet.Mango.Examples
                     nativeQuantity,
                     clientOrderId,
                     reduceOnly));
+
+            return txBuilder.CompileMessage();
+        }
+        private byte[] PlacePerpOrder2(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress,
+            TokenInfo baseTokenInfo, TokenInfo quoteTokenInfo, PerpMarket market, PublicKey perpMarket, Side side,
+            PerpOrderType perpOrderType, float size, float price, bool reduceOnly, byte timeInForce = byte.MinValue,
+            ulong clientOrderId = 1UL, PublicKey referrerMangoAccount = null)
+        {
+            var blockhash = _rpcClient.GetRecentBlockHash();
+
+            var (nativePrice, nativeQuantity) = market.UiToNativePriceQuantity(price, size, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
+
+            var maxQuote = size * price;
+
+            var maxQuoteQuantity = market.UiQuoteToLots(maxQuote, quoteTokenInfo.Decimals);
+
+            var ts = (ulong)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+            var expiryTs = ts + timeInForce;
+
+            TransactionBuilder txBuilder = new TransactionBuilder()
+                .SetFeePayer(_wallet.Account)
+                .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
+                .AddInstruction(_mango.PlacePerpOrder2(
+                    Constants.DevNetMangoGroup,
+                    mangoAccountAddress,
+                    _wallet.Account,
+                    mangoGroup.MangoCache,
+                    perpMarket,
+                    market.Bids,
+                    market.Asks,
+                    market.EventQueue,
+                    mangoAccount.SpotOpenOrders,
+                    side,
+                    perpOrderType,
+                    nativePrice,
+                    nativeQuantity,
+                    clientOrderId,
+                    expiryTs,
+                    maxQuoteQuantity,
+                    reduceOnly,
+                    referrerMangoAccount
+                    ));
 
             return txBuilder.CompileMessage();
         }

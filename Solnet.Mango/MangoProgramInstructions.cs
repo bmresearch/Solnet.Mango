@@ -45,7 +45,8 @@ namespace Solnet.Mango
             { Values.CancelPerpOrdersSide, "Cancel Perp Orders Side" },
             { Values.SetDelegate, "Set Delegate"},
             { Values.SetReferrerMemory, "Set Referrer Memory" },
-            { Values.RegisterReferrerId, "Register Referrer Id" }
+            { Values.RegisterReferrerId, "Register Referrer Id" },
+            { Values.PlacePerpOrder2, "Place Perp Order2" }
         };
 
         /// <summary>
@@ -192,6 +193,12 @@ namespace Solnet.Mango
             /// Registers a referrer id.
             /// </summary>
             RegisterReferrerId = 63,
+
+            /// <summary>
+            /// Place perp order v2
+            /// <remarks>Similar to <see cref="Values.PlacePerpOrder"/> but more efficient, allows specifying Time In Force.</remarks>
+            /// </summary>
+            PlacePerpOrder2 = 64,
         };
     }
 }

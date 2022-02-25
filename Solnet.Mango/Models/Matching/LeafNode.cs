@@ -44,6 +44,14 @@ namespace Solnet.Mango.Models.Matching
             internal const int VersionOffset = 2;
 
             /// <summary>
+            /// The offset at which the time in force value begins.
+            /// <remarks>
+            /// This value is only valid after reading the Tag property of the <see cref="Node"/>.
+            /// </remarks>
+            /// </summary>
+            internal const int TimeInForceOffset = 3;
+
+            /// <summary>
             /// The offset at which the order id value begins.
             /// <remarks>
             /// This value is only valid after reading the Tag property of the <see cref="Node"/>.
@@ -116,6 +124,12 @@ namespace Solnet.Mango.Models.Matching
         public byte Version;
 
         /// <summary>
+        /// The time in force.
+        /// <remarks>If value is 0 then order never expires.</remarks>
+        /// </summary>
+        public byte TimeInForce;
+
+        /// <summary>
         /// The order id.
         /// </summary>
         public BigInteger OrderId;
@@ -152,6 +166,21 @@ namespace Solnet.Mango.Models.Matching
         public ulong Timestamp;
 
         /// <summary>
+        /// Whether the order is valid or not.
+        /// <remarks>
+        /// This is checked by the order's <see cref="TimeInForce"/> value.
+        /// If it is equal to<see cref="byte.MinValue"/> the order never expires,
+        /// otherwise the order expires after <see cref="Timestamp"/> plus <see cref="byte.MaxValue"/> seconds.</remarks>
+        /// </summary>
+        /// <returns>true if it is valid, otherwise false.</returns>
+        public bool IsValid()
+        {
+            var expiry = Timestamp + TimeInForce;
+            var now = (ulong) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
+            return TimeInForce == 0 || now <= expiry;
+        }
+
+        /// <summary>
         /// Deserialize a span of bytes into a <see cref="LeafNode"/> instance.
         /// </summary>
         /// <param name="data">The data to deserialize into the structure.</param>
@@ -166,6 +195,7 @@ namespace Solnet.Mango.Models.Matching
                 OwnerSlot = data.GetU8(ExtraLayout.OwnerSlotOffset),
                 OrderType = (PerpOrderType) Enum.Parse(typeof(PerpOrderType), data.GetU8(ExtraLayout.OrderTypeOffset).ToString()),
                 Version = data.GetU8(ExtraLayout.VersionOffset),
+                TimeInForce = data.GetU8(ExtraLayout.TimeInForceOffset),
                 OrderId = data.GetBigInt(ExtraLayout.OrderIdOffset, Layout.KeyLength),
                 Owner = data.GetPubKey(ExtraLayout.OwnerOffset),
                 Quantity = data.GetS64(ExtraLayout.QuantityOffset),
