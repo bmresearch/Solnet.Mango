@@ -54,6 +54,8 @@ namespace Solnet.Mango.Test
 
         private const string CreateAddInfoAndSetReferrerMessage = "AQADBwpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4yiEgLUxe5THUGq5sQ2Rv8F8NRHbDK0ZojLyq5m4ZIiFUuwWRySJQNgY58mxU+b8uVIuhNTll53Dwl92OZZe3JkTFd9tOlil5/rnLZPD7yWlc3nbyadEvaHdN1aiMKRWiAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA5kw4m3RTlrY1U1TDoqPHph4SQpWHgwU5NDOx8pbUuMZgDGKDYUS/Ky0lGSOvWR+S/EaL8QpMvVBpkUNVmt9okws4NuTwmaDTUgOHsTuXuQqpZ4EMZU8FTWTackpIQdPoDBQQBAgAEDDcAAAAEAAAAAAAAAAUDAQIAJCIAAABNYW5nbyBTaGFycCBSZWYgVGVzdAAAAAAAAAAAAAAAAAUHAQIAAwYABAQ+AAAA";
 
+        private const string PlacePerpOrder2WithTifMessage = "AQAGDApz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4mAMYoNhRL8rLSUZI69ZH5L8RovxCky9UGmRQ1Wa32iQ9dmVTKSYZag+O01pwnLcV1a7r3u6a0cY8x7rwMTjHZV1bU5cbj2puO4JDHMAiUZ9jWoNO+IbWCyIipn8n0f5zOHSa70IivD53UX4zgb7JC7c7a12AKmjrw3J2+hatSEerqA8Cp4Gf1w/c3bseRn5Vhg+dYleVYrleQsgDaFd3qsohIC1MXuUx1BqubENkb/BfDUR2wytGaIy8quZuGSIhc1enabCRStasrnNU4+aP4LPFLTp9LFYZTQ1yFH/LwMUKu59GUp19o2AwuBTxLZi4MI+qSdpEVVFQ9lCtgxJxQQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcDmn0Nd3Y84NZcsnHKXuZpXddV6Dj+Jzl27WlW28Cuc5kw4m3RTlrY1U1TDoqPHph4SQpWHgwU5NDOx8pbUuMe8bteDdqrDGrEyKkxrmMa1J/gS5LCW1XuA0DUAEpGsxAQsYBgEABwIDBAUBCAkJCgkJCQkJCQkJCQkJMEAAAABMHQAAAAAAABAnAAAAAAAAwGh4BAAAAAABAAAAAAAAAG8UGGIAAAAAAAAA/w==";
+
         [ClassInitialize]
         public static void Setup(TestContext tc)
         {
@@ -524,6 +526,52 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("ImmediateOrCancel", ix[0].Values.GetValueOrDefault("Order Type").ToString());
             Assert.AreEqual("1000000", ix[0].Values.GetValueOrDefault("Client Order Id").ToString());
             Assert.AreEqual("True", ix[0].Values.GetValueOrDefault("Reduce Only").ToString());
+        }
+
+        [TestMethod]
+        public void PlacePerpOrder2WithTimeInForce()
+        {
+            Message msg = Message.Deserialize(Convert.FromBase64String(PlacePerpOrder2WithTifMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(1, ix.Count);
+            Assert.AreEqual("Place Perp Order2", ix[0].InstructionName);
+            Assert.AreEqual("Mango Program V3", ix[0].ProgramName);
+            Assert.AreEqual(0, ix[0].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[0].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", ix[0].Values.GetValueOrDefault("Mango Account").ToString());
+            Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[0].Values.GetValueOrDefault("Owner").ToString());
+            Assert.AreEqual("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z", ix[0].Values.GetValueOrDefault("Mango Cache").ToString());
+            Assert.AreEqual("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ", ix[0].Values.GetValueOrDefault("Perp Market").ToString());
+            Assert.AreEqual("7HRgm8iXEDx2TmSETo3Lq9SXkF954HMVKNiq8t5sKvQS", ix[0].Values.GetValueOrDefault("Bids").ToString());
+            Assert.AreEqual("4oNxXQv1Rx3h7aNWjhTs3PWBoXdoPZjCaikSThV4yGb8", ix[0].Values.GetValueOrDefault("Asks").ToString());
+            Assert.AreEqual("CZ5MCRvkN38d5pnZDDEEyMiED3drgDUVpEUjkuJq31Kf", ix[0].Values.GetValueOrDefault("Event Queue").ToString());
+            Assert.AreEqual("BEPi5vEzwwY5SDfzxWsVQiK7ApuTE3doJkYUVGqAoX2s", ix[0].Values.GetValueOrDefault("Referrer Mango Account").ToString());
+            for (int i = 0; i < Constants.MaxPairs; i++)
+            {
+                if (i == 0)
+                {
+                    Assert.AreEqual("iu1duyU4vcfio6B2rKMToRQQNy4VVDYVGYf7bi8NpNC", ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+                }
+                else if (i == 3)
+                {
+                    Assert.AreEqual("8Z5esfhcw6zb9kBRSUH4SWfERoEDUH3cpMXFMnN2F1wC", ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+                }
+                else
+                {
+                    Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault($"Open Orders Account {i + 1}").ToString());
+                }
+            }
+            Assert.AreEqual("7500", ix[0].Values.GetValueOrDefault("Price").ToString());
+            Assert.AreEqual("10000", ix[0].Values.GetValueOrDefault("Max Base Quantity").ToString());
+            Assert.AreEqual("75000000", ix[0].Values.GetValueOrDefault("Max Quote Quantity").ToString());
+            Assert.AreEqual("1", ix[0].Values.GetValueOrDefault("Client Order Id").ToString());
+            Assert.AreEqual("1645745263", ix[0].Values.GetValueOrDefault("Expiry Timestamp").ToString());
+            Assert.AreEqual("Buy", ix[0].Values.GetValueOrDefault("Side").ToString());
+            Assert.AreEqual("Limit", ix[0].Values.GetValueOrDefault("Order Type").ToString());
+            Assert.AreEqual("False", ix[0].Values.GetValueOrDefault("Reduce Only").ToString());
+            Assert.AreEqual("255", ix[0].Values.GetValueOrDefault("Limit").ToString());
         }
 
         [TestMethod]

@@ -102,23 +102,38 @@ namespace Solnet.Mango.Models.Matching
         /// <summary>
         /// Gets the list of orders in the order book.
         /// </summary>
-        /// <returns></returns>
-        public List<OpenOrder> GetOrders()
+        /// <param name="includeExpired">Whether to include expired orders in the list of orders or not.</param>
+        /// <returns>A list of open orders on the book side.</returns>
+        public List<OpenOrder> GetOrders(bool includeExpired = false)
         {
             bool isBids = Metadata.DataType == DataType.Bids;
-            _orders = (from node in Nodes
-                    where node is LeafNode
-                    select (LeafNode)node
-                into leafNode
-                    select new OpenOrder
+
+            _orders = new List<OpenOrder>();
+
+            foreach (var node in Nodes)
+            {
+                if (node is LeafNode leafNode)
+                {
+                    var valid = leafNode.IsValid();
+                    if (valid || includeExpired)
                     {
-                        RawPrice = leafNode.Price,
-                        RawQuantity = leafNode.Quantity,
-                        ClientOrderId = leafNode.ClientOrderId,
-                        Owner = leafNode.Owner,
-                        OrderIndex = leafNode.OwnerSlot,
-                        OrderId = new BigInteger(leafNode.Key)
-                    }).ToList();
+                        _orders.Add(new OpenOrder
+                        {
+                            RawPrice = leafNode.Price,
+                            RawQuantity = leafNode.Quantity,
+                            ClientOrderId = leafNode.ClientOrderId,
+                            Owner = leafNode.Owner,
+                            OrderIndex = leafNode.OwnerSlot,
+                            OrderId = new BigInteger(leafNode.Key),
+                            Timestamp = leafNode.Timestamp,
+                            ExpiryTimestamp = leafNode.TimeInForce != 0 ? leafNode.Timestamp + leafNode.TimeInForce : ulong.MaxValue,
+                            TimeInForce = leafNode.TimeInForce,
+                            OrderType = leafNode.OrderType,
+                        });
+                    }
+                }
+            }
+
             if (!isBids)
             {
                 _orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order.RawPrice.CompareTo(order1.RawPrice)));
@@ -156,7 +171,6 @@ namespace Solnet.Mango.Models.Matching
         {
             if (_orders != null) return _orders.FirstOrDefault();
             return GetOrders().FirstOrDefault();
-
         }
 
 

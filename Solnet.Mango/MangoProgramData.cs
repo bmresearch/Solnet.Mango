@@ -337,6 +337,8 @@ namespace Solnet.Mango
             {
                 decodedInstruction.Values.Add($"Open Orders Account {i - 7}", keys[keyIndices[i]]);
             }
+            if (keyIndices.Length == 24)
+                decodedInstruction.Values.Add("Referrer Mango Account", keys[keyIndices[23]]);
             decodedInstruction.Values.Add("Price", data.GetS64(MangoProgramLayouts.PlacePerpOrder.PriceOffset));
             decodedInstruction.Values.Add("Quantity", data.GetS64(MangoProgramLayouts.PlacePerpOrder.QuantityOffset));
             decodedInstruction.Values.Add("Client Order Id", data.GetU64(MangoProgramLayouts.PlacePerpOrder.ClientOrderIdOffset));
@@ -345,6 +347,73 @@ namespace Solnet.Mango
             decodedInstruction.Values.Add("Order Type",
                 (OrderType)Enum.Parse(typeof(OrderType), data.GetU8(MangoProgramLayouts.PlacePerpOrder.OrderTypeOffset).ToString()));
             decodedInstruction.Values.Add("Reduce Only", data.GetBool(MangoProgramLayouts.PlacePerpOrder.ReduceOnlyOffset));
+        }
+
+        /// <summary>
+        /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.PlacePerpOrder2"/> method.
+        /// </summary>
+        /// <param name="side">The side order type.</param>
+        /// <param name="orderType">The order type.</param>
+        /// <param name="price">The price.</param>
+        /// <param name="maxBaseQuantity">The max base quantity to sell, in lots.</param>
+        /// <param name="maxQuoteQuantity">The max quote quantity to pay/receive, in lots (not taking fees into account).</param>
+        /// <param name="clientOrderId">The client order id.</param>
+        /// <param name="expiryTimestamp">The expiry timestamp, pass 0 if you want the order to never expire, timestamps in the past mean the instruction is skipped, timestamps in the future are reduced to now + 255s.</param>
+        /// <param name="reduceOnly">Whether the order is to reduce only or not.</param>
+        /// <param name="limit">Maximum number of orders from the book to fill, use this to limit compute used during order matching. When the limit is reached, processing stops.</param>
+        /// <returns>The encoded data.</returns>
+        internal static byte[] EncodePlacePerpOrder2Data(Side side, PerpOrderType orderType, 
+            long price, long maxBaseQuantity,long maxQuoteQuantity, ulong clientOrderId,
+            ulong expiryTimestamp, bool reduceOnly = false, byte limit = byte.MaxValue)
+        {
+            byte[] data = new byte[48];
+            data.WriteU32((uint)MangoProgramInstructions.Values.PlacePerpOrder2, MangoProgramLayouts.MethodOffset);
+            data.WriteS64(price, MangoProgramLayouts.PlacePerpOrder2.PriceOffset);
+            data.WriteS64(maxBaseQuantity, MangoProgramLayouts.PlacePerpOrder2.MaxBaseQuantityOffset);
+            data.WriteS64(maxQuoteQuantity, MangoProgramLayouts.PlacePerpOrder2.MaxQuoteQuantityOffset);
+            data.WriteU64(clientOrderId, MangoProgramLayouts.PlacePerpOrder2.ClientOrderIdOffset);
+            data.WriteU64(expiryTimestamp, MangoProgramLayouts.PlacePerpOrder2.ExpiryTimestampOffset);
+            data.WriteU8((byte)side, MangoProgramLayouts.PlacePerpOrder2.SideOffset);
+            data.WriteU8((byte)orderType, MangoProgramLayouts.PlacePerpOrder2.OrderTypeOffset);
+            data.WriteU8(reduceOnly ? (byte)1 : (byte)0, MangoProgramLayouts.PlacePerpOrder2.ReduceOnlyOffset);
+            data.WriteU8(limit, MangoProgramLayouts.PlacePerpOrder2.LimitOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.PlacePerpOrder2"/> method
+        /// </summary>
+        /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
+        /// <param name="data">The instruction data to decode.</param>
+        /// <param name="keys">The account keys present in the transaction.</param>
+        /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
+        internal static void DecodePlacePerpOrder2Data(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data,
+            IList<PublicKey> keys, byte[] keyIndices)
+        {
+            decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
+            decodedInstruction.Values.Add("Mango Account", keys[keyIndices[1]]);
+            decodedInstruction.Values.Add("Owner", keys[keyIndices[2]]);
+            decodedInstruction.Values.Add("Mango Cache", keys[keyIndices[3]]);
+            decodedInstruction.Values.Add("Perp Market", keys[keyIndices[4]]);
+            decodedInstruction.Values.Add("Bids", keys[keyIndices[5]]);
+            decodedInstruction.Values.Add("Asks", keys[keyIndices[6]]);
+            decodedInstruction.Values.Add("Event Queue", keys[keyIndices[7]]);
+            decodedInstruction.Values.Add("Referrer Mango Account", keys[keyIndices[8]]);
+            for (int i = 9; i < keyIndices.Length; i++)
+            {
+                decodedInstruction.Values.Add($"Open Orders Account {i - 8}", keys[keyIndices[i]]);
+            }
+            decodedInstruction.Values.Add("Price", data.GetS64(MangoProgramLayouts.PlacePerpOrder2.PriceOffset));
+            decodedInstruction.Values.Add("Max Base Quantity", data.GetS64(MangoProgramLayouts.PlacePerpOrder2.MaxBaseQuantityOffset));
+            decodedInstruction.Values.Add("Max Quote Quantity", data.GetS64(MangoProgramLayouts.PlacePerpOrder2.MaxQuoteQuantityOffset));
+            decodedInstruction.Values.Add("Client Order Id", data.GetU64(MangoProgramLayouts.PlacePerpOrder2.ClientOrderIdOffset));
+            decodedInstruction.Values.Add("Expiry Timestamp", data.GetS64(MangoProgramLayouts.PlacePerpOrder2.ExpiryTimestampOffset));
+            decodedInstruction.Values.Add("Side",
+                (Side)Enum.Parse(typeof(Side), data.GetU8(MangoProgramLayouts.PlacePerpOrder2.SideOffset).ToString()));
+            decodedInstruction.Values.Add("Order Type",
+                (OrderType)Enum.Parse(typeof(OrderType), data.GetU8(MangoProgramLayouts.PlacePerpOrder2.OrderTypeOffset).ToString()));
+            decodedInstruction.Values.Add("Reduce Only", data.GetBool(MangoProgramLayouts.PlacePerpOrder2.ReduceOnlyOffset));
+            decodedInstruction.Values.Add("Limit", data.GetU8(MangoProgramLayouts.PlacePerpOrder2.LimitOffset));
         }
 
         /// <summary>
