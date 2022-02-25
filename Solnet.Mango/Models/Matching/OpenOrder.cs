@@ -29,5 +29,25 @@ namespace Solnet.Mango.Models.Matching
         /// The owner of this order.
         /// </summary>
         public PublicKey Owner;
+
+        /// <summary>
+        /// The timestamp.
+        /// </summary>
+        public ulong Timestamp;
+
+        /// <summary>
+        /// The timestamp.
+        /// </summary>
+        public ulong ExpiryTimestamp;
+
+        /// <summary>
+        /// The time in force.
+        /// </summary>
+        public byte TimeInForce;
+
+        /// <summary>
+        /// The order type.
+        /// </summary>
+        public PerpOrderType OrderType;
     }
 }
