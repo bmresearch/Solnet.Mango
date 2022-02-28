@@ -35,11 +35,6 @@ namespace Solnet.Mango
         IStreamingRpcClient StreamingRpcClient { get; }
 
         /// <summary>
-        /// The program id.
-        /// </summary>
-        PublicKey ProgramId { get; }
-
-        /// <summary>
         /// The statistics of the current websocket connection.
         /// </summary>
         IConnectionStatistics ConnectionStatistics { get; }
