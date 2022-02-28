@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Solnet.Mango.Models.Banks;
 using Solnet.Mango.Models.Caches;
+using Solnet.Mango.Models.Configs;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Mango.Types;
 using Solnet.Programs;
@@ -114,12 +115,12 @@ namespace Solnet.Mango.Models
             internal const int FeesVaultOffset = 5968;
 
             /// <summary>
-            /// 
+            /// The offset at which the max mango accounts value begins.
             /// </summary>
             internal const int MaxMangoAccountsOffset = 6000;
 
             /// <summary>
-            /// 
+            /// The offset at which the number of mango accounts begins.
             /// </summary>
             internal const int NumMangoAccountsOffset = 6004;
         }
@@ -225,6 +226,11 @@ namespace Solnet.Mango.Models
         public uint NumMangoAccounts;
 
         /// <summary>
+        /// The mango group's config.
+        /// </summary>
+        public MangoGroupConfig Config;
+
+        /// <summary>
         /// Loads the perp markets for this mango group. This is an asynchronous operation.
         /// </summary>
         /// <param name="mangoClient">A mango client instance.</param>
@@ -244,6 +250,7 @@ namespace Solnet.Mango.Models
             logger?.LogInformation(
                 $"Successfully fetched {perpMarketAccounts.ParsedResult.Count} perp market accounts.");
 
+            int i = 0;
             PerpetualMarkets.ForEach(key =>
             {
                 int keyIndex = filteredPerpMarkets.IndexOf(key.Market);
@@ -252,7 +259,12 @@ namespace Solnet.Mango.Models
                     PerpMarketAccounts.Add(null);
                     return;
                 }
-                PerpMarketAccounts.Add(perpMarketAccounts.ParsedResult[keyIndex]);
+                var perpMarket = perpMarketAccounts.ParsedResult[keyIndex];
+                if (Config != null)
+                {
+                    perpMarket.SetConfig(Config.PerpMarkets[i++]);
+                }
+                PerpMarketAccounts.Add(perpMarket);
             });
 
             return perpMarketAccounts;
@@ -485,6 +497,17 @@ namespace Solnet.Mango.Models
         public TokenInfo GetQuoteTokenInfo()
         {
             return Tokens[Constants.MaxTokens - 1];
+        }
+
+        /// <summary>
+        /// Adds the config to a mango group.
+        /// </summary>
+        /// <param name="config">The mango group's config.</param>
+        public void SetConfig(MangoGroupConfig config)
+        {
+            if (config == null) return;
+            if (Config == null)
+                Config = config;
         }
 
         /// <summary>

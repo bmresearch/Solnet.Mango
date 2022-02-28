@@ -1,14 +1,14 @@
 ﻿using Solnet.Mango.Models;
-using Solnet.Mango.Models.Perpetuals;
+using Solnet.Mango.Models.Configs;
 using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
-using Solnet.Rpc.Utilities;
 using Solnet.Serum.Models;
 using Solnet.Wallet;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Solnet.Mango
@@ -18,6 +18,36 @@ namespace Solnet.Mango
     /// </summary>
     public static class MangoUtils
     {
+        /// <summary>
+        /// The path to the configs file.
+        /// </summary>
+        private const string ConfigsPath = "./Resources/ids.json";
+
+        /// <summary>
+        /// The json serializer options.
+        /// </summary>
+        private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
+        {
+            PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        };
+
+        /// <summary>
+        /// Gets the mango group config for the given mango program id.
+        /// </summary>
+        /// <param name="programId">The mango program id.</param>
+        /// <returns>The mango group config if found, otherwise null.</returns>
+        public static async Task<MangoGroupConfig> GetConfigForProgramId(string programId)
+        {
+            var json = await File.ReadAllTextAsync(ConfigsPath);
+            var configs = JsonSerializer.Deserialize<List<MangoGroupConfig>>(json, _jsonSerializerOptions);
+
+            foreach(var config in configs)
+            {
+                if (programId == config.MangoProgramId) return config;
+            }
+            return null;
+        }
+
         /// <summary>
         /// Humanizes a native <see cref="I80F48"/> value.
         /// </summary>

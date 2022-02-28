@@ -30,11 +30,6 @@ namespace Solnet.Mango
         private readonly ILogger _logger;
 
         /// <summary>
-        /// The program id.
-        /// </summary>
-        private readonly PublicKey _programId;
-
-        /// <summary>
         /// The list of <see cref="EventQueue"/> subscriptions.
         /// </summary>
         private readonly IList<SubscriptionWrapper<EventQueue>> _eventQueueSubscriptions;
@@ -63,14 +58,14 @@ namespace Solnet.Mango
         /// <param name="programId">The program id.</param>
         /// <returns>The Mango Client.</returns>
         internal MangoClient(ILogger logger = null, IRpcClient rpcClient = default,
-            IStreamingRpcClient streamingRpcClient = default, PublicKey programId = null) : base(rpcClient, streamingRpcClient)
+            IStreamingRpcClient streamingRpcClient = default, PublicKey programId = null) 
+            : base(rpcClient, streamingRpcClient, programId != null ? programId : MangoProgram.MainNetProgramIdKeyV3)
         {
             _logger = logger;
             _eventQueueSubscriptions = new List<SubscriptionWrapper<EventQueue>>();
             _mangoAccountSubscriptions = new List<SubscriptionWrapper<MangoAccount>>();
             _mangoCacheSubscriptions = new List<SubscriptionWrapper<MangoCache>>();
             _orderBookSideSubscriptions = new List<SubscriptionWrapper<OrderBookSide>>();
-            _programId = programId != null ? programId : MangoProgram.MainNetProgramIdKeyV3;
         }
 
         /// <inheritdoc cref="IMangoClient.NodeAddress"/>
@@ -82,13 +77,10 @@ namespace Solnet.Mango
         /// <inheritdoc cref="IMangoClient.State"/>
         public WebSocketState State => StreamingRpcClient.State;
 
-        /// <inheritdoc cref="IMangoClient.ProgramId"/>
-        public PublicKey ProgramId { get => _programId; }
-
         /// <inheritdoc cref="IMangoClient.ConnectAsync"/>
-        public Task ConnectAsync() 
-        { 
-            if(State != WebSocketState.Open)
+        public Task ConnectAsync()
+        {
+            if (State != WebSocketState.Open)
                 return StreamingRpcClient.ConnectAsync();
             return null;
         }
@@ -108,7 +100,22 @@ namespace Solnet.Mango
         /// <inheritdoc cref="IMangoClient.GetMangoGroupAsync(string, Commitment)"/>
         public async Task<AccountResultWrapper<MangoGroup>> GetMangoGroupAsync(string account,
             Commitment commitment = Commitment.Finalized)
-            => await GetAccount<MangoGroup>(account, commitment);
+        {
+            var mangoGroup = await GetAccount<MangoGroup>(account, commitment);
+
+            if (mangoGroup.WasSuccessful)
+            {
+                var config = MangoUtils.GetConfigForProgramId(ProgramIdKey);
+
+                if (config != null)
+                {
+                    mangoGroup.ParsedResult.SetConfig(config.Result);
+                }
+            }
+
+            return mangoGroup;
+        }
+
 
         /// <inheritdoc cref="IMangoClient.GetMangoGroup(string, Commitment)"/>
         public AccountResultWrapper<MangoGroup> GetMangoGroup(string account,
@@ -257,7 +264,7 @@ namespace Solnet.Mango
                 new MemCmp { Offset = MangoAccount.Layout.OwnerOffset, Bytes = ownerAccount }
             };
 
-            return await GetProgramAccounts<MangoAccount>(_programId, filters, MangoAccount.Layout.Length, commitment);
+            return await GetProgramAccounts<MangoAccount>(ProgramIdKey, filters, MangoAccount.Layout.Length, commitment);
         }
 
         /// <inheritdoc cref="IMangoClient.GetMangoAccounts(string, Commitment)"/>
