@@ -17,6 +17,27 @@ namespace Solnet.Mango.Examples
 {
     public static class ExampleHelpers
     {
+        public static void LogMangoGroupWeights(MangoGroup mangoGroup)
+        {
+            for (int token = 0; token < Constants.MaxTokens; token++)
+            {
+                var t = mangoGroup.Tokens[token];
+                var winit = MangoUtils.GetWeights(mangoGroup, token, HealthType.Initialization);
+                var wmaint = MangoUtils.GetWeights(mangoGroup, token, HealthType.Maintenance);
+
+                Console.WriteLine($"Token: {t.Mint}\n" +
+                    $"Spot Asset Maintenance: {wmaint.SpotAssetWeight}\n" +
+                    $"Spot Liab Maintenance: {wmaint.SpotLiabilityWeight}\n" +
+                    $"Perp Asset Maintenance: {wmaint.PerpAssetWeight}\n" +
+                    $"Perp Liab Maintenance: {wmaint.PerpLiabilityWeight}\n" +
+                    $"Spot Asset Init: {winit.SpotAssetWeight}\n" +
+                    $"Spot Liab Init: {winit.SpotLiabilityWeight}\n" +
+                    $"Perp Asset Init: {winit.PerpAssetWeight}\n" +
+                    $"Perp Liab Init: {winit.PerpLiabilityWeight}\n");
+            }
+
+        }
+
         public static void LogAccountStatus(MangoGroup mangoGroup, MangoCache mangoCache, MangoAccount mangoAccount,
             AdvancedOrdersAccount advancedOrders = null, List<I80F48> breakEvenPrices = null)
         {
@@ -31,6 +52,7 @@ namespace Solnet.Mango.Examples
                         $"Deposits: {mangoAccount.GetUiDeposit(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal(),-25:N4}" +
                         $"Borrows: {mangoAccount.GetUiBorrow(mangoGroup.RootBankAccounts[token], mangoGroup, token).ToDecimal(),-25:N4}" +
                         $"MaxWithBorrow: {mangoAccount.GetMaxWithBorrowForToken(mangoGroup, mangoCache, token).ToDecimal(),-25:N4}" +
+                        $"Available: {mangoAccount.GetUiAvailableBalance(mangoGroup, mangoCache, token).ToDecimal(),-25:N4}" +
                         $"Net: {mangoAccount.GetUiNet(mangoCache.RootBankCaches[token], mangoGroup, token).ToDecimal(),-25:N4}");
                 }
             }

@@ -1,3 +1,4 @@
+using Solnet.Mango.Models.Configs;
 using Solnet.Mango.Types;
 using Solnet.Programs.Utilities;
 using Solnet.Wallet;
@@ -170,6 +171,22 @@ namespace Solnet.Mango.Models.Perpetuals
         /// The mango vault.
         /// </summary>
         public PublicKey MangoVault;
+
+        /// <summary>
+        /// The config of the market.
+        /// </summary>
+        public MarketConfig Config;
+
+        /// <summary>
+        /// Sets the config on the perp market.
+        /// </summary>
+        /// <param name="config">The config.</param>
+        public void SetConfig(MarketConfig config)
+        {
+            if (config == null) return;
+            if (Config == null)
+                Config = config;
+        }
 
         /// <summary>
         /// Converts the price lots quantity to a the native value.
