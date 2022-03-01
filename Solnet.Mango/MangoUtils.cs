@@ -19,11 +19,6 @@ namespace Solnet.Mango
     public static class MangoUtils
     {
         /// <summary>
-        /// The path to the configs file.
-        /// </summary>
-        private const string ConfigsPath = "./Resources/ids.json";
-
-        /// <summary>
         /// The json serializer options.
         /// </summary>
         private static readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions()
@@ -38,8 +33,7 @@ namespace Solnet.Mango
         /// <returns>The mango group config if found, otherwise null.</returns>
         public static async Task<MangoGroupConfig> GetConfigForProgramId(string programId)
         {
-            var json = await File.ReadAllTextAsync(ConfigsPath);
-            var configs = JsonSerializer.Deserialize<List<MangoGroupConfig>>(json, _jsonSerializerOptions);
+            var configs = JsonSerializer.Deserialize<List<MangoGroupConfig>>(Ids.Json, _jsonSerializerOptions);
 
             foreach(var config in configs)
             {
