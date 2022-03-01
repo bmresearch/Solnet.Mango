@@ -298,17 +298,17 @@ namespace Solnet.Mango.Models
             logger?.LogInformation(
                 $"Successfully fetched {rootBankAccounts.ParsedResult.Count} root bank accounts.");
 
-            Tokens.ForEach(key =>
+            foreach(var key in Tokens)
             {
                 int keyIndex = filteredRootBanks.IndexOf(key.RootBank);
                 if (keyIndex == -1)
                 {
                     RootBankAccounts.Add(null);
-                    return;
+                    continue;
                 }
-                rootBankAccounts.ParsedResult[keyIndex].LoadNodeBanks(mangoClient, logger);
+                await rootBankAccounts.ParsedResult[keyIndex].LoadNodeBanksAsync(mangoClient, logger);
                 RootBankAccounts.Add(rootBankAccounts.ParsedResult[keyIndex]);
-            });
+            }
 
             return rootBankAccounts;
         }
