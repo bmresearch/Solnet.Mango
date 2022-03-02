@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using Solnet.Mango.Historical.Models;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -184,6 +185,50 @@ namespace Solnet.Mango.Historical
             }
 
             return await HandleResponse<Response<VolumeInfo>>(res);
+        }        
+        
+        /// <inheritdoc cref="IMangoHistoricalDataService.GetPerpTrades(string)"/>
+        public Response<List<PerpTrade>> GetPerpTrades(string mangoAccountAddress) => GetPerpTradesAsync(mangoAccountAddress).Result;
+
+        /// <inheritdoc cref="IMangoHistoricalDataService.GetPerpTradesAsync(string)"/>
+        public async Task<Response<List<PerpTrade>>> GetPerpTradesAsync(string mangoAccountAddress)
+        {
+            var url = _config.EventHistoryBaseUrl != null ?
+                _config.EventHistoryBaseUrl :
+                EventHistoryBaseUrl + 
+                $"perp_trades/{mangoAccountAddress}";
+            HttpResponseMessage res = await _httpClient.GetAsync(url);
+
+            if (!res.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var parsed = await HandleResponse<Response<List<PerpTrade>>>(res);
+
+            parsed.Data = parsed.Data.Where(x => x != null).ToList();
+
+            return parsed;
+        }
+        
+        /// <inheritdoc cref="IMangoHistoricalDataService.GetOpenOrders(string)"/>
+        public Response<List<SpotOpenOrder>> GetOpenOrders(string openOrdersAccountAddress) => GetOpenOrdersAsync(openOrdersAccountAddress).Result;
+
+        /// <inheritdoc cref="IMangoHistoricalDataService.GetOpenOrdersAsync(string)"/>
+        public async Task<Response<List<SpotOpenOrder>>> GetOpenOrdersAsync(string openOrdersAccountAddress)
+        {
+            var url = _config.EventHistoryBaseUrl != null ?
+                _config.EventHistoryBaseUrl :
+                EventHistoryBaseUrl + 
+                $"trades/open_orders/{openOrdersAccountAddress}";
+            HttpResponseMessage res = await _httpClient.GetAsync(url);
+
+            if (!res.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            return await HandleResponse<Response<List<SpotOpenOrder>>>(res);
         }
 
         /// <inheritdoc cref="IMangoHistoricalDataService.GetHistoryAsync(DateTime, DateTime, string, string)"/>
@@ -214,7 +259,7 @@ namespace Solnet.Mango.Historical
         /// Handle the response to the request.
         /// </summary>
         /// <typeparam name="T">The type of the data.</typeparam>
-        /// <returns>The task which returns the <see cref="RequestResult{T}"/>.</returns>
+        /// <returns>The task which returns the handled response type.</returns>
         private async Task<T> HandleResponse<T>(HttpResponseMessage message)
         {
             string data = await message.Content.ReadAsStringAsync();

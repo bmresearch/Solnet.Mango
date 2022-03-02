@@ -1,0 +1,70 @@
+{
+  "success": true,
+  "data": [
+    {
+      "loadTimestamp": "2022-03-02T17:34:23.000Z",
+      "address": "2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi",
+      "seqNum": "677821",
+      "makerFee": "-0.0002999999999993008",
+      "takerFee": "0.0004999999999988347",
+      "takerSide": "sell",
+      "maker": "CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG",
+      "makerOrderId": "190444185816977353044730",
+      "taker": "2CbbRVC34pfKKBSibPzWkmpk4EmiVVnKXgBS8i5krQhh",
+      "takerOrderId": "185611138869665566199047",
+      "price": "103.23",
+      "quantity": "171.18",
+      "makerClientOrderId": "1646242464685",
+      "takerClientOrderId": "0"
+    },
+    {
+      "loadTimestamp": "2022-03-02T17:28:33.000Z",
+      "address": "2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi",
+      "seqNum": "677740",
+      "makerFee": "-0.0002999999999993008",
+      "takerFee": "0.0004999999999988347",
+      "takerSide": "sell",
+      "maker": "CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG",
+      "makerOrderId": "189706316054028970984299",
+      "taker": "4TB9ZvXDMHpEabCqpMwczfp9BP8RSRjVQV4smCaHa7PW",
+      "takerOrderId": "189632529077734248447171",
+      "price": "102.83",
+      "quantity": "5.4",
+      "makerClientOrderId": "1646242112407",
+      "takerClientOrderId": "24209793332"
+    },
+    {
+      "loadTimestamp": "2022-03-02T17:25:33.000Z",
+      "address": "2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi",
+      "seqNum": "677650",
+      "makerFee": "-0.0002999999999993008",
+      "takerFee": "0.0004999999999988347",
+      "takerSide": "sell",
+      "maker": "CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG",
+      "makerOrderId": "188525724433311559683264",
+      "taker": "12KDMcRkE6RopQARHro1NuqtvwhSEDqmoP1J2wxhj64q",
+      "takerOrderId": "169654705245906804044623",
+      "price": "102.19",
+      "quantity": "4",
+      "makerClientOrderId": "1646241930956",
+      "takerClientOrderId": "1646241930736"
+    },
+    {
+      "loadTimestamp": "2022-03-02T17:25:33.000Z",
+      "address": "2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi",
+      "seqNum": "677651",
+      "makerFee": "-0.0002999999999993008",
+      "takerFee": "0.0004999999999988347",
+      "takerSide": "sell",
+      "maker": "CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG",
+      "makerOrderId": "188525724433311559683264",
+      "taker": "72US6v3ZGuN6Ktwn2hmj2s15Sh5sfKosLJLJTJQRJJbx",
+      "takerOrderId": "169654705245906804044624",
+      "price": "102.19",
+      "quantity": "4",
+      "makerClientOrderId": "1646241930956",
+      "takerClientOrderId": "1646241930967"
+    },
+    []
+  ]
+}
