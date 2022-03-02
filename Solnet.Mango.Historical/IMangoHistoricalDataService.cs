@@ -65,18 +65,46 @@ namespace Solnet.Mango.Historical
         Response<VolumeInfo> GetVolume(string marketAddress);
 
         /// <summary>
-        /// Gets the historical funding rate for a given market address. This is an asynchronous operation.
+        /// Gets the recent trades of a given mango account. This is an asynchronous operation.
         /// </summary>
-        /// <param name="marketAddress">The market address.</param>
-        /// <returns>A task which may return a list of historical funding rates.</returns>
-        Task<IList<FundingRateStats>> GetHistoricalFundingRatesAsync(string marketAddress);
+        /// <param name="mangoAccountAddress">The mango account address.</param>
+        /// <returns>A task which may return the perp trades.</returns>
+        Task<Response<List<PerpTrade>>> GetPerpTradesAsync(string mangoAccountAddress);
 
         /// <summary>
-        /// Gets the historical funding rate for a given market address. 
+        /// Gets the recent trades of a given mango account.
         /// </summary>
-        /// <param name="marketAddress">The market address.</param>
+        /// <param name="mangoAccountAddress">The mango account address.</param>
+        /// <returns>The perp trades.</returns>
+        Response<List<PerpTrade>> GetPerpTrades(string mangoAccountAddress);
+
+        /// <summary>
+        /// Gets the open orders of a given open orders account. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="openOrdersAccountAddress">The open orders account address.</param>
+        /// <returns>A task which may return the spot open orders.</returns>
+        Task<Response<List<SpotOpenOrder>>> GetOpenOrdersAsync(string openOrdersAccountAddress);
+
+        /// <summary>
+        /// Gets the open orders of a given open orders account.
+        /// </summary>
+        /// <param name="openOrdersAccountAddress">The open orders account address.</param>
+        /// <returns>The spot open orders.</returns>
+        Response<List<SpotOpenOrder>> GetOpenOrders(string openOrdersAccountAddress);
+
+        /// <summary>
+        /// Gets the historical funding rate for a given market name. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="marketName">The market name.</param>
+        /// <returns>A task which may return a list of historical funding rates.</returns>
+        Task<IList<FundingRateStats>> GetHistoricalFundingRatesAsync(string marketName);
+
+        /// <summary>
+        /// Gets the historical funding rate for a given market name. 
+        /// </summary>
+        /// <param name="marketName">The market name.</param>
         /// <returns>A list of historical funding rates.</returns>
-        IList<FundingRateStats> GetHistoricalFundingRates(string marketAddress);
+        IList<FundingRateStats> GetHistoricalFundingRates(string marketName);
 
         /// <inheritdoc cref="TradingViewProvider.GetHistoryAsync(DateTime, DateTime, string, string)"/>
         Task<TvBarResponse> GetHistoryAsync(DateTime from, DateTime to, string symbol, string resolution);
