@@ -361,6 +361,100 @@ namespace Solnet.Mango.Historical.Test
         }
 
         [TestMethod]
+        public void GetOpenOrders()
+        {
+            string responseData = File.ReadAllText("Resources/OpenOrders.json");
+            var url = EventHistoryBaseUrl + "trades/open_orders/DBZUDrcXEPNdLaNJZ973w1joCnsa1k4a8hUFVvgCuzGf";
+            Mock<HttpMessageHandler> messageHandlerMock = SetupHttpClientTest(responseData, url);
+
+            HttpClient httpClient = new(messageHandlerMock.Object)
+            {
+                BaseAddress = new Uri(url),
+            };
+
+            var sut = new MangoHistoricalDataService(new MangoHistoricalDataServiceConfig()
+            {
+                MangoGroup = "mainnet.1"
+            }, httpClient: httpClient);
+
+            var recentTrades = sut.GetOpenOrders("DBZUDrcXEPNdLaNJZ973w1joCnsa1k4a8hUFVvgCuzGf");
+
+            Assert.IsNotNull(recentTrades);
+
+            FinishHttpClientTest(messageHandlerMock, url);
+        }
+
+        [TestMethod]
+        public void GetOpenOrdersUnsuccessful()
+        {
+            Mock<HttpMessageHandler> messageHandlerMock = SetupHttpClientUnsuccessfulTest();
+            var url = EventHistoryBaseUrl + "trades/open_orders/DBZUDrcXEPNdLaNJZ973w1joCnsa1k4a8hUFVvgCuzGf";
+
+            HttpClient httpClient = new(messageHandlerMock.Object)
+            {
+                BaseAddress = new Uri(url),
+            };
+
+            var sut = new MangoHistoricalDataService(new MangoHistoricalDataServiceConfig()
+            {
+                MangoGroup = "mainnet.1"
+            }, httpClient: httpClient);
+
+            var recentTrades = sut.GetOpenOrders("DBZUDrcXEPNdLaNJZ973w1joCnsa1k4a8hUFVvgCuzGf");
+
+            Assert.IsNull(recentTrades);
+
+            FinishHttpClientTest(messageHandlerMock, url);
+        }
+        
+        [TestMethod]
+        public void GetPerpTrades()
+        {
+            string responseData = File.ReadAllText("Resources/PerpTrades.json");
+            var url = EventHistoryBaseUrl + "perp_trades/CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG";
+            Mock<HttpMessageHandler> messageHandlerMock = SetupHttpClientTest(responseData, url);
+
+            HttpClient httpClient = new(messageHandlerMock.Object)
+            {
+                BaseAddress = new Uri(url),
+            };
+
+            var sut = new MangoHistoricalDataService(new MangoHistoricalDataServiceConfig()
+            {
+                MangoGroup = "mainnet.1"
+            }, httpClient: httpClient);
+
+            var recentTrades = sut.GetPerpTrades("CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG");
+
+            Assert.IsNotNull(recentTrades);
+
+            FinishHttpClientTest(messageHandlerMock, url);
+        }
+
+        [TestMethod]
+        public void GetPerpTradesUnsuccessful()
+        {
+            Mock<HttpMessageHandler> messageHandlerMock = SetupHttpClientUnsuccessfulTest();
+            var url = EventHistoryBaseUrl + "perp_trades/CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG";
+
+            HttpClient httpClient = new(messageHandlerMock.Object)
+            {
+                BaseAddress = new Uri(url),
+            };
+
+            var sut = new MangoHistoricalDataService(new MangoHistoricalDataServiceConfig()
+            {
+                MangoGroup = "mainnet.1"
+            }, httpClient: httpClient);
+
+            var recentTrades = sut.GetPerpTrades("CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG");
+
+            Assert.IsNull(recentTrades);
+
+            FinishHttpClientTest(messageHandlerMock, url);
+        }
+
+        [TestMethod]
         public void GetConfig()
         {
             string responseContent = File.ReadAllText("Resources/TvConfig.json");
