@@ -55,13 +55,13 @@ jobs:
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.ACCESS_TOKEN }}
-          file: Solnet.Mango/bin/Release/net5.0/ref/Solnet.Mango.dll
+          file: artifacts/Solnet.Mango.dll
           tag: ${{ steps.publish_nuget.outputs.VERSION }}
           upload_url: ${{ steps.create_release.outputs.upload_url }}
       - name: Upload Solnet.Mango.Historical release assets
         uses: svenstaro/upload-release-action@v2
         with:
           repo_token: ${{ secrets.ACCESS_TOKEN }}
-          file: Solnet.Mango.Historical/bin/Release/net5.0/ref/Solnet.Mango.Historical.dll
+          file: artifacts/Solnet.Mango.Historical.dll
           tag: ${{ steps.publish_nuget.outputs.VERSION }}
           upload_url: ${{ steps.create_release.outputs.upload_url }}

@@ -45,6 +45,10 @@ namespace Solnet.Mango.Examples
 
             var recentTrades = _mangoHistoricalDataService.GetRecentTrades("2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi");
 
+            var recentPerpTrades = _mangoHistoricalDataService.GetPerpTrades("CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG");
+
+            var openOrders = _mangoHistoricalDataService.GetOpenOrders("DBZUDrcXEPNdLaNJZ973w1joCnsa1k4a8hUFVvgCuzGf");
+
             Console.ReadLine();
         }
     }
