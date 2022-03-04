@@ -21,11 +21,15 @@ namespace Solnet.Mango
             { Values.InitMangoAccount, "Initialize Mango Account" },
             { Values.Deposit, "Deposit" },
             { Values.Withdraw, "Withdraw" },
+            { Values.CachePrices, "Cache Prices" },
+            { Values.CacheRootBanks, "Cache Root Banks" },
             { Values.PlaceSpotOrder, "Place Spot Order" },
             { Values.PlaceSpotOrder2, "Place Spot Order2" },
             { Values.PlacePerpOrder, "Place Perp Order" },
             { Values.CancelPerpOrderByClientId, "Cancel Perp Order By Client Id" },
             { Values.CancelPerpOrder, "Cancel Perp Order" },
+            { Values.CachePerpMarkets, "Cache Perp Markets" },
+            { Values.UpdateFunding, "Update Funding" },
             { Values.SettleFunds, "Settle Funds" },
             { Values.CancelSpotOrder, "Cancel Spot Order" },
             { Values.SettleProfitAndLoss, "Settle Profit & Loss" },
@@ -70,6 +74,16 @@ namespace Solnet.Mango
             Withdraw = 3,
 
             /// <summary>
+            /// Caches the price data.
+            /// </summary>
+            CachePrices = 7,
+
+            /// <summary>
+            /// Caches the root banks data.
+            /// </summary>
+            CacheRootBanks = 8,
+
+            /// <summary>
             /// Places an order on the Serum DEX using Mango's margin facilities.
             /// </summary>
             PlaceSpotOrder = 9,
@@ -88,6 +102,16 @@ namespace Solnet.Mango
             /// Cancels a perp order.
             /// </summary>
             CancelPerpOrder = 14,
+
+            /// <summary>
+            /// Caches the perp markets data.
+            /// </summary>
+            CachePerpMarkets = 16,
+
+            /// <summary>
+            /// Updates the funding for a given perp market..
+            /// </summary>
+            UpdateFunding = 17,
 
             /// <summary>
             /// Settles all funds from Serum DEX open orders into <see cref="MangoAccount"/> positions.

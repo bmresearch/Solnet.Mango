@@ -1147,5 +1147,92 @@ namespace Solnet.Mango.Test
             CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
             CollectionAssert.AreEqual(expectedData, ix.Data);
         }
+
+        [TestMethod]
+        public void CachePrices()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var oracles = new List<PublicKey>();
+
+            for(int i = 0; i < 10; i++)
+            {
+                oracles.Add(new Account());
+            }
+
+            var ix = mango.CachePrices(
+                Constants.DevNetMangoGroup,
+                new("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z"),
+                oracles
+                );
+            var expectedData = new byte[]
+            {
+                7, 0, 0, 0,
+            };
+            Assert.AreEqual(12, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void CacheRootBanks()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var rootBanks = new List<PublicKey>();
+
+            for(int i = 0; i < 10; i++)
+            {
+                rootBanks.Add(new Account());
+            }
+
+            var ix = mango.CacheRootBanks(
+                Constants.DevNetMangoGroup,
+                new("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z"),
+                rootBanks
+                );
+            var expectedData = new byte[]
+            {
+                8, 0, 0, 0,
+            };
+            Assert.AreEqual(12, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
+
+        [TestMethod]
+        public void CachePerpMarkets()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var perpMarkets = new List<PublicKey>();
+
+            for(int i = 0; i < 10; i++)
+            {
+                perpMarkets.Add(new Account());
+            }
+
+            var ix = mango.CachePerpMarkets(
+                Constants.DevNetMangoGroup,
+                new("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z"),
+                perpMarkets
+                );
+            var expectedData = new byte[]
+            {
+                16, 0, 0, 0,
+            };
+            Assert.AreEqual(12, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
     }
 }
