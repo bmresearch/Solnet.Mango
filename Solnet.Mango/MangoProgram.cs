@@ -1,4 +1,7 @@
 using Solnet.Mango.Models;
+using Solnet.Mango.Models.Banks;
+using Solnet.Mango.Models.Caches;
+using Solnet.Mango.Models.Perpetuals;
 using Solnet.Mango.Types;
 using Solnet.Programs;
 using Solnet.Programs.Abstract;
@@ -71,6 +74,114 @@ namespace Solnet.Mango
         /// </summary>
         /// <returns>The <see cref="MangoProgram"/> instance.</returns>
         public static MangoProgram CreateMainNet() => new MangoProgram(MainNetProgramIdKeyV3, SerumProgram.MainNetProgramIdKeyV3);
+
+        /// <summary>
+        /// Initializes an instruction to cache the <see cref="PriceCache"/>s.
+        /// </summary>
+        /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="oracles">The oracles.</param>
+        /// <returns>The transaction instruction.</returns>
+        public TransactionInstruction CachePrices(PublicKey mangoGroup, PublicKey mangoCache, List<PublicKey> oracles)
+            => CachePrices(ProgramIdKey, mangoGroup, mangoCache, oracles);
+
+        /// <summary>
+        /// Initializes an instruction to cache the <see cref="PriceCache"/>s.
+        /// </summary>
+        /// <param name="programIdKey">The public key of the program.</param>
+        /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="oracles">The oracles.</param>
+        /// <returns>The transaction instruction.</returns>
+        public static TransactionInstruction CachePrices(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoCache, List<PublicKey> oracles)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoCache, false),
+            };
+
+            keys.AddRange(oracles.Select(x => AccountMeta.ReadOnly(x, false)));
+            return new TransactionInstruction 
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCachePricesData()
+            };
+        }
+
+        /// <summary>
+        /// Initializes an instruction to cache the <see cref="RootBank"/>s.
+        /// </summary>
+        /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="rootBanks">The root banks.</param>
+        /// <returns>The transaction instruction.</returns>
+        public TransactionInstruction CacheRootBanks(PublicKey mangoGroup, PublicKey mangoCache, List<PublicKey> rootBanks)
+            => CacheRootBanks(ProgramIdKey, mangoGroup, mangoCache, rootBanks);
+
+        /// <summary>
+        /// Initializes an instruction to cache the <see cref="RootBank"/>s.
+        /// </summary>
+        /// <param name="programIdKey">The public key of the program.</param>
+        /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="rootBanks">The root banks.</param>
+        /// <returns>The transaction instruction.</returns>
+        public static TransactionInstruction CacheRootBanks(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoCache, List<PublicKey> rootBanks)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoCache, false),
+            };
+
+            keys.AddRange(rootBanks.Select(x => AccountMeta.ReadOnly(x, false)));
+            return new TransactionInstruction 
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCacheRootBanksData()
+            };
+        }
+
+        /// <summary>
+        /// Initializes an instruction to cache the <see cref="PerpMarket"/>s.
+        /// </summary>
+        /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpMarkets">The perp markets.</param>
+        /// <returns>The transaction instruction.</returns>
+        public TransactionInstruction CachePerpMarkets(PublicKey mangoGroup, PublicKey mangoCache, List<PublicKey> perpMarkets)
+            => CachePerpMarkets(ProgramIdKey, mangoGroup, mangoCache, perpMarkets);
+
+        /// <summary>
+        /// Initializes an instruction to cache the <see cref="PerpMarket"/>s.
+        /// </summary>
+        /// <param name="programIdKey">The public key of the program.</param>
+        /// <param name="mangoGroup">The public key of the <see cref="MangoGroup"/> account.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpMarkets">The perp markets.</param>
+        /// <returns>The transaction instruction.</returns>
+        public static TransactionInstruction CachePerpMarkets(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoCache, List<PublicKey> perpMarkets)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.Writable(mangoCache, false),
+            };
+
+            keys.AddRange(perpMarkets.Select(x => AccountMeta.ReadOnly(x, false)));
+            return new TransactionInstruction 
+            {
+                ProgramId = programIdKey,
+                Keys = keys,
+                Data = MangoProgramData.EncodeCachePerpMarketsData()
+            };
+        }
 
         /// <summary>
         /// Initializes an instruction to initialize a given account as a <see cref="MangoAccount"/>.
@@ -1823,6 +1934,12 @@ namespace Solnet.Mango
                 case MangoProgramInstructions.Values.Withdraw:
                     MangoProgramData.DecodeWithdrawData(decodedInstruction, data, keys, keyIndices);
                     break;
+                case MangoProgramInstructions.Values.CachePrices:
+                    MangoProgramData.DecodeCachePricesData(decodedInstruction, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CacheRootBanks:
+                    MangoProgramData.DecodeCacheRootBanksData(decodedInstruction, keys, keyIndices);
+                    break;
                 case MangoProgramInstructions.Values.PlaceSpotOrder:
                     MangoProgramData.DecodePlaceSpotOrderData(decodedInstruction, data, keys, keyIndices);
                     break;
@@ -1837,6 +1954,9 @@ namespace Solnet.Mango
                     break;
                 case MangoProgramInstructions.Values.CancelPerpOrder:
                     MangoProgramData.DecodeCancelPerpOrderData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.CachePerpMarkets:
+                    MangoProgramData.DecodeCachePerpMarketsData(decodedInstruction, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.SettleFunds:
                     MangoProgramData.DecodeSettleFundsData(decodedInstruction, keys, keyIndices);

@@ -1,23 +1,19 @@
 ﻿using Solnet.Mango.Historical.Converters;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace Solnet.Mango.Historical.Models
 {
     /// <summary>
     /// Represents a perp trade.
     /// </summary>
-    [JsonConverter(typeof(PerpTradeJsonConverter))]
     public class PerpTrade
     {
         /// <summary>
         /// The timestamp.
         /// </summary>
+        [JsonConverter(typeof(StringToDateTimeJsonConverter))]
         public DateTime Timestamp { get; set; }
 
         /// <summary>
@@ -28,16 +24,19 @@ namespace Solnet.Mango.Historical.Models
         /// <summary>
         /// The sequence number.
         /// </summary>
+        [JsonConverter(typeof(StringToUlongJsonConverter))]
         public ulong SequenceNumber { get; set; }
 
         /// <summary>
         /// The maker's fee.
         /// </summary>
+        [JsonConverter(typeof(StringToDecimalJsonConverter))]
         public decimal MakerFee { get; set; }
 
         /// <summary>
         /// The taker's fee.
         /// </summary>
+        [JsonConverter(typeof(StringToDecimalJsonConverter))]
         public decimal TakerFee { get; set; }
 
         /// <summary>
@@ -53,6 +52,7 @@ namespace Solnet.Mango.Historical.Models
         /// <summary>
         /// The maker's order id.
         /// </summary>
+        [JsonConverter(typeof(StringToBigIntegerJsonConverter))]
         public BigInteger MakerOrderId { get; set; }
 
         /// <summary>
@@ -63,26 +63,31 @@ namespace Solnet.Mango.Historical.Models
         /// <summary>
         /// The taker's order id.
         /// </summary>
+        [JsonConverter(typeof(StringToBigIntegerJsonConverter))]
         public BigInteger TakerOrerId { get; set; }
 
         /// <summary>
         /// The price.
         /// </summary>
+        [JsonConverter(typeof(StringToDecimalJsonConverter))]
         public decimal Price { get; set; }
 
         /// <summary>
         /// The quantity.
         /// </summary>
+        [JsonConverter(typeof(StringToDecimalJsonConverter))]
         public decimal Quantity { get; set; }
 
         /// <summary>
         /// The maker's client order id.
         /// </summary>
+        [JsonConverter(typeof(StringToUlongJsonConverter))]
         public ulong MakerClientOrderId { get; set; }
 
         /// <summary>
         /// The teaker's client order id.
         /// </summary>
+        [JsonConverter(typeof(StringToUlongJsonConverter))]
         public ulong TakerClientOrderId { get; set; }
     }
 }

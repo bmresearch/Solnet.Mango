@@ -56,6 +56,10 @@ namespace Solnet.Mango.Test
 
         private const string PlacePerpOrder2WithTifMessage = "AQAGDApz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4mAMYoNhRL8rLSUZI69ZH5L8RovxCky9UGmRQ1Wa32iQ9dmVTKSYZag+O01pwnLcV1a7r3u6a0cY8x7rwMTjHZV1bU5cbj2puO4JDHMAiUZ9jWoNO+IbWCyIipn8n0f5zOHSa70IivD53UX4zgb7JC7c7a12AKmjrw3J2+hatSEerqA8Cp4Gf1w/c3bseRn5Vhg+dYleVYrleQsgDaFd3qsohIC1MXuUx1BqubENkb/BfDUR2wytGaIy8quZuGSIhc1enabCRStasrnNU4+aP4LPFLTp9LFYZTQ1yFH/LwMUKu59GUp19o2AwuBTxLZi4MI+qSdpEVVFQ9lCtgxJxQQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcDmn0Nd3Y84NZcsnHKXuZpXddV6Dj+Jzl27WlW28Cuc5kw4m3RTlrY1U1TDoqPHph4SQpWHgwU5NDOx8pbUuMe8bteDdqrDGrEyKkxrmMa1J/gS5LCW1XuA0DUAEpGsxAQsYBgEABwIDBAUBCAkJCgkJCQkJCQkJCQkJMEAAAABMHQAAAAAAABAnAAAAAAAAwGh4BAAAAAABAAAAAAAAAG8UGGIAAAAAAAAA/w==";
 
+        private const string CachePricesAndBanksMessage = "AQAYGgpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4c1enabCRStasrnNU4+aP4LPFLTp9LFYZTQ1yFH/LwMXKISAtTF7lMdQarmxDZG/wXw1EdsMrRmiMvKrmbhkiIXMM1+Hq/GZSJHVJgPEAfBo+shRIsKJj+EnwXrEU27rQ+cAXK6EN+k0ZCI2U9b9h07VNW9dIOjIqmC4Tc+6OoxvKgLptwy4I0G8aqIYBHu0dd8d76et2HMENcrfQov1Xpv5lDwNn1KfvmBWlk+oV02WT8GQ6qvAUm7BL5nq4Ud7NeOwlYV1T0khtsQHoKfd2FcRAjLvVQwiHFLnyZ9pEWRo0I+BSNkuXWou8+asHglTSIG3XmiD46QRk4J6kV1NI1x/BiGEjIpAiFGEiC9TirNHc37yJyECSyTwYvcd1bBWIc9wAmVPIPJRGkAN+pHffYnZX9FwU8WrTphCJxaP59PIBhKYKR6t8I/y4KNcnsFdI71JDP7Wulvd1zJjJBJ2MLFYHDD13Knda2hV5aYzrY9PepomOBPCjFLNncc/rVE7QZcGGZ3LfYc7Y85ytS3Jbq/QqBdM2uytiHON24NzVL4Ds9VN3DZsQll+Ptkdx6T9WkKGC7cMr5KMjbgyqpuBYGklocHLYLDuNefEQ6+MVSQC0fT68cM5eWWtOJptxdAseOZMOJt0U5a2NVNUw6Kjx6YeEkKVh4MFOTQzsfKW1LjGrZdZo3KEngdIn5YplWXVHB8ohgsXi71DdlCwcU+1BZp4e+ViX93y3F32uBHN8CQA00oLHfIkfBhDys4BGyfPllA3KcpLuvWkcI3fGObfrSPrSWyP8/o2zHogxMTXGe1tr5hhZPwoXhqySnHIzG5+InJNPrMxz0DGtN+8HGkoZqFnKGItPa8l0ytbzyYVhImAzjz4+U14dZpOxNCCoeS7XLrwX9xgo8LmazBUyAtipJvrNdLmqOX1UcRyXQ6mUlHABnTgZWcM60MO6D0ULUOkrCiKUnEikuU6JVQ1zikK6hDfbur1G/LfCK6XHXMJf2dY0B4f49ArhmLrpTdmYhxQe9LGQ2FJabSAYPUVtGc7Lh18DjC4UzyIU1Hs6i+UXyTv5oGChVGK2boNZDkICsHZSSy7Xotf9tXMNZ0KBK80P7QIQDwIBAwQFBgcICQoLDA0ODwQHAAAAEAsCARESExQVFhcYGQQIAAAA";
+
+        private const string CachePerpMarketsMessage = "AQAMDgpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4c1enabCRStasrnNU4+aP4LPFLTp9LFYZTQ1yFH/LwMXKISAtTF7lMdQarmxDZG/wXw1EdsMrRmiMvKrmbhkiIXjmD9Cm9pxjA0V3jNSfhZcDaSKo3TdVWp4N4jAcICio1Dfq6oDX+7E8swT9S47u4rUmtWiSa/yjP7qyLDe22rNy2P8ujDG2hZLLFzzZ3QQihbcp2YUOpJ8CLDb/Fyngez12ZVMpJhlqD47TWnCctxXVruve7prRxjzHuvAxOMdlkDs0zUN3a454cyB+IB171YmH83sBQAY3bIfxbx9KRJdx0qkazg97nI9w7cmzViiqP13B12zWrb9AwRhr6JDADNgCBOiBsuZSQARUrHosRL5hnB2v+E6WMImAuSY1ocJFsOYT4v0lQPWsb9KqgHtbiZYz31QQXjeR4dCXGzyCdn4iv2ankLYKNmVWaMwajrpBWVH9lWddOclAwvuwb4QrRNt1WMk7ofzOyMAbRfYgnsusySlwFHOOAyUdYrjO35u1OZMOJt0U5a2NVNUw6Kjx6YeEkKVh4MFOTQzsfKW1LjH5oGChVGK2boNZDkICsHZSSy7Xotf9tXMNZ0KBK80P7QENDAIBAwQFBgcICQoLDAQQAAAA";
+
         [ClassInitialize]
         public static void Setup(TestContext tc)
         {
@@ -703,6 +707,50 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh", ix[0].Values.GetValueOrDefault("Payer").ToString());
             Assert.AreEqual(SystemProgram.ProgramIdKey, ix[0].Values.GetValueOrDefault("System Program").ToString());
             Assert.AreEqual("\v\0\0\0\0\0\0\0Mango Sharp", ix[0].Values.GetValueOrDefault("Referrer Id").ToString());
+        }
+
+        [TestMethod]
+        public void CachePricesAndBanks()
+        {
+            Message msg = Message.Deserialize(Convert.FromBase64String(CachePricesAndBanksMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(2, ix.Count);
+            Assert.AreEqual("Mango Program V3", ix[0].ProgramName);
+            Assert.AreEqual("Cache Prices", ix[0].InstructionName);
+            Assert.AreEqual(0, ix[0].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[0].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z", ix[0].Values.GetValueOrDefault("Mango Cache").ToString());
+            Assert.AreEqual("8k7F9Xb36oFJsjpCKpsXvg4cgBRoZtwNTc3EzG5Ttd2o", ix[0].Values.GetValueOrDefault("Oracle 1").ToString());
+            Assert.AreEqual("4WXvuax8VeqhFZeWQ1d9Nx7FHt9YnePahPPvSrf59Nbp", ix[0].Values.GetValueOrDefault("Oracle 6").ToString());
+            Assert.AreEqual("5wZ8TQrizdWp4LKwBEPaer4AaNeLiPcQYuy5ddSr2Zfj", ix[0].Values.GetValueOrDefault("Oracle 13").ToString());
+            Assert.AreEqual("Mango Program V3", ix[1].ProgramName);
+            Assert.AreEqual("Cache Root Banks", ix[1].InstructionName);
+            Assert.AreEqual(0, ix[1].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[1].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z", ix[1].Values.GetValueOrDefault("Mango Cache").ToString());
+            Assert.AreEqual("CY4nMV9huW5KCYFxWChrmoLwGCsZiXoiREeo2PMrBm5o", ix[1].Values.GetValueOrDefault("Root Bank 1").ToString());
+            Assert.AreEqual("8GC81raaLjhTx3yedctxCJW46qdmmSRybH2s1eFYFFxT", ix[1].Values.GetValueOrDefault("Root Bank 4").ToString());
+            Assert.AreEqual("HUBX4iwWEUK5VrXXXcB7uhuKrfT4fpu2T9iZbg712JrN", ix[1].Values.GetValueOrDefault("Root Bank 9").ToString());
+        }
+
+        [TestMethod]
+        public void CachePerpMarkets()
+        {
+            Message msg = Message.Deserialize(Convert.FromBase64String(CachePerpMarketsMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(1, ix.Count);
+            Assert.AreEqual("Mango Program V3", ix[0].ProgramName);
+            Assert.AreEqual("Cache Perp Markets", ix[0].InstructionName);
+            Assert.AreEqual(0, ix[0].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[0].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z", ix[0].Values.GetValueOrDefault("Mango Cache").ToString());
+            Assert.AreEqual("98wPi7vBkiJ1sXLPipQEjrgHYcMBcNUsg9avTyWUi26j", ix[0].Values.GetValueOrDefault("Perp Market 1").ToString());
+            Assert.AreEqual("8fKNzMe22bZ6H9TP8KpyM8B6b6DhZQyNmodChvQRbV8P", ix[0].Values.GetValueOrDefault("Perp Market 6").ToString());
+            Assert.AreEqual("Fmg4wXV9hYUNjAYeLX1gDBSC3ucKcYJGrZQus64n9h9N", ix[0].Values.GetValueOrDefault("Perp Market 10").ToString());
         }
     }
 }
