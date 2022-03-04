@@ -17,6 +17,88 @@ namespace Solnet.Mango
     /// </summary>
     internal static class MangoProgramData
     {
+
+        /// <summary>
+        /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.CachePrices"/> method.
+        /// </summary>
+        /// <returns>The encoded data.</returns>
+        internal static byte[] EncodeCachePricesData()
+        {
+            byte[] data = new byte[4];
+            data.WriteU32((uint)MangoProgramInstructions.Values.CachePrices, MangoProgramLayouts.MethodOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.CachePrices"/> method
+        /// </summary>
+        /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
+        /// <param name="keys">The account keys present in the transaction.</param>
+        /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
+        internal static void DecodeCachePricesData(DecodedInstruction decodedInstruction, IList<PublicKey> keys, byte[] keyIndices)
+        {
+            decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
+            decodedInstruction.Values.Add("Mango Cache", keys[keyIndices[1]]);
+            for (int i = 2; i < keyIndices.Length; i++)
+            {
+                decodedInstruction.Values.Add($"Oracle {i - 1}", keys[keyIndices[i]]);
+            }
+        }
+
+        /// <summary>
+        /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.CacheRootBanks"/> method.
+        /// </summary>
+        /// <returns>The encoded data.</returns>
+        internal static byte[] EncodeCacheRootBanksData()
+        {
+            byte[] data = new byte[4];
+            data.WriteU32((uint)MangoProgramInstructions.Values.CacheRootBanks, MangoProgramLayouts.MethodOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.CacheRootBanks"/> method
+        /// </summary>
+        /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
+        /// <param name="keys">The account keys present in the transaction.</param>
+        /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
+        internal static void DecodeCacheRootBanksData(DecodedInstruction decodedInstruction, IList<PublicKey> keys, byte[] keyIndices)
+        {
+            decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
+            decodedInstruction.Values.Add("Mango Cache", keys[keyIndices[1]]);
+            for (int i = 2; i < keyIndices.Length; i++)
+            {
+                decodedInstruction.Values.Add($"Root Bank {i - 1}", keys[keyIndices[i]]);
+            }
+        }
+
+        /// <summary>
+        /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.CachePerpMarkets"/> method.
+        /// </summary>
+        /// <returns>The encoded data.</returns>
+        internal static byte[] EncodeCachePerpMarketsData()
+        {
+            byte[] data = new byte[4];
+            data.WriteU32((uint)MangoProgramInstructions.Values.CachePerpMarkets, MangoProgramLayouts.MethodOffset);
+            return data;
+        }
+
+        /// <summary>
+        /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.CachePerpMarkets"/> method
+        /// </summary>
+        /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
+        /// <param name="keys">The account keys present in the transaction.</param>
+        /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
+        internal static void DecodeCachePerpMarketsData(DecodedInstruction decodedInstruction, IList<PublicKey> keys, byte[] keyIndices)
+        {
+            decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
+            decodedInstruction.Values.Add("Mango Cache", keys[keyIndices[1]]);
+            for (int i = 2; i < keyIndices.Length; i++)
+            {
+                decodedInstruction.Values.Add($"Perp Market {i - 1}", keys[keyIndices[i]]);
+            }
+        }
+
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.InitMangoAccount"/> method.
         /// </summary>
