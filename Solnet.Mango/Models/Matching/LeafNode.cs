@@ -170,14 +170,13 @@ namespace Solnet.Mango.Models.Matching
         /// <remarks>
         /// This is checked by the order's <see cref="TimeInForce"/> value.
         /// If it is equal to<see cref="byte.MinValue"/> the order never expires,
-        /// otherwise the order expires after <see cref="Timestamp"/> plus <see cref="byte.MaxValue"/> seconds.</remarks>
+        /// otherwise the order expires at <see cref="Timestamp"/> plus <see cref="byte.MaxValue"/> seconds.</remarks>
         /// </summary>
         /// <returns>true if it is valid, otherwise false.</returns>
-        public bool IsValid()
+        public bool IsValid(ulong timestamp)
         {
             var expiry = Timestamp + TimeInForce;
-            var now = (ulong) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalSeconds;
-            return TimeInForce == 0 || now <= expiry;
+            return TimeInForce == 0 || timestamp < expiry;
         }
 
         /// <summary>
