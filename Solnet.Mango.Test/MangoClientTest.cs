@@ -582,7 +582,7 @@ namespace Solnet.Mango.Test
             Assert.IsTrue(obs.ParsedResult.Metadata.IsInitialized);
             Assert.AreEqual(DataType.Bids, obs.ParsedResult.Metadata.DataType);
             var bids = obs.ParsedResult.GetOrders();
-            Assert.AreEqual(11, bids.Count); // there's 11 orders without expiry
+            Assert.AreEqual(14, bids.Count); // there's 14 orders without expiry
             var bidsWithExpired = obs.ParsedResult.GetOrders(true);
             Assert.AreEqual(16, bidsWithExpired.Count); // there's 16 orders total including expired
         }
