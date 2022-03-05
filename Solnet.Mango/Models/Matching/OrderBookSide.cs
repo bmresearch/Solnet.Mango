@@ -106,35 +106,33 @@ namespace Solnet.Mango.Models.Matching
         /// <returns>A list of open orders on the book side.</returns>
         public List<OpenOrder> GetOrders(bool includeExpired = false)
         {
-            bool isBids = Metadata.DataType == DataType.Bids;
-
             _orders = new List<OpenOrder>();
 
-            foreach (var node in Nodes)
+            var leafNodes = Nodes.Where(n => n is LeafNode).Cast<LeafNode>().ToList();
+            ulong timestamp = leafNodes.Select(n => n.Timestamp).Max();
+
+            foreach (LeafNode leafNode in leafNodes)
             {
-                if (node is LeafNode leafNode)
+                var valid = leafNode.IsValid(timestamp);
+                if (valid || includeExpired)
                 {
-                    var valid = leafNode.IsValid();
-                    if (valid || includeExpired)
+                    _orders.Add(new OpenOrder
                     {
-                        _orders.Add(new OpenOrder
-                        {
-                            RawPrice = leafNode.Price,
-                            RawQuantity = leafNode.Quantity,
-                            ClientOrderId = leafNode.ClientOrderId,
-                            Owner = leafNode.Owner,
-                            OrderIndex = leafNode.OwnerSlot,
-                            OrderId = new BigInteger(leafNode.Key),
-                            Timestamp = leafNode.Timestamp,
-                            ExpiryTimestamp = leafNode.TimeInForce != 0 ? leafNode.Timestamp + leafNode.TimeInForce : ulong.MaxValue,
-                            TimeInForce = leafNode.TimeInForce,
-                            OrderType = leafNode.OrderType,
-                        });
-                    }
+                        RawPrice = leafNode.Price,
+                        RawQuantity = leafNode.Quantity,
+                        ClientOrderId = leafNode.ClientOrderId,
+                        Owner = leafNode.Owner,
+                        OrderIndex = leafNode.OwnerSlot,
+                        OrderId = new BigInteger(leafNode.Key),
+                        Timestamp = leafNode.Timestamp,
+                        ExpiryTimestamp = leafNode.TimeInForce != 0 ? leafNode.Timestamp + leafNode.TimeInForce : ulong.MaxValue,
+                        TimeInForce = leafNode.TimeInForce,
+                        OrderType = leafNode.OrderType,
+                    });
                 }
             }
 
-            if (!isBids)
+            if (Metadata.DataType != DataType.Bids)
             {
                 _orders.Sort(Comparer<OpenOrder>.Create((order, order1) => order.RawPrice.CompareTo(order1.RawPrice)));
             }
