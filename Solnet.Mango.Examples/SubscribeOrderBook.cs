@@ -16,9 +16,9 @@ namespace Solnet.Mango.Examples
         private readonly IMangoClient _mangoClient;
         private static Dictionary<string, string> Markets = new Dictionary<string, string>()
         {
-            { "SOL-PERP", "CqxX2QupYiYafBSbA519j4vRVxxecidbh2zwX66Lmqem" },
-            { "BTC-PERP", "4nfmQP3KmUqEJ6qJLsS3offKgE96YUB4Rp7UQvm2Fbi9" },
-            { "MNGO-PERP", "2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi" }
+            { "SOL-PERP", "2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi" },
+            { "BTC-PERP", "DtEcjPLyD4YtTBB4q8xwFZ9q49W89xZCZtJyrGebi5t8" },
+            { "MNGO-PERP", "4nfmQP3KmUqEJ6qJLsS3offKgE96YUB4Rp7UQvm2Fbi9" }
         };
 
         private Dictionary<string, List<OpenOrder>> allAskOrders;
