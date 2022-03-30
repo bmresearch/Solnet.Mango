@@ -46,8 +46,8 @@ namespace Solnet.Mango.Historical.Models
         /// <param name="oldestShortFunding">The oldest short funding.</param>
         /// <param name="latestLongFunding">the latest long funding.</param>
         /// <param name="latestShortFunding">The latest short funding.</param>
-        /// <param name="oraclePrice">The oracle price.</param>
         /// <param name="perpMarket">The perp market.</param>
+        /// <param name="oraclePrice">The oracle price.</param>
         /// <param name="baseDecimals">The decimals of the base token.</param>
         /// <param name="quoteDecimals">The decimals of the quote token.</param>
         /// <returns>The fundin rate per hourly period.</returns>
@@ -62,7 +62,7 @@ namespace Solnet.Mango.Historical.Models
             var fundingDiff = endFunding - startFunding;
 
             var fundingInQuoteDecimals = fundingDiff / (decimal) Math.Pow(10, quoteDecimals);
-            var basePriceInBaseLots = oraclePrice * perpMarket.BaseLotsToNumber(1m, baseDecimals);
+            var basePriceInBaseLots = oraclePrice * perpMarket.NativeQuantityToUi(1m, baseDecimals);
 
             return (fundingInQuoteDecimals / basePriceInBaseLots) * 100;
         }
@@ -90,7 +90,7 @@ namespace Solnet.Mango.Historical.Models
             var avgPrice = (latestStat.BaseOraclePrice + oldestStat.BaseOraclePrice) / 2;
 
             var fundingInQuoteDecimals = fundingDiff / (decimal) Math.Pow(10, quoteDecimals);
-            var basePriceInBaseLots = avgPrice * perpMarket.BaseLotsToNumber(1m, baseDecimals);
+            var basePriceInBaseLots = avgPrice * perpMarket.NativeQuantityToUi(1m, baseDecimals);
 
             return (fundingInQuoteDecimals / basePriceInBaseLots) * 100;
         }
@@ -118,7 +118,7 @@ namespace Solnet.Mango.Historical.Models
         /// <param name="latestShortFunding">The latest short funding.</param>
         /// <param name="perpMarket">The perp market.</param>
         /// <param name="oraclePrice">The oracle price.</param>
-        /// <returns>The fundin rate per hourly period.</returns>
+        /// <returns></returns>
         public static decimal CalculateFundingRate(decimal oldestLongFunding, decimal oldestShortFunding,
             decimal latestLongFunding, decimal latestShortFunding, decimal oraclePrice, PerpMarket perpMarket)
         {
