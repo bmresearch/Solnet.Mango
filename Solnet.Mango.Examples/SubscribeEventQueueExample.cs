@@ -93,8 +93,8 @@ namespace Solnet.Mango.Examples
                     switch (evt)
                     {
                         case FillEvent fill:
-                            var price = perpMarket.ParsedResult.PriceLotsToNumber(new(fill.Price), tokenInfo.Decimals, mangoGroup.ParsedResult.GetQuoteTokenInfo().Decimals);
-                            var size = perpMarket.ParsedResult.BaseLotsToNumber(fill.Quantity, tokenInfo.Decimals);
+                            var price = perpMarket.ParsedResult.NativePriceToUi(fill.Price, tokenInfo.Decimals, mangoGroup.ParsedResult.GetQuoteTokenInfo().Decimals);
+                            var size = perpMarket.ParsedResult.NativeQuantityToUi(fill.Quantity, tokenInfo.Decimals);
                             Console.WriteLine(
                                 $"{DateTime.UnixEpoch.AddSeconds((long)fill.Timestamp)} - Fill - Maker: {fill.Maker} Taker: {fill.Taker} " +
                                 $"Size: {size} " +
@@ -106,8 +106,8 @@ namespace Solnet.Mango.Examples
                                 $"{DateTime.UnixEpoch.AddSeconds((long)outEvt.Timestamp)} - Out - Owner: {outEvt.Owner} Size: {outEvt.Quantity}");
                             break;
                         case LiquidateEvent liq:
-                            var lprice = perpMarket.ParsedResult.PriceLotsToNumber(liq.Price, tokenInfo.Decimals, mangoGroup.ParsedResult.GetQuoteTokenInfo().Decimals);
-                            var lsize = perpMarket.ParsedResult.BaseLotsToNumber(liq.Quantity, tokenInfo.Decimals);
+                            var lprice = perpMarket.ParsedResult.NativePriceToUi(liq.Price.ToDecimal(), tokenInfo.Decimals, mangoGroup.ParsedResult.GetQuoteTokenInfo().Decimals);
+                            var lsize = perpMarket.ParsedResult.NativeQuantityToUi(liq.Quantity, tokenInfo.Decimals);
                             Console.WriteLine(
                                 $"{DateTime.UnixEpoch.AddSeconds((long)liq.Timestamp)} - Liquidation - Victor: {liq.Liquidator} Victim: {liq.Liquidated} Price: {lprice} Size {lsize}");
                             break;

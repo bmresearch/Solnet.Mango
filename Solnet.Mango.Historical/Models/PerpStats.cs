@@ -62,7 +62,7 @@ namespace Solnet.Mango.Historical.Models
             var fundingDiff = endFunding - startFunding;
 
             var fundingInQuoteDecimals = fundingDiff / (decimal) Math.Pow(10, quoteDecimals);
-            var basePriceInBaseLots = oraclePrice * perpMarket.BaseLotsToNumber(1m, baseDecimals);
+            var basePriceInBaseLots = oraclePrice * perpMarket.NativeQuantityToUi(1m, baseDecimals);
 
             return (fundingInQuoteDecimals / basePriceInBaseLots) * 100;
         }
@@ -90,7 +90,7 @@ namespace Solnet.Mango.Historical.Models
             var avgPrice = (latestStat.BaseOraclePrice + oldestStat.BaseOraclePrice) / 2;
 
             var fundingInQuoteDecimals = fundingDiff / (decimal) Math.Pow(10, quoteDecimals);
-            var basePriceInBaseLots = avgPrice * perpMarket.BaseLotsToNumber(1m, baseDecimals);
+            var basePriceInBaseLots = avgPrice * perpMarket.NativeQuantityToUi(1m, baseDecimals);
 
             return (fundingInQuoteDecimals / basePriceInBaseLots) * 100;
         }

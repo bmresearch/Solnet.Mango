@@ -122,7 +122,7 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <returns>The adjusted PnL.</returns>
         public decimal GetProfitAndLoss(MangoGroup mangoGroup, MangoCache mangoCache, PerpMarket market, I80F48 breakEvenPrice, int tokenIndex)
         {
-            return market.BaseLotsToNumber(BasePosition, mangoGroup.Tokens[tokenIndex].Decimals) * 
+            return market.NativeQuantityToUi(BasePosition, mangoGroup.Tokens[tokenIndex].Decimals) * 
                 (mangoGroup.GetPrice(mangoCache, tokenIndex) - breakEvenPrice).ToDecimal();
         }
 
@@ -168,7 +168,7 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="baseDecimals">The decimals of the base token.</param>
         /// <returns>The base position size for ui display.</returns>
         public decimal GetUiBasePosition(PerpMarket market, byte baseDecimals) =>
-            market.BaseLotsToNumber(BasePosition, baseDecimals);
+            market.NativeQuantityToUi(BasePosition, baseDecimals);
 
         /// <summary>
         /// Simulates the position health against the given base position change.
