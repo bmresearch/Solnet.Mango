@@ -87,8 +87,8 @@ namespace Solnet.Mango.Examples
                         var quoteToken = mangoGroup.GetQuoteTokenInfo();
                         var triggerPrice = MangoUtils.TriggerPriceToNumber(perpTrigger.TriggerPrice, baseToken.Decimals, quoteToken.Decimals);
 
-                        var price = mangoGroup.PerpMarketAccounts[perpTrigger.MarketIndex].PriceLotsToNumber(new(perpTrigger.Price), baseToken.Decimals, quoteToken.Decimals);
-                        var size = mangoGroup.PerpMarketAccounts[perpTrigger.MarketIndex].BaseLotsToNumber(perpTrigger.Quantity, baseToken.Decimals);
+                        var price = mangoGroup.PerpMarketAccounts[perpTrigger.MarketIndex].NativePriceToUi(new(perpTrigger.Price), baseToken.Decimals, quoteToken.Decimals);
+                        var size = mangoGroup.PerpMarketAccounts[perpTrigger.MarketIndex].NativeQuantityToUi(perpTrigger.Quantity, baseToken.Decimals);
 
                         var msg = $"If Price {perpTrigger.TriggerCondition} {triggerPrice:N4} {perpTrigger.OrderType} {perpTrigger.Side} {size:N4} AT {price:N4} ";
 

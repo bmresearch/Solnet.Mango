@@ -128,14 +128,14 @@ namespace Solnet.Mango.Examples
                             // TODO: this is inaccurate, change this and write a method which receives the perpStats to properly calculate funding
                             var funding = (cache.PerpetualMarketCaches[i].LongFunding + cache.PerpetualMarketCaches[i].ShortFunding);
                             var fundingInQuoteDecimals = funding / new I80F48(Math.Pow(10, mangoGroup.GetQuoteTokenInfo().Decimals));
-                            var basePriceInBaseLots = cache.PriceCaches[i].Price * new I80F48(mangoGroup.PerpMarketAccounts[i].BaseLotsToNumber(1m, mangoGroup.Tokens[i].Decimals));
+                            var basePriceInBaseLots = cache.PriceCaches[i].Price * new I80F48(mangoGroup.PerpMarketAccounts[i].NativeQuantityToUi(1m, mangoGroup.Tokens[i].Decimals));
 
                             log += 
                                 $"| {tokenNames[i] + "-PERP",-15} |" +
                                 $" {mangoGroup.PerpetualMarkets[i].Market.Key[..10],-10} |" +
                                 $" {cache.PerpetualMarketCaches[i].LongFunding.ToDecimal(),-15:N4} |" +
                                 $" {cache.PerpetualMarketCaches[i].ShortFunding.ToDecimal(),-15:N4} |" +
-                                $" {mangoGroup.PerpMarketAccounts[i].BaseLotsToNumber(mangoGroup.PerpMarketAccounts[i].OpenInterest, mangoGroup.Tokens[i].Decimals) / 2,-15:N4} |";
+                                $" {mangoGroup.PerpMarketAccounts[i].NativeQuantityToUi(mangoGroup.PerpMarketAccounts[i].OpenInterest, mangoGroup.Tokens[i].Decimals) / 2,-15:N4} |";
                         }
                         else
                         {
