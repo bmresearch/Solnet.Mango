@@ -72,16 +72,16 @@ namespace Solnet.Mango.Examples
                     {
                         for (int i = 9; i >= 0; i--)
                         {
-                            Console.WriteLine($"{name} Ask:\t{market.PriceLotsToNumber(new(askOrders[i].RawPrice), token.Decimals, quoteToken.Decimals)}" +
-                                $"\tSize:\t{market.BaseLotsToNumber(askOrders[i].RawQuantity, token.Decimals)}");
+                            Console.WriteLine($"{name} Ask:\t{market.NativePriceToUi(new(askOrders[i].RawPrice), token.Decimals, quoteToken.Decimals)}" +
+                                $"\tSize:\t{market.NativeQuantityToUi(askOrders[i].RawQuantity, token.Decimals)}");
                         }
                     }
                     Console.WriteLine($"-----------BIDS----------");
                     for (int i = 0; i < 10; i++)
                     {
                         Console.WriteLine(
-                                $"{name} Bid:\t{market.PriceLotsToNumber(new(bidOrders[i].RawPrice), token.Decimals, quoteToken.Decimals)}\t" +
-                                $"Size:\t{market.BaseLotsToNumber(bidOrders[i].RawQuantity, token.Decimals)}");
+                                $"{name} Bid:\t{market.NativePriceToUi(new(bidOrders[i].RawPrice), token.Decimals, quoteToken.Decimals)}\t" +
+                                $"Size:\t{market.NativeQuantityToUi(bidOrders[i].RawQuantity, token.Decimals)}");
                     }
                     Console.WriteLine($"-------------------------\n");
                     var bestBid = orderBook.GetBest();
@@ -102,8 +102,8 @@ namespace Solnet.Mango.Examples
                     Console.WriteLine($"----------ASKS-----------");
                     for (int i = 9; i >= 0; i--)
                     {
-                        Console.WriteLine($"{name} Ask:\t{market.PriceLotsToNumber(new(askOrders[i].RawPrice), token.Decimals, quoteToken.Decimals)}" +
-                            $"\tSize:\t{market.BaseLotsToNumber(askOrders[i].RawQuantity, token.Decimals)}");
+                        Console.WriteLine($"{name} Ask:\t{market.NativePriceToUi(new(askOrders[i].RawPrice), token.Decimals, quoteToken.Decimals)}" +
+                            $"\tSize:\t{market.NativeQuantityToUi(askOrders[i].RawQuantity, token.Decimals)}");
                     }
                     Console.WriteLine($"-----------BIDS----------");
                     if (exists)
@@ -111,8 +111,8 @@ namespace Solnet.Mango.Examples
                         for (int i = 0; i < 10; i++)
                         {
                             Console.WriteLine(
-                                $"{name} Bid:\t{market.PriceLotsToNumber(new(bidOrders[i].RawPrice), token.Decimals, quoteToken.Decimals)}\t" +
-                                $"Size:\t{market.BaseLotsToNumber(bidOrders[i].RawQuantity, token.Decimals)}");
+                                $"{name} Bid:\t{market.NativePriceToUi(new(bidOrders[i].RawPrice), token.Decimals, quoteToken.Decimals)}\t" +
+                                $"Size:\t{market.NativeQuantityToUi(bidOrders[i].RawQuantity, token.Decimals)}");
                         }
                     }
                     Console.WriteLine($"-------------------------\n");

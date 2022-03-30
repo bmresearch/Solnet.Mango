@@ -470,7 +470,8 @@ namespace Solnet.Mango.Examples
         {
             var blockhash = _rpcClient.GetRecentBlockHash();
 
-            var (nativePrice, nativeQuantity) = market.UiToNativePriceQuantity(price, size, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
+            var nativePrice = market.UiToNativePrice(price, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
+            var nativeQuantity = market.UiToNativeQuantity(size, baseTokenInfo.Decimals);
 
             var nativeTriggerPrice = MangoUtils.TriggerPriceToNative((decimal) triggerPrice, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
 
@@ -606,7 +607,8 @@ namespace Solnet.Mango.Examples
         {
             var blockhash = _rpcClient.GetRecentBlockHash();
 
-            var (nativePrice, nativeQuantity) = market.UiToNativePriceQuantity(price, size, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
+            var nativePrice = market.UiToNativePrice(price, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
+            var nativeQuantity = market.UiToNativeQuantity(size, baseTokenInfo.Decimals);
 
             TransactionBuilder txBuilder = new TransactionBuilder()
                 .SetFeePayer(_wallet.Account)
@@ -637,7 +639,8 @@ namespace Solnet.Mango.Examples
         {
             var blockhash = _rpcClient.GetRecentBlockHash();
 
-            var (nativePrice, nativeQuantity) = market.UiToNativePriceQuantity(price, size, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
+            var nativePrice = market.UiToNativePrice(price, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
+            var nativeQuantity = market.UiToNativeQuantity(size, baseTokenInfo.Decimals);
 
             var maxQuote = size * price;
 

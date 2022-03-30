@@ -189,31 +189,17 @@ namespace Solnet.Mango.Models.Perpetuals
         }
 
         /// <summary>
-        /// Converts the price lots quantity to a the native value.
-        /// </summary>
-        /// <param name="price">The price</param>
-        /// <returns>Convert price lots to the native value.</returns>
-        public long PriceLotsToNative(decimal price) => (long)(QuoteLotSize * price) / BaseLotSize;
-
-        /// <summary>
-        /// Converts the base lots quantity to a the native value.
-        /// </summary>
-        /// <param name="quantity">The quantity.</param>
-        /// <returns>Convert price lots to the native value.</returns>
-        public long BaseLotsToNative(decimal quantity) => (long)(BaseLotSize * quantity);
-
-        /// <summary>
         /// Converts the price lots quantity to a humanized number.
         /// </summary>
         /// <param name="price">The price</param>
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quoteDecimals">The quote decimals.</param>
         /// <returns>Convert price lots to humanized number.</returns>
-        public decimal PriceLotsToNumber(I80F48 price, byte baseDecimals, byte quoteDecimals)
+        public decimal NativePriceToUi(decimal price, byte baseDecimals, byte quoteDecimals)
         {
             decimal nativeToUi = (decimal) Math.Pow(10, baseDecimals - quoteDecimals);
             decimal lotsToNative = (decimal) QuoteLotSize / BaseLotSize;
-            return price.ToDecimal() * lotsToNative * nativeToUi;
+            return price * lotsToNative * nativeToUi;
         }
 
         /// <summary>
@@ -222,7 +208,7 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quantity">The quantity.</param>
         /// <returns>Converted base lots to humanized number.</returns>
-        public decimal BaseLotsToNumber(decimal quantity, byte baseDecimals)
+        public decimal NativeQuantityToUi(decimal quantity, byte baseDecimals)
             => (quantity * BaseLotSize) / (decimal) Math.Pow(10, baseDecimals);
 
         /// <summary>
@@ -230,7 +216,7 @@ namespace Solnet.Mango.Models.Perpetuals
         /// </summary>
         /// <param name="baseDecimals">The base decimals.</param>
         /// <returns>The minimum order size.</returns>
-        public decimal MinOrderSize(byte baseDecimals) => BaseLotsToNumber(1, baseDecimals);
+        public decimal MinOrderSize(byte baseDecimals) => NativeQuantityToUi(1, baseDecimals);
 
         /// <summary>
         /// The tick size.
@@ -238,25 +224,39 @@ namespace Solnet.Mango.Models.Perpetuals
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quoteDecimals">The quote decimals.</param>
         /// <returns>The tick size.</returns>
-        public decimal TickSize(byte baseDecimals, byte quoteDecimals) => PriceLotsToNumber(I80F48.One, baseDecimals, quoteDecimals);
+        public decimal TickSize(byte baseDecimals, byte quoteDecimals) 
+            => NativePriceToUi(I80F48.One.ToDecimal(), baseDecimals, quoteDecimals);
 
         /// <summary>
-        /// Conversion for order values.
+        /// Converts a ui quantity to native value.
+        /// </summary>
+        /// <param name="quantity">The quantity.</param>
+        /// <param name="baseDecimals">The base decimals.</param>
+        /// <returns>The price and quantity.</returns>
+        public long UiToNativeQuantity(double quantity, byte baseDecimals)
+        {
+            var baseUnit = Math.Pow(10, baseDecimals);
+
+            var nativeQuantity = (long)(quantity * baseUnit / BaseLotSize);
+
+            return nativeQuantity;
+        }        
+        
+        /// <summary>
+        /// Converts a ui price to native value.
         /// </summary>
         /// <param name="price">The price.</param>
-        /// <param name="quantity">The quantity.</param>
         /// <param name="baseDecimals">The base decimals.</param>
         /// <param name="quoteDecimals">The quote decimals.</param>
         /// <returns>The price and quantity.</returns>
-        public (long Price, long Quantity) UiToNativePriceQuantity(double price, double quantity, byte baseDecimals, byte quoteDecimals)
+        public long UiToNativePrice(double price, byte baseDecimals, byte quoteDecimals)
         {
             var baseUnit = Math.Pow(10, baseDecimals);
             var quoteUnit = Math.Pow(10, quoteDecimals);
 
             var nativePrice = (long)(price * quoteUnit * BaseLotSize / (QuoteLotSize * baseUnit));
-            var nativeQuantity = (long)(quantity * baseUnit / BaseLotSize);
 
-            return (nativePrice, nativeQuantity);
+            return nativePrice;
         }
 
         /// <summary>

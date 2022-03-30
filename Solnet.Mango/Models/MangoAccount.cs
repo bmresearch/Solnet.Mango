@@ -933,12 +933,12 @@ namespace Solnet.Mango.Models
 
             if (basePosition > I80F48.Zero)
             {
-                deposits = new I80F48(market.BaseLotsToNumber(basePosition.ToDecimal(), decimals));
+                deposits = new I80F48(market.NativeQuantityToUi(basePosition.ToDecimal(), decimals));
                 uiDeposit = deposits * price;
             }
             else
             {
-                borrows = new I80F48(market.BaseLotsToNumber(basePosition.ToDecimal(), decimals)).Abs();
+                borrows = new I80F48(market.NativeQuantityToUi(basePosition.ToDecimal(), decimals)).Abs();
                 uiBorrow = borrows * price;
             }
 
