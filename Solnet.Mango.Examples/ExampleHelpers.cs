@@ -57,6 +57,20 @@ namespace Solnet.Mango.Examples
                 }
             }
 
+            Console.WriteLine($"- - - - - - ACCOUNT MARKET MARGINS - - - - - -");
+            Console.WriteLine($"- - - - - - - -  SPOT MARKETS  - - - - - - - -");
+            for (int i = 0; i< mangoGroup.SpotMarkets.Count; i++)
+            {
+                Console.WriteLine($"Market: {mangoGroup.SpotMarkets[i].Market} " + 
+                    $"Margin: {mangoAccount.GetUiMarketMarginAvailable(mangoGroup, mangoCache, i, MarketType.Spot).ToDecimal(),-25:N4}");
+            }
+            Console.WriteLine($"- - - - - - - -  PERP MARKETS  - - - - - - - -");
+            for (int i = 0; i< mangoGroup.PerpetualMarkets.Count; i++)
+            {
+                Console.WriteLine($"Market: {mangoGroup.PerpetualMarkets[i].Market} " +
+                    $"Margin {mangoAccount.GetUiMarketMarginAvailable(mangoGroup, mangoCache, i, MarketType.Perpetual).ToDecimal(),-25:N4}");
+            }
+
             Console.WriteLine($"- - - - - - ACCOUNT PERP POSITIONS - - - - - -");
             if (mangoGroup.PerpMarketAccounts.Count != 0)
             {

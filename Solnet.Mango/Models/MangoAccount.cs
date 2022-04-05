@@ -667,7 +667,7 @@ namespace Solnet.Mango.Models
         /// <returns>The available balance.</returns>
         public I80F48 GetUiAvailableBalance(MangoGroup mangoGroup, MangoCache mangoCache, int tokenIndex) =>
             MangoUtils.HumanizeNative(GetAvailableBalance(mangoGroup, mangoCache, tokenIndex),
-                mangoGroup.GetQuoteTokenInfo().Decimals);
+                mangoGroup.Tokens[tokenIndex].Decimals);
 
         /// <summary>
         /// Gets the account's available balance.
@@ -884,8 +884,7 @@ namespace Solnet.Mango.Models
                 //shouldn't happen
                 return health;
             }
-
-            return health / (I80F48.Zero - weight);
+            return health / (I80F48.One - weight);
         }
 
         /// <summary>
