@@ -2,8 +2,8 @@
          xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
         <Product>Solnet.Mango</Product>
-        <Version>5.0.4</Version>
-        <Copyright>Copyright 2021 &#169; blockmountain</Copyright>
+        <Version>5.0.4.1</Version>
+        <Copyright>Copyright 2022 &#169; blockmountain</Copyright>
         <Authors>blockmountain</Authors>
         <PublisherName>blockmountain</PublisherName>
         <RepositoryUrl>https://github.com/bmresearch/Solnet.Mango</RepositoryUrl>
@@ -12,7 +12,7 @@
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <PackageIcon>icon.png</PackageIcon>
         <PackageDescription>Solnet.Mango is a .Net integration library for Mango Markets.</PackageDescription>
-        <PackageTags>solana;solnet;sol;srm;mango;net5</PackageTags>
+        <PackageTags>solana;solnet;sol;srm;mango;net5;net6</PackageTags>
         <PackageReleaseNotes>https://github.com/bmresearch/Solnet.Mango/releases</PackageReleaseNotes>
         <RepositoryType>git</RepositoryType>
     </PropertyGroup>

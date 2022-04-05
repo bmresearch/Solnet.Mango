@@ -12,7 +12,7 @@ namespace Solnet.Mango.Examples
 {
     public class GetMangoAccountExample : IRunnableExample
     {
-        private static readonly PublicKey Owner = new("hoakwpFB8UoLnPpLC56gsjpY7XbVwaCuRQRMQzN5TVh");
+        private static readonly PublicKey Owner = new("FuYyAigRhCtPwBnh1smZCfS66q3PaC2o3bRU1rJAsax1");
         private static readonly IRpcClient RpcClient = Solnet.Rpc.ClientFactory.GetClient("https://mango.devnet.rpcpool.com");
 
         private static readonly IStreamingRpcClient StreamingRpcClient =
