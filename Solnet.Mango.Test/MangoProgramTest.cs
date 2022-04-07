@@ -1234,5 +1234,34 @@ namespace Solnet.Mango.Test
             CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
             CollectionAssert.AreEqual(expectedData, ix.Data);
         }
+
+        [TestMethod]
+        public void ConsumeEvents()
+        {
+            var mango = MangoProgram.CreateDevNet();
+
+            Assert.AreEqual(MangoProgram.DevNetProgramIdKeyV3, mango.ProgramIdKey);
+            Assert.AreEqual("Mango Program V3", mango.ProgramName);
+
+            var ix = mango.ConsumeEvents(
+                Constants.DevNetMangoGroup,
+                new("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z"),
+                new("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ"),
+                new("CZ5MCRvkN38d5pnZDDEEyMiED3drgDUVpEUjkuJq31Kf"),
+                new() { 
+                    new("DRUZRfLQtki4ZYvRXhi5yGmyqCf6iMfTzxtBpxo6rbHu"),
+                    new("2opNT9MrcECYKDJvdjbnpVwBPMCVZWEnwXaFWwxrTt47")
+                },
+                5
+                );
+
+            var expectedData = new byte[]
+            {
+                15, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0
+            };
+            Assert.AreEqual(6, ix.Keys.Count);
+            CollectionAssert.AreEqual(Encoders.Base58.DecodeData(MangoProgram.DevNetProgramIdKeyV3), ix.ProgramId);
+            CollectionAssert.AreEqual(expectedData, ix.Data);
+        }
     }
 }

@@ -60,6 +60,8 @@ namespace Solnet.Mango.Test
 
         private const string CachePerpMarketsMessage = "AQAMDgpz5x/t0hNl7QruhPzk4rIGR/001ey9oRXwI9JjP4d4c1enabCRStasrnNU4+aP4LPFLTp9LFYZTQ1yFH/LwMXKISAtTF7lMdQarmxDZG/wXw1EdsMrRmiMvKrmbhkiIXjmD9Cm9pxjA0V3jNSfhZcDaSKo3TdVWp4N4jAcICio1Dfq6oDX+7E8swT9S47u4rUmtWiSa/yjP7qyLDe22rNy2P8ujDG2hZLLFzzZ3QQihbcp2YUOpJ8CLDb/Fyngez12ZVMpJhlqD47TWnCctxXVruve7prRxjzHuvAxOMdlkDs0zUN3a454cyB+IB171YmH83sBQAY3bIfxbx9KRJdx0qkazg97nI9w7cmzViiqP13B12zWrb9AwRhr6JDADNgCBOiBsuZSQARUrHosRL5hnB2v+E6WMImAuSY1ocJFsOYT4v0lQPWsb9KqgHtbiZYz31QQXjeR4dCXGzyCdn4iv2ankLYKNmVWaMwajrpBWVH9lWddOclAwvuwb4QrRNt1WMk7ofzOyMAbRfYgnsusySlwFHOOAyUdYrjO35u1OZMOJt0U5a2NVNUw6Kjx6YeEkKVh4MFOTQzsfKW1LjH5oGChVGK2boNZDkICsHZSSy7Xotf9tXMNZ0KBK80P7QENDAIBAwQFBgcICQoLDAQQAAAA";
 
+        private const string PlacePerpOrderAndConsumeEventsMessage = "AQAFC91590DVJoFZSFrFIicQh2xb2Ott/4068eWO5VhGFNRaIgUvU47Gi8zf2AzsMUc9vSSGjFoZfkoLS7PIX/Ax+4I9dmVTKSYZag+O01pwnLcV1a7r3u6a0cY8x7rwMTjHZV1bU5cbj2puO4JDHMAiUZ9jWoNO+IbWCyIipn8n0f5zOHSa70IivD53UX4zgb7JC7c7a12AKmjrw3J2+hatSEerqA8Cp4Gf1w/c3bseRn5Vhg+dYleVYrleQsgDaFd3qsohIC1MXuUx1BqubENkb/BfDUR2wytGaIy8quZuGSIhc1enabCRStasrnNU4+aP4LPFLTp9LFYZTQ1yFH/LwMUAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPYfgOcqnAqyMJTex8vA8eyrSAdiNXeZsVKGYCAL/OnUOZMOJt0U5a2NVNUw6Kjx6YeEkKVh4MFOTQzsfKW1LjE1p6i0Xqz5JBKNVkGY9Cvwf2gP19UJeMemaFyGzXCGfAIKFwYBAAcCAwQFCAgICQgICAgICAgICAgIHwwAAADAKwAAAAAAAI8CAAAAAAAAAQAAAAAAAAABAwEKBQYHAgUBDA8AAAABAAAAAAAAAA==";
+
         [ClassInitialize]
         public static void Setup(TestContext tc)
         {
@@ -751,6 +753,25 @@ namespace Solnet.Mango.Test
             Assert.AreEqual("98wPi7vBkiJ1sXLPipQEjrgHYcMBcNUsg9avTyWUi26j", ix[0].Values.GetValueOrDefault("Perp Market 1").ToString());
             Assert.AreEqual("8fKNzMe22bZ6H9TP8KpyM8B6b6DhZQyNmodChvQRbV8P", ix[0].Values.GetValueOrDefault("Perp Market 6").ToString());
             Assert.AreEqual("Fmg4wXV9hYUNjAYeLX1gDBSC3ucKcYJGrZQus64n9h9N", ix[0].Values.GetValueOrDefault("Perp Market 10").ToString());
+        }
+
+        [TestMethod]
+        public void PlacePerpOrderAndConsumeEvents()
+        {
+            Message msg = Message.Deserialize(Convert.FromBase64String(PlacePerpOrderAndConsumeEventsMessage));
+            List<DecodedInstruction> ix =
+                InstructionDecoder.DecodeInstructions(msg);
+
+            Assert.AreEqual(2, ix.Count);
+            Assert.AreEqual("Mango Program V3", ix[1].ProgramName);
+            Assert.AreEqual("Consume Events", ix[1].InstructionName);
+            Assert.AreEqual(0, ix[1].InnerInstructions.Count);
+            Assert.AreEqual("Ec2enZyoC4nGpEfu2sUNAa2nUGJHWxoUWYSEJ2hNTWTA", ix[1].Values.GetValueOrDefault("Mango Group").ToString());
+            Assert.AreEqual("8mFQbdXsFXt3R3cu3oSNS3bDZRwJRP18vyzd9J278J9z", ix[1].Values.GetValueOrDefault("Mango Cache").ToString());
+            Assert.AreEqual("58vac8i9QXStG1hpaa4ouwE1X7ngeDjY9oY7R15hcbKJ", ix[1].Values.GetValueOrDefault("Perpetual Market").ToString());
+            Assert.AreEqual("CZ5MCRvkN38d5pnZDDEEyMiED3drgDUVpEUjkuJq31Kf", ix[1].Values.GetValueOrDefault("Event Queue").ToString());
+            Assert.AreEqual("3HoSwYU79YNEtEoFyw1eu8ga3qxtY1PDPuGqbMdqgPfw", ix[1].Values.GetValueOrDefault("Mango Account 1").ToString());
+            Assert.AreEqual("1", ix[1].Values.GetValueOrDefault("Limit").ToString());
         }
     }
 }

@@ -11,6 +11,11 @@ namespace Solnet.Mango
         internal const int MethodOffset = 0;
 
         /// <summary>
+        /// The offset at which to write the limit amount for the <see cref="MangoProgramInstructions.Values.ConsumeEvents"/> instruction.
+        /// </summary>
+        internal const int ConsumeEventsLimitOffset = 4;
+
+        /// <summary>
         /// The offset at which to write the quantity amount for the <see cref="MangoProgramInstructions.Values.Deposit"/> instruction.
         /// </summary>
         internal const int DepositQuantityOffset = 4;
