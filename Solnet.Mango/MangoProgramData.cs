@@ -17,6 +17,38 @@ namespace Solnet.Mango
     /// </summary>
     internal static class MangoProgramData
     {
+        /// <summary>
+        /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.CachePrices"/> method.
+        /// </summary>
+        /// <param name="limit">The maximum number of iterations in the event queue loop.</param>
+        /// <returns>The encoded data.</returns>
+        internal static byte[] EncodeConsumeEventsData(ulong limit)
+        {
+            byte[] data = new byte[12];
+            data.WriteU32((uint)MangoProgramInstructions.Values.ConsumeEvents, MangoProgramLayouts.MethodOffset);
+            data.WriteU64(limit, MangoProgramLayouts.ConsumeEventsLimitOffset);
+            return data;
+        }
+        /// <summary>
+        /// Decodes the instruction instruction data  for the <see cref="MangoProgramInstructions.Values.Deposit"/> method
+        /// </summary>
+        /// <param name="decodedInstruction">The decoded instruction to add data to.</param>
+        /// <param name="data">The instruction data to decode.</param>
+        /// <param name="keys">The account keys present in the transaction.</param>
+        /// <param name="keyIndices">The indices of the account keys for the instruction as they appear in the transaction.</param>
+        internal static void DecodeConsumeEventsData(DecodedInstruction decodedInstruction, ReadOnlySpan<byte> data,
+            IList<PublicKey> keys, byte[] keyIndices)
+        {
+            decodedInstruction.Values.Add("Mango Group", keys[keyIndices[0]]);
+            decodedInstruction.Values.Add("Mango Cache", keys[keyIndices[1]]);
+            decodedInstruction.Values.Add("Perpetual Market", keys[keyIndices[2]]);
+            decodedInstruction.Values.Add("Event Queue", keys[keyIndices[3]]);
+            for (int i = 4; i < keyIndices.Length; i++)
+            {
+                decodedInstruction.Values.Add($"Mango Account {i - 3}", keys[keyIndices[i]]);
+            }
+            decodedInstruction.Values.Add("Limit", data.GetU64(MangoProgramLayouts.ConsumeEventsLimitOffset));
+        }
 
         /// <summary>
         /// Encodes the <see cref="TransactionInstruction"/> data for the <see cref="MangoProgramInstructions.Values.CachePrices"/> method.

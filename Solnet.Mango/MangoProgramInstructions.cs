@@ -1,4 +1,5 @@
 using Solnet.Mango.Models;
+using Solnet.Mango.Models.Perpetuals;
 using Solnet.Serum.Models;
 using System.Collections.Generic;
 
@@ -28,6 +29,7 @@ namespace Solnet.Mango
             { Values.PlacePerpOrder, "Place Perp Order" },
             { Values.CancelPerpOrderByClientId, "Cancel Perp Order By Client Id" },
             { Values.CancelPerpOrder, "Cancel Perp Order" },
+            { Values.ConsumeEvents, "Consume Events" },
             { Values.CachePerpMarkets, "Cache Perp Markets" },
             { Values.UpdateFunding, "Update Funding" },
             { Values.SettleFunds, "Settle Funds" },
@@ -102,6 +104,11 @@ namespace Solnet.Mango
             /// Cancels a perp order.
             /// </summary>
             CancelPerpOrder = 14,
+
+            /// <summary>
+            /// Consumes events in a <see cref="PerpMarket"/>'s <see cref="EventQueue"/>.
+            /// </summary>
+            ConsumeEvents = 15,
 
             /// <summary>
             /// Caches the perp markets data.

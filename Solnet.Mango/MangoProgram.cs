@@ -853,6 +853,51 @@ namespace Solnet.Mango
         }
 
         /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.ConsumeEvents"/> method.
+        /// </summary>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="eventQueue">The perp market's event queue.</param>
+        /// <param name="mangoAccounts">The mango accounts to consume events for.</param>
+        /// <param name="limit">The maximum number of iterations in the event queue loop. Defaults to max possible value due to compute and memory limits.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public TransactionInstruction ConsumeEvents(PublicKey mangoGroup,
+            PublicKey mangoCache, PublicKey perpetualMarket, PublicKey eventQueue, List<PublicKey> mangoAccounts, ulong limit = 8)
+            => ConsumeEvents(ProgramIdKey, mangoGroup, mangoCache, perpetualMarket, eventQueue, mangoAccounts, limit);
+
+        /// <summary>
+        /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.ConsumeEvents"/> method.
+        /// </summary>
+        /// <param name="programIdKey">The program id key.</param>
+        /// <param name="mangoGroup">The mango group.</param>
+        /// <param name="mangoCache">The mango cache.</param>
+        /// <param name="perpetualMarket">The perp market.</param>
+        /// <param name="eventQueue">The perp market's event queue.</param>
+        /// <param name="mangoAccounts">The mango accounts to consume events for.</param>
+        /// <param name="limit">The maximum number of iterations in the event queue loop. Defaults to max possible value due to compute and memory limits.</param>
+        /// <returns>The <see cref="TransactionInstruction"/>.</returns>
+        public static TransactionInstruction ConsumeEvents(PublicKey programIdKey, PublicKey mangoGroup,
+            PublicKey mangoCache, PublicKey perpetualMarket, PublicKey eventQueue, List<PublicKey> mangoAccounts, ulong limit = 8)
+        {
+            List<AccountMeta> keys = new()
+            {
+                AccountMeta.ReadOnly(mangoGroup, false),
+                AccountMeta.ReadOnly(mangoCache, false),
+                AccountMeta.Writable(perpetualMarket, false),
+                AccountMeta.Writable(eventQueue, false),
+            };
+            keys.AddRange(mangoAccounts.Select(key => AccountMeta.Writable(key, false)));
+
+            return new TransactionInstruction
+            {
+                Keys = keys,
+                ProgramId = programIdKey,
+                Data = MangoProgramData.EncodeConsumeEventsData(limit)
+            };
+        }
+
+        /// <summary>
         /// Initialize a new <see cref="TransactionInstruction"/> for the <see cref="MangoProgramInstructions.Values.SettleFunds"/> method.
         /// </summary>
         /// <param name="mangoGroup">The mango group.</param>
@@ -1954,6 +1999,9 @@ namespace Solnet.Mango
                     break;
                 case MangoProgramInstructions.Values.CancelPerpOrder:
                     MangoProgramData.DecodeCancelPerpOrderData(decodedInstruction, data, keys, keyIndices);
+                    break;
+                case MangoProgramInstructions.Values.ConsumeEvents:
+                    MangoProgramData.DecodeConsumeEventsData(decodedInstruction, data, keys, keyIndices);
                     break;
                 case MangoProgramInstructions.Values.CachePerpMarkets:
                     MangoProgramData.DecodeCachePerpMarketsData(decodedInstruction, keys, keyIndices);
