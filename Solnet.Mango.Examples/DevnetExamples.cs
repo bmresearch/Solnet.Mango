@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging.Console;
 using Solnet.KeyStore;
 using Solnet.Mango.Models;
 using Solnet.Mango.Models.Banks;
+using Solnet.Mango.Models.Events;
 using Solnet.Mango.Models.Perpetuals;
 using Solnet.Programs;
 using Solnet.Programs.Models;
@@ -67,7 +68,7 @@ namespace Solnet.Mango.Examples
 
             // get the wallet
             var keyStore = new SolanaKeyStoreService();
-            _wallet = keyStore.RestoreKeystoreFromFile("C:\\Users\\warde\\hoakwp.json");
+            _wallet = keyStore.RestoreKeystoreFromFile("C:\\Users\\warde\\.config\\solana\\id.json");
 
         }
 
@@ -93,15 +94,15 @@ namespace Solnet.Mango.Examples
             var mangoAccount = _mangoClient.GetMangoAccount(mangoAccountAddress);
             mangoAccount.ParsedResult.LoadOpenOrdersAccounts(_rpcClient, _logger);
 
-            var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
+            //var advancedOrders = _mangoClient.GetAdvancedOrdersAccount(mangoAccount.ParsedResult.AdvancedOrdersAccount);
 
             /* 
              * Example transaction submissions 
              * 
              */
-            ExampleHelpers.LogAccountStatus(mangoGroup.ParsedResult, mangoCache.ParsedResult, mangoAccount.ParsedResult, advancedOrders.ParsedResult);
+            ExampleHelpers.LogAccountStatus(mangoGroup.ParsedResult, mangoCache.ParsedResult, mangoAccount.ParsedResult);
 
-            var msg = BuyWithTimeInForceSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
+            //var msg = BuyWithTimeInForceSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
 
             // create account, add account info and set it's referral
             //var msg = CreateMangoAccountAddInfoAndSetReferral(mangoAccountAddress, "Mango Sharp Ref Test", "Mango Sharp");
@@ -116,8 +117,15 @@ namespace Solnet.Mango.Examples
             //var msg = SetTriggerOrderSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
 
             // close LONG on SOL-PERP
-            // var msg = ClosePositionSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
+            var msg = ClosePositionSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
 
+            ExampleHelpers.DecodeAndLogMessage(msg);
+
+            Console.ReadLine();
+            var txBytes = SignAndAssembleTx(msg);
+
+            Console.ReadLine();
+            var sig = ExampleHelpers.SubmitTxSendAndLog(_rpcClient, txBytes);
             // settle perp fees
             // var msg = SettleFeesSOLPERP(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress);
 
@@ -129,14 +137,58 @@ namespace Solnet.Mango.Examples
             // withdraw from an account
             //var msg = Withdraw(mangoGroup.ParsedResult, mangoAccount.ParsedResult, mangoAccountAddress, new("8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN"), 2500);
 
+            msg = ConsumeEvents(mangoGroup.ParsedResult);
+
             ExampleHelpers.DecodeAndLogMessage(msg);
 
             Console.ReadLine();
-            var txBytes = SignAndAssembleTx(msg);
+            txBytes = SignAndAssembleTx(msg);
 
             Console.ReadLine();
-            var sig = ExampleHelpers.SubmitTxSendAndLog(_rpcClient, txBytes);
+            sig = ExampleHelpers.SubmitTxSendAndLog(_rpcClient, txBytes);
             ExampleHelpers.PollTx(_rpcClient, sig, Commitment.Confirmed).Wait();
+        }
+
+        private byte[] ConsumeEvents(MangoGroup mangoGroup)
+        {
+            var perpMarketConfig = mangoGroup.Config.PerpMarkets.First(x => x.Name == "SOL-PERP");
+
+            var perpMarket = _mangoClient.GetPerpMarket(perpMarketConfig.PublicKey);
+
+            var accounts = new List<PublicKey>();
+
+            while (true)
+            {
+                var eq = _mangoClient.GetEventQueue(perpMarket.ParsedResult.EventQueue, Commitment.Processed);
+
+                var unconsumedEvts = eq.ParsedResult.GetUnconsumedEvents();
+                if(unconsumedEvts.Count == 0)
+                {
+                    Task.Delay(1000).Wait();
+                    continue;
+                }
+                Console.WriteLine($"Found {unconsumedEvts.Count} unconsumed events.");
+
+
+                foreach (var evt in unconsumedEvts)
+                {
+                    if (evt is FillEvent fill)
+                    {
+                        accounts.Add(fill.Maker);
+                        accounts.Add(fill.Taker);
+                    }
+                    else if (evt is OutEvent outEvent)
+                    {
+                        accounts.Add(outEvent.Owner);
+                    }
+
+                    if (accounts.Count > 10) break;
+                }
+
+                break;
+            }
+
+            return ConsumeEventsIx(mangoGroup, mangoGroup.PerpetualMarkets[perpMarketConfig.MarketIndex].Market, perpMarket.ParsedResult.EventQueue, accounts);
         }
 
         private byte[] CancelSellSpotOrderSOLUSDC(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress)
@@ -183,8 +235,8 @@ namespace Solnet.Mango.Examples
             var market = _mangoClient.GetPerpMarket(mangoGroup.PerpetualMarkets[tokenIndex].Market);
 
             return PlacePerpOrder(mangoGroup, mangoAccount, mangoAccountAddress, wrappedSolTokenInfo, quoteTokenInfo,
-                market.ParsedResult, mangoGroup.PerpetualMarkets[tokenIndex].Market, Side.Sell, PerpOrderType.ImmediateOrCancel,
-                (float)mangoAccount.PerpetualAccounts[tokenIndex].GetUiBasePosition(market.ParsedResult, wrappedSolTokenInfo.Decimals), 105, true);
+                market.ParsedResult, mangoGroup.PerpetualMarkets[tokenIndex].Market, Side.Sell, PerpOrderType.Market,
+                (float)mangoAccount.PerpetualAccounts[tokenIndex].GetUiBasePosition(market.ParsedResult, wrappedSolTokenInfo.Decimals) / 2, 112, true);
         }
 
         private byte[] SetTriggerOrderSOLPERP(MangoGroup mangoGroup, MangoAccount mangoAccount, PublicKey mangoAccountAddress)
@@ -605,7 +657,7 @@ namespace Solnet.Mango.Examples
             TokenInfo baseTokenInfo, TokenInfo quoteTokenInfo, PerpMarket market, PublicKey perpMarket, Side side,
             PerpOrderType perpOrderType, float size, float price, bool reduceOnly, ulong clientOrderId = 1UL)
         {
-            var blockhash = _rpcClient.GetRecentBlockHash();
+            var blockhash = _rpcClient.GetLatestBlockHash();
 
             var nativePrice = market.UiToNativePrice(price, baseTokenInfo.Decimals, quoteTokenInfo.Decimals);
             var nativeQuantity = market.UiToNativeQuantity(size, baseTokenInfo.Decimals);
@@ -628,7 +680,15 @@ namespace Solnet.Mango.Examples
                     nativePrice,
                     nativeQuantity,
                     clientOrderId,
-                    reduceOnly));
+                    reduceOnly))
+                .AddInstruction(_mango.ConsumeEvents(
+                    Constants.DevNetMangoGroup,
+                    mangoGroup.MangoCache,
+                    perpMarket,
+                    market.EventQueue,
+                    new List<PublicKey>() { mangoAccountAddress },
+                    5 // this value is the maximum number of iterations in the event queue processor loop, 8 is the absolute maximum due to compute and memory limits
+                    ));
 
             return txBuilder.CompileMessage();
         }
@@ -671,6 +731,25 @@ namespace Solnet.Mango.Examples
                     maxQuoteQuantity,
                     reduceOnly,
                     referrerMangoAccount
+                    ));
+
+            return txBuilder.CompileMessage();
+        }
+
+        private byte[] ConsumeEventsIx(MangoGroup mangoGroup, PublicKey perpMarket, PublicKey eventQueue, List<PublicKey> mangoAccounts)
+        {
+            var blockhash = _rpcClient.GetLatestBlockHash();
+
+            var txBuilder = new TransactionBuilder()
+                .SetRecentBlockHash(blockhash.Result.Value.Blockhash)
+                .SetFeePayer(_wallet.Account)
+                .AddInstruction(_mango.ConsumeEvents(
+                    Constants.DevNetMangoGroup,
+                    mangoGroup.MangoCache,
+                    perpMarket,
+                    eventQueue,
+                    mangoAccounts,
+                    5 // this value is the maximum number of iterations in the event queue processor loop, 8 is the absolute maximum due to compute and memory limits
                     ));
 
             return txBuilder.CompileMessage();

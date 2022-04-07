@@ -22,6 +22,21 @@ namespace Solnet.Mango.Models.Events
         public IList<Event> Events;
 
         /// <summary>
+        /// Gets unconsumed events.
+        /// </summary>
+        /// <returns>A list of <see cref="Event"/>s.</returns>
+        public IList<Event> GetUnconsumedEvents()
+        {
+            var evts = new List<Event>();
+            for(int i = 0; i < (int) Header.Count; i++)
+            {
+                evts.Add(Events[((int) Header.Head + i) % Events.Count]);
+            }
+
+            return evts;
+        }
+
+        /// <summary>
         /// Deserialize a span of bytes into an <see cref="EventQueue"/> instance.
         /// </summary>
         /// <param name="data">The data to deserialize into the structure.</param>
