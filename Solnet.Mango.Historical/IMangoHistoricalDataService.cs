@@ -3,6 +3,7 @@ using BlockMountain.TradingView.Models;
 using Solnet.Mango.Historical.Models;
 using System;
 using System.Collections.Generic;
+using System.Net.WebSockets;
 using System.Threading.Tasks;
 
 namespace Solnet.Mango.Historical
@@ -12,6 +13,42 @@ namespace Solnet.Mango.Historical
     /// </summary>
     public interface IMangoHistoricalDataService
     {
+        /// <summary>
+        /// The web socket connection state.
+        /// </summary>
+        public WebSocketState State { get; }
+
+        /// <summary>
+        /// Subscribe to the feed of fill events.
+        /// </summary>
+        /// <param name="snapshotAction">An action that is called to receive the fills snapshot upon connection.</param>
+        /// <param name="eventAction">An action that is called whenever there is a new fill event.</param>
+        void SubscribeFills(Action<FillsSnapshot> snapshotAction, Action<FillsEvent> eventAction);
+
+        /// <summary>
+        /// Subscribe to the feed of fill events. This is an asynchronous operation.
+        /// </summary>
+        /// <param name="snapshotAction">An action that is called to receive the fills snapshot upon connection.</param>
+        /// <param name="eventAction">An action that is called whenever there is a new fill event.</param>
+        /// <returns>A^task which performs the action.</returns>
+        Task SubscribeFillsAsync(Action<FillsSnapshot> snapshotAction, Action<FillsEvent> eventAction);
+
+        /// <summary>
+        /// Disconnect from the web socket server.
+        /// </summary>
+        void Disconnect();
+
+        /// <summary>
+        /// Disconnect from the web socket server. This is an asynchronous operation.
+        /// </summary>
+        /// <returns>A^task which performs the action.</returns>
+        Task DisconnectAsync();
+
+        /// <summary>
+        /// An event raised whenever the web socket connection state changes.
+        /// </summary>
+        public event EventHandler<WebSocketState> ConnectionStateChanged;
+
         /// <summary>
         /// Gets the margin lending stats. This is an asynchronous operation.
         /// </summary>
@@ -123,6 +160,5 @@ namespace Solnet.Mango.Historical
 
         /// <inheritdoc cref="TradingViewProvider.GetSymbol(string)"/>
         TvSymbolInfo GetSymbol(string symbol);
-
     }
 }
