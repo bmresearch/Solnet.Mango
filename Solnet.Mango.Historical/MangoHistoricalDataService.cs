@@ -2,12 +2,17 @@
 using BlockMountain.TradingView.Models;
 using Microsoft.Extensions.Logging;
 using Solnet.Mango.Historical.Models;
+using Solnet.Mango.Models.Events;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Net.WebSockets;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Solnet.Mango.Historical
@@ -33,6 +38,11 @@ namespace Solnet.Mango.Historical
         private static readonly string EventHistoryApiCandlesBaseUrl = "https://event-history-api-candles.herokuapp.com/";
 
         /// <summary>
+        /// The base url for the mango fills service.
+        /// </summary>
+        private static readonly string MangoFillsBaseUrl = "ws://api.mngo.cloud:8080";
+
+        /// <summary>
         /// The logger.
         /// </summary>
         private readonly ILogger _logger;
@@ -46,6 +56,16 @@ namespace Solnet.Mango.Historical
         /// The http client.
         /// </summary>
         private HttpClient _httpClient;
+
+        /// <summary>
+        /// The websocket client.
+        /// </summary>
+        private ClientWebSocket _webSocket;
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private CancellationTokenSource _cancellationTokenSource;
 
         /// <summary>
         /// The json serializer options.
@@ -63,13 +83,16 @@ namespace Solnet.Mango.Historical
         /// <param name="config">The config.</param>
         /// <param name="logger">A logger instance.</param>
         /// <param name="httpClient">An http client.</param>
+        /// <param name="webSocket">A web socket client.</param>
         /// <param name="tradingViewProvider">A trading view provider.</param>
         public MangoHistoricalDataService(MangoHistoricalDataServiceConfig config, ILogger logger = null,
-            HttpClient httpClient = default, ITradingViewProvider tradingViewProvider = null)
+            HttpClient httpClient = default, ClientWebSocket webSocket = default, ITradingViewProvider tradingViewProvider = null)
         {
             _logger = logger;
             _config = config;
             _httpClient = httpClient ?? new HttpClient();
+            _webSocket = webSocket ?? new ClientWebSocket();
+            _cancellationTokenSource = new CancellationTokenSource();
             _jsonSerializerOptions = new JsonSerializerOptions()
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
@@ -265,6 +288,143 @@ namespace Solnet.Mango.Historical
             string data = await message.Content.ReadAsStringAsync();
             _logger?.LogInformation(new EventId(0, "REC"), $"Result: {data}");
             return JsonSerializer.Deserialize<T>(data, _jsonSerializerOptions);
+        }
+
+        /// <inheritdoc cref="IMangoHistoricalDataService.SubscribeFillsAsync"/>
+        public void SubscribeFills(Action<FillsSnapshot> snapshotAction, Action<FillsEvent> eventAction) 
+            => SubscribeFillsAsync(snapshotAction, eventAction).Wait();
+
+        /// <inheritdoc cref="IMangoHistoricalDataService.SubscribeFillsAsync"/>
+        public async Task SubscribeFillsAsync(Action<FillsSnapshot> snapshotAction, Action<FillsEvent> eventAction)
+        {
+            await _webSocket.ConnectAsync(new Uri(MangoFillsBaseUrl), _cancellationTokenSource.Token);
+            ConnectionStateChanged?.Invoke(this, State);
+
+            Memory<byte> data;
+
+            while(_webSocket.State == WebSocketState.Open)
+            {
+                try
+                {
+                    data = await ReadMessage(_cancellationTokenSource.Token);
+
+                    Console.WriteLine($"{Encoding.UTF8.GetString(data.ToArray())}");
+                    var t = HandleMessage(data);
+
+                    if (t == -1) continue;
+
+                    switch (t)
+                    {
+                        case 0:
+                            var snapshot = JsonSerializer.Deserialize<FillsSnapshot>(data.Span, _jsonSerializerOptions);
+                            snapshot.DecodedEvents = new(snapshot.Events.Count);
+                            foreach(var e in snapshot.Events)
+                            {
+                                snapshot.DecodedEvents.Add(FillEvent.Deserialize(Convert.FromBase64String(e)));
+                            }
+                            snapshotAction(snapshot);
+                            break;
+                        case 1:
+                            var evt = JsonSerializer.Deserialize<FillsEvent>(data.Span, _jsonSerializerOptions);
+                            evt.DecodedEvent = FillEvent.Deserialize(Convert.FromBase64String(evt.Event));
+                            eventAction(evt);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    _logger?.LogDebug(new EventId(), e, "Exception trying to read next message.");
+                }
+            }
+            _logger?.LogDebug(new EventId(), $"Stopped reading messages. Web Socket State changed to {_webSocket.State}");
+            ConnectionStateChanged?.Invoke(this, State);
+        }
+
+        /// <inheritdoc cref="IMangoHistoricalDataService.UnsubscribeFills"/>
+        public void UnsubscribeFills() => UnsubscribeFillsAsync().Wait();
+
+        /// <inheritdoc cref="IMangoHistoricalDataService.UnsubscribeFillsAsync"/>
+        public async Task UnsubscribeFillsAsync()
+        {
+            await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "User requested closure.", _cancellationTokenSource.Token);
+            ConnectionStateChanged?.Invoke(this, State);
+        }
+
+        /// <inheritdoc cref="IMangoHistoricalDataService.ConnectionStateChanged"/>
+        public event EventHandler<WebSocketState> ConnectionStateChanged;
+
+        /// <inheritdoc cref="IMangoHistoricalDataService.State"/>
+        public WebSocketState State => _webSocket.State;
+
+        private async Task<Memory<byte>> ReadMessage(CancellationToken cancellationToken = default)
+        {
+            var buffer = new byte[32768];
+            Memory<byte> mem = new(buffer);
+            ValueWebSocketReceiveResult result = await _webSocket.ReceiveAsync(mem, cancellationToken).ConfigureAwait(false);
+            int count = result.Count;
+
+            if (result.MessageType == WebSocketMessageType.Close)
+            {
+                await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, string.Empty, cancellationToken);
+            }
+            else
+            {
+                if (!result.EndOfMessage)
+                {
+                    MemoryStream ms = new ();
+                    ms.Write(mem.Span);
+
+
+                    while (!result.EndOfMessage)
+                    {
+                        result = await _webSocket.ReceiveAsync(mem, cancellationToken).ConfigureAwait(false);
+                        ms.Write(mem[..result.Count].Span);
+                        count += result.Count;
+                    }
+
+                    mem = new Memory<byte>(ms.ToArray());
+                }
+                else
+                {
+                    mem = mem[..count];
+                }
+
+                return mem;
+            }
+
+            return null;
+        }
+
+        private int HandleMessage(Memory<byte> data)
+        {
+            Utf8JsonReader jsonReader = new Utf8JsonReader(data.Span);
+            jsonReader.Read();
+
+            if (_logger?.IsEnabled(LogLevel.Information) ?? false)
+            {
+                var str = Encoding.UTF8.GetString(data.Span);
+                _logger?.LogInformation($"[Received] {str}");
+            }
+
+            while (jsonReader.Read())
+            {
+                switch (jsonReader.TokenType)
+                {
+                    case JsonTokenType.PropertyName:
+                        var prop = jsonReader.GetString();
+                        if (prop == "events")
+                        {
+                            return 0;
+                        }
+                        else if(prop == "event")
+                        {
+                            return 1;
+                        }
+                        break;
+                }
+            } 
+
+            return -1;
         }
     }
 }
