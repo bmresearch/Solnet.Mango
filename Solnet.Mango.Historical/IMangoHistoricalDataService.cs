@@ -30,19 +30,19 @@ namespace Solnet.Mango.Historical
         /// </summary>
         /// <param name="snapshotAction">An action that is called to receive the fills snapshot upon connection.</param>
         /// <param name="eventAction">An action that is called whenever there is a new fill event.</param>
-        /// <returns>A^task which performs the action.</returns>
+        /// <returns>A task which performs the action.</returns>
         Task SubscribeFillsAsync(Action<FillsSnapshot> snapshotAction, Action<FillsEvent> eventAction);
 
         /// <summary>
-        /// Disconnect from the web socket server.
+        /// Unsubscribes to the feed of fill events and disconnects from the web socket server.
         /// </summary>
-        void Disconnect();
+        void UnsubscribeFills();
 
         /// <summary>
-        /// Disconnect from the web socket server. This is an asynchronous operation.
+        /// Unsubscribes to the feed of fill events and disconnects from the web socket server. This is an asynchronous operation.
         /// </summary>
-        /// <returns>A^task which performs the action.</returns>
-        Task DisconnectAsync();
+        /// <returns>A task which performs the action.</returns>
+        Task UnsubscribeFillsAsync();
 
         /// <summary>
         /// An event raised whenever the web socket connection state changes.

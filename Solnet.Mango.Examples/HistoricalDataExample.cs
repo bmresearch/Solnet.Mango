@@ -56,21 +56,19 @@ namespace Solnet.Mango.Examples
             _mangoHistoricalDataService.SubscribeFillsAsync(
                 (snapshot) =>
             {
-                foreach (var evt in snapshot.Events)
+                foreach (var evt in snapshot.DecodedEvents)
                 {
-                    var fill = FillEvent.Deserialize(Convert.FromBase64String(evt));
-                    Console.WriteLine($"{snapshot.Market} - {fill.Price} {fill.Quantity}");
+                    Console.WriteLine($"{snapshot.Market} - {evt.Price} {evt.Quantity}");
                 }
             }, (evt) =>
             {
-                var fill = FillEvent.Deserialize(Convert.FromBase64String(evt.Event));
-                Console.WriteLine($"{evt.Market} - {fill.Price} {fill.Quantity}");
+                Console.WriteLine($"{evt.Market} - {evt.DecodedEvent.Price} {evt.DecodedEvent.Quantity}");
             });
 
 
             Task.Delay(60_000).Wait();
 
-            _mangoHistoricalDataService.Disconnect();
+            _mangoHistoricalDataService.UnsubscribeFills();
 
             Console.ReadLine();
         }

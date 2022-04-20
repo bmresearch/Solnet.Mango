@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Solnet.Mango.Models.Events;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,6 +17,11 @@ namespace Solnet.Mango.Historical.Models
         /// The event.
         /// </summary>
         public string Event { get; set; }
+
+        /// <summary>
+        /// The decoded event.
+        /// </summary>
+        public FillEvent DecodedEvent { get; set; }
 
         /// <summary>
         /// The market name.

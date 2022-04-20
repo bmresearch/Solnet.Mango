@@ -2,6 +2,7 @@
 using BlockMountain.TradingView.Models;
 using Microsoft.Extensions.Logging;
 using Solnet.Mango.Historical.Models;
+using Solnet.Mango.Models.Events;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -316,10 +317,16 @@ namespace Solnet.Mango.Historical
                     {
                         case 0:
                             var snapshot = JsonSerializer.Deserialize<FillsSnapshot>(data.Span, _jsonSerializerOptions);
+                            snapshot.DecodedEvents = new(snapshot.Events.Count);
+                            foreach(var e in snapshot.Events)
+                            {
+                                snapshot.DecodedEvents.Add(FillEvent.Deserialize(Convert.FromBase64String(e)));
+                            }
                             snapshotAction(snapshot);
                             break;
                         case 1:
                             var evt = JsonSerializer.Deserialize<FillsEvent>(data.Span, _jsonSerializerOptions);
+                            evt.DecodedEvent = FillEvent.Deserialize(Convert.FromBase64String(evt.Event));
                             eventAction(evt);
                             break;
                     }
@@ -333,11 +340,11 @@ namespace Solnet.Mango.Historical
             ConnectionStateChanged?.Invoke(this, State);
         }
 
-        /// <inheritdoc cref="IMangoHistoricalDataService.Disconnect"/>
-        public void Disconnect() => DisconnectAsync().Wait();
+        /// <inheritdoc cref="IMangoHistoricalDataService.UnsubscribeFills"/>
+        public void UnsubscribeFills() => UnsubscribeFillsAsync().Wait();
 
-        /// <inheritdoc cref="IMangoHistoricalDataService.DisconnectAsync"/>
-        public async Task DisconnectAsync()
+        /// <inheritdoc cref="IMangoHistoricalDataService.UnsubscribeFillsAsync"/>
+        public async Task UnsubscribeFillsAsync()
         {
             await _webSocket.CloseAsync(WebSocketCloseStatus.NormalClosure, "User requested closure.", _cancellationTokenSource.Token);
             ConnectionStateChanged?.Invoke(this, State);

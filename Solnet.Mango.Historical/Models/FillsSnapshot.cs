@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Solnet.Mango.Models.Events;
+using System.Collections.Generic;
 
 namespace Solnet.Mango.Historical.Models
 {
@@ -12,6 +13,11 @@ namespace Solnet.Mango.Historical.Models
         /// The list of events in the snapshot.
         /// </summary>
         public List<string> Events { get; set; }
+
+        /// <summary>
+        /// The decoded events.
+        /// </summary>
+        public List<FillEvent> DecodedEvents { get; set; }
 
         /// <summary>
         /// The market of the snapshot.
