@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Solnet.Mango.Historical;
+using Solnet.Mango.Models.Events;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,7 +29,7 @@ namespace Solnet.Mango.Examples
                 .SetMinimumLevel(LogLevel.Debug);
             }).CreateLogger<IMangoHistoricalDataService>();
 
-            _mangoHistoricalDataService = new MangoHistoricalDataService( new MangoHistoricalDataServiceConfig 
+            _mangoHistoricalDataService = new MangoHistoricalDataService(new MangoHistoricalDataServiceConfig
             {
                 MangoGroup = "mainnet.1",
             }, _logger);
@@ -36,20 +37,45 @@ namespace Solnet.Mango.Examples
 
         public void Run()
         {
-            var spotStats = _mangoHistoricalDataService.GetMarginLendingStats();
-            var perpStats = _mangoHistoricalDataService.GetPerpStats();
+            //var spotStats = _mangoHistoricalDataService.GetMarginLendingStats();
 
-            var fundingRate = _mangoHistoricalDataService.GetHistoricalFundingRates("SOL-PERP");
+            //var perpStats = _mangoHistoricalDataService.GetPerpStats();
 
-            var volumeInfo = _mangoHistoricalDataService.GetVolume("2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi");
+            //var fundingRate = _mangoHistoricalDataService.GetHistoricalFundingRates("SOL-PERP");
 
-            var recentTrades = _mangoHistoricalDataService.GetRecentTrades("2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi");
+            //var volumeInfo = _mangoHistoricalDataService.GetVolume("2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi");
 
-            var recentPerpTrades = _mangoHistoricalDataService.GetPerpTrades("CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG");
+            //var recentTrades = _mangoHistoricalDataService.GetRecentTrades("2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi");
 
-            var openOrders = _mangoHistoricalDataService.GetOpenOrders("DBZUDrcXEPNdLaNJZ973w1joCnsa1k4a8hUFVvgCuzGf");
+            //var recentPerpTrades = _mangoHistoricalDataService.GetPerpTrades("CGcrpkxyx92vjyQApsr1jTN6M5PeERKSEaH1zskzccRG");
+
+            //var openOrders = _mangoHistoricalDataService.GetOpenOrders("DBZUDrcXEPNdLaNJZ973w1joCnsa1k4a8hUFVvgCuzGf");
+
+            _mangoHistoricalDataService.ConnectionStateChanged += _mangoHistoricalDataService_ConnectionStateChanged;
+
+            _mangoHistoricalDataService.SubscribeFillsAsync(
+                (snapshot) =>
+            {
+                foreach (var evt in snapshot.DecodedEvents)
+                {
+                    Console.WriteLine($"{snapshot.Market} - {evt.Price} {evt.Quantity}");
+                }
+            }, (evt) =>
+            {
+                Console.WriteLine($"{evt.Market} - {evt.DecodedEvent.Price} {evt.DecodedEvent.Quantity}");
+            });
+
+
+            Task.Delay(60_000).Wait();
+
+            _mangoHistoricalDataService.UnsubscribeFills();
 
             Console.ReadLine();
+        }
+
+        private void _mangoHistoricalDataService_ConnectionStateChanged(object sender, System.Net.WebSockets.WebSocketState e)
+        {
+            _logger?.LogDebug(new EventId(), $"Web Socket State changed to {e}");
         }
     }
 }
