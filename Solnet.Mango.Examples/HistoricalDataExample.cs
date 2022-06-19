@@ -37,6 +37,9 @@ namespace Solnet.Mango.Examples
 
         public void Run()
         {
+            var now = DateTime.Now;
+            var ohlcv = _mangoHistoricalDataService.GetHistory(now.Subtract(TimeSpan.FromDays(30)), now, "SOL-PERP", "1D");
+
             //var spotStats = _mangoHistoricalDataService.GetMarginLendingStats();
 
             //var perpStats = _mangoHistoricalDataService.GetPerpStats();
