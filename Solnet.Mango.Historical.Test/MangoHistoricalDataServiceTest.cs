@@ -317,7 +317,7 @@ namespace Solnet.Mango.Historical.Test
         public void GetRecentTrades()
         {
             string responseData = File.ReadAllText("Resources/RecentTrades.json");
-            var url = EventHistoryApiCandlesBaseUrl + "trades/address/2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi";
+            var url = EventHistoryApiCandlesBaseUrl + "tv/trades/address/2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi";
             Mock<HttpMessageHandler> messageHandlerMock = SetupHttpClientTest(responseData, url);
 
             HttpClient httpClient = new(messageHandlerMock.Object)
@@ -341,7 +341,7 @@ namespace Solnet.Mango.Historical.Test
         public void GetRecentTradesUnsuccessful()
         {
             Mock<HttpMessageHandler> messageHandlerMock = SetupHttpClientUnsuccessfulTest();
-            var url = EventHistoryApiCandlesBaseUrl + "trades/address/2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi";
+            var url = EventHistoryApiCandlesBaseUrl + "tv/trades/address/2TgaaVoHgnSeEtXvWTx13zQeTf4hYWAMEiMQdcG6EwHi";
 
             HttpClient httpClient = new(messageHandlerMock.Object)
             {

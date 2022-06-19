@@ -13,12 +13,12 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Solnet.Programs" Version="5.0.5" />
-        <PackageReference Include="Solnet.Rpc" Version="5.0.5" />
-        <PackageReference Include="Solnet.Wallet" Version="5.0.5" />
-        <PackageReference Include="Solnet.KeyStore" Version="5.0.5" />
-		<PackageReference Include="Solnet.Pyth" Version="5.0.5" />
-        <PackageReference Include="Solnet.Serum" Version="5.0.5" />
+        <PackageReference Include="Solnet.Programs" Version="5.0.6" />
+        <PackageReference Include="Solnet.Rpc" Version="5.0.6" />
+        <PackageReference Include="Solnet.Wallet" Version="5.0.6" />
+        <PackageReference Include="Solnet.KeyStore" Version="5.0.6" />
+		<PackageReference Include="Solnet.Pyth" Version="5.0.6" />
+        <PackageReference Include="Solnet.Serum" Version="5.0.6" />
     </ItemGroup>
 
     <ItemGroup>

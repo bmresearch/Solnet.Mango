@@ -15,9 +15,9 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="Solnet.Rpc" Version="5.0.5" />
-        <PackageReference Include="Solnet.Wallet" Version="5.0.5" />
-        <PackageReference Include="Solnet.Serum" Version="5.0.5" />
+        <PackageReference Include="Solnet.Rpc" Version="5.0.6" />
+        <PackageReference Include="Solnet.Wallet" Version="5.0.6" />
+        <PackageReference Include="Solnet.Serum" Version="5.0.6" />
     </ItemGroup>
 
     <ItemGroup>
