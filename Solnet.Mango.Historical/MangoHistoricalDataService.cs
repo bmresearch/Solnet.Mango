@@ -35,7 +35,7 @@ namespace Solnet.Mango.Historical
         /// <summary>
         /// The base url for the candlestick data endpoints.
         /// </summary>
-        private static readonly string EventHistoryApiCandlesBaseUrl = "https://event-history-api-candles.herokuapp.com/";
+        private static readonly string EventHistoryApiCandlesBaseUrl = "https://event-history-api-candles.herokuapp.com/tv/";
 
         /// <summary>
         /// The base url for the mango fills service.
