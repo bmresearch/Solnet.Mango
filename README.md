@@ -97,10 +97,10 @@ separate repository so it is contained, as the goal for [Solnet](https://github.
 
 ## Dependencies
 - BlockMountain.TradingView v1.0.0
-- Solnet.Serum v6.0.12
-- Solnet.Wallet v6.0.12
-- Solnet.Rpc v6.0.12
-- Solnet.Programs v6.0.12
+- Solnet.Serum v6.0.13
+- Solnet.Wallet v6.0.13
+- Solnet.Rpc v6.0.13
+- Solnet.Programs v6.0.13
 
 ## Examples
 
